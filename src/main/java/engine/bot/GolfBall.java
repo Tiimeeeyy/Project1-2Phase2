@@ -1,4 +1,4 @@
-package solvers;
+package engine.bot;
 
 public class GolfBall {
     // TODO: Implement the golfball (weight etc) for later use in the solvers
