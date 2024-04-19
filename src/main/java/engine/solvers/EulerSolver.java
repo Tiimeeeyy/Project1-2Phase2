@@ -1,4 +1,4 @@
-package solvers;
+package engine.solvers;
 /**
  * EulerSolver
  */

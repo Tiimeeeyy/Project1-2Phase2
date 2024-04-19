@@ -1,13 +1,15 @@
-package solvers;
+package engine.bot;
 // TODO: Handle cases for different lengths of certain terrain
 // TODO: Get the putts to under 5 m/s per putt
 // TODO: Take gravitational force into account
 
 
-public class PuttCalculator {
-    
+import engine.bot.BotInterface;
+
+public class PuttCalculator implements BotInterface {
+
     public static final double GRAVITY = 9.81;
-    
+
     public double handleVelocity(double[] a, double[] b, double[] frictions, double maxVelocity) {
         // Calculate the distance between the two points (a and b)
         final var totalRequVelocity = getTotalRequiredVelocity(a, b, frictions);
@@ -25,7 +27,7 @@ public class PuttCalculator {
 
     }
 
-    private double getTotalRequiredVelocity(double[] a, double[] b, double[] frictions) {
+    public double getTotalRequiredVelocity(double[] a, double[] b, double[] frictions) {
         double distance = Math.sqrt(Math.pow(b[0] - a[0], 2)) + Math.pow(b[1] - a[1], 2) + Math.pow(b[2] - a[2], 2);
         // Calculate the height difference from the two points (a and b)
         double heightDifference = b[2] - a[2];
