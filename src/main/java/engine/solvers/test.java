@@ -81,13 +81,12 @@ public class test {
         // double r=0.15;
 
         m.createMap("target/classes/createdmap.png");
-        ArrayList<double[]> xpath=g.shoot(new RK4(), x, a, dt, hole,r,"target/classes/createdmap.png");
+        ArrayList<double[]> xpath=g.shoot(new RK4(), x, frictGrass, dt, hole,r,"target/classes/createdmap.png");
         System.out.println(Arrays.toString(xpath.get(0)));
         m.plotTrajectory("target/classes/createdmap.png", "output/outplot.png", xpath);
         System.out.println(xpath.getLast()[0]+" "+xpath.getLast()[1]);
         System.out.println(g.getMinDistance());
         
-       
     }
 
 

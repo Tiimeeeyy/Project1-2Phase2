@@ -1,6 +1,16 @@
 package engine.solvers;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import javax.imageio.ImageIO;
 
+import engine.parser.ExpressionParser;
+
+import java.awt.Color;
 
 /**
  * The type Golfgame.
@@ -208,6 +218,6 @@ public class golfgame {
         initVars.put("y", y);
         ExpressionParser parser = new ExpressionParser(func, initVars);
         // System.out.println(parser.evaluate());
-        return h;
+        return (int) parser.evaluate();
     }
 }
