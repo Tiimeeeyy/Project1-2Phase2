@@ -104,7 +104,4 @@ public class golfgame {
         return this.goal;
     }
 
-    
-
-   
 }

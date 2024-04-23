@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Scanner;
 
+import engine.parser.ExpressionParser;
+
 /**
  * The type Test.
  */
@@ -18,10 +20,15 @@ public class test {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
+        // func processing 
         System.out.print("Enter a function: ");
         String func = scanner.nextLine();
         System.out.println("Your function: "+func);
-        
+        System.out.println("Height: ");
+        System.out.println(getHeightCoordinates(func));
+
+        // params
+        System.out.println("Position for the start: ");
         System.out.print("  For x: ");
         double xPosition = scanner.nextDouble();
         System.out.print("  For y: ");
@@ -73,12 +80,6 @@ public class test {
 
         golfgame g=new golfgame();
         MapHandler m=new MapHandler();
-        // bot bot=new bot();
-        // double[] x={17.0,46.0,2,-3.5};
-        // double[] a={0.06,0.10};             // a[0] is kenitic friction. a[1] is Static friction
-        // double dt=0.05;
-        // double[] hole={33.5,9.97};
-        // double r=0.15;
 
         m.createMap("target/classes/createdmap.png");
         ArrayList<double[]> xpath=g.shoot(new RK4(), x, frictGrass, dt, hole,r,"target/classes/createdmap.png");
@@ -89,6 +90,21 @@ public class test {
         
     }
 
+
+    public static ArrayList<Double> getHeightCoordinates(String func){
+        ArrayList<Double> heightStorage = new ArrayList<Double>();
+        
+        for(double i = 0;i<500;i++){
+            for(double j = 0;j<500;j++){
+                HashMap<String, Double> currentCoordinates = new HashMap<>();
+                currentCoordinates.put("x", i);
+                currentCoordinates.put("y", j);
+                ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
+                heightStorage.add(parser.evaluate());
+            }
+        }
+        return heightStorage;
+    }
 
 
     

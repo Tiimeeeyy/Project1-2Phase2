@@ -16,5 +16,4 @@ public class EulerSolver implements MySolver {
         }
         return equillium;
     }
-    
 }
