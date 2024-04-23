@@ -129,6 +129,6 @@ public class MapHandler {
         initVars.put("y", y);
         ExpressionParser parser = new ExpressionParser(func, initVars);
         
-        return h;
+        return (int) parser.evaluate();
     }
 }
