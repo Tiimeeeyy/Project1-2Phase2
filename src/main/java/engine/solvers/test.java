@@ -72,10 +72,18 @@ public class test {
         System.out.println("Position of the hole: " + Arrays.toString(hole));
 
         golfgame g=new golfgame();
-        g.createMap("target/classes/createdmap.png");
-        ArrayList<double[]> xpath=g.shoot(new RK4(), x, frictGrass, dt, hole,r,"target/classes/createdmap.png");
+        MapHandler m=new MapHandler();
+        // bot bot=new bot();
+        // double[] x={17.0,46.0,2,-3.5};
+        // double[] a={0.06,0.10};             // a[0] is kenitic friction. a[1] is Static friction
+        // double dt=0.05;
+        // double[] hole={33.5,9.97};
+        // double r=0.15;
+
+        m.createMap("target/classes/createdmap.png");
+        ArrayList<double[]> xpath=g.shoot(new RK4(), x, a, dt, hole,r,"target/classes/createdmap.png");
         System.out.println(Arrays.toString(xpath.get(0)));
-        g.plotTrajectory("target/classes/createdmap.png", "output/outplot.png", xpath);
+        m.plotTrajectory("target/classes/createdmap.png", "output/outplot.png", xpath);
         System.out.println(xpath.getLast()[0]+" "+xpath.getLast()[1]);
         System.out.println(g.getMinDistance());
         
