@@ -14,11 +14,26 @@ import engine.parser.ExpressionParser;
 
 import java.awt.Color;
 
+/**
+ * The type Golfgame.
+ */
 public class golfgame {
     private double minDis=100;
     private boolean goal=false;
     private double[] minCoordinate=new double[2];
 
+    /**
+     * Shoot array list.
+     *
+     * @param solver  the solver
+     * @param x       the x
+     * @param a       the a
+     * @param dt      the dt
+     * @param hole    the hole
+     * @param r       the r
+     * @param mappath the mappath
+     * @return the array list
+     */
     public ArrayList<double[]> shoot(MySolver solver, double[] x, double[] a, double dt,double[] hole, double r, String mappath){
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
         xtrac.clear();
@@ -52,19 +67,50 @@ public class golfgame {
         return xtrac;
     }
 
+    /**
+     * Get distance double.
+     *
+     * @param src the src
+     * @param des the des
+     * @return the double
+     */
     public double getDistance (double[] src, double[] des){
         return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
     }
+
+    /**
+     * Get min distance double.
+     *
+     * @return the double
+     */
     double getMinDistance(){
         return this.minDis;
     }
+
+    /**
+     * Get min coordinate double [ ].
+     *
+     * @return the double [ ]
+     */
     double[] getMinCoordinate(){
         return this.minCoordinate;
     }
+
+    /**
+     * Is goal boolean.
+     *
+     * @return the boolean
+     */
     boolean isGoal(){
         return this.goal;
     }
 
+    /**
+     * Readmap double [ ] [ ] [ ].
+     *
+     * @param mappath the mappath
+     * @return the double [ ] [ ] [ ]
+     */
     public double[][][] readmap(String mappath){
         int width = 20;
         int height = 20;
@@ -102,6 +148,13 @@ public class golfgame {
         
     }
 
+    /**
+     * Plot trajectory.
+     *
+     * @param sourceMap  the source map
+     * @param plotMap    the plot map
+     * @param trajectory the trajectory
+     */
     public void plotTrajectory(String sourceMap,String plotMap, ArrayList<double[]> trajectory){
         int width = 20;
         int height = 20;
@@ -128,6 +181,11 @@ public class golfgame {
 
     }
 
+    /**
+     * Create map.
+     *
+     * @param desPath the des path
+     */
     public void createMap(String desPath){
         int width= 500;
         int height=500;

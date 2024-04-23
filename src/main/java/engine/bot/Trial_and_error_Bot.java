@@ -31,11 +31,15 @@ public class Trial_and_error_Bot implements BotInterface {
     }
 
     // Double[] x is the Array that contains the current position and the current Velocity
-        public boolean collisionChecker(double[][][] map, double[] x,double[] friction, double[] hole, double gravity) {
+    public boolean collisionChecker(double[][][] map, double[] x, double[] friction, double[] hole, double gravity) {
 
         double[] direction = {hole[0] - x[0], hole[1] - x[1]};
 
-        return true;
+        return false;
+    }
+
+    public boolean heightChecker(double[][][] map, double[] x) {
+        return false;
     }
 
 }
