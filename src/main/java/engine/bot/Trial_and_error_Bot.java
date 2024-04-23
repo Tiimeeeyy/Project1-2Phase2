@@ -5,7 +5,6 @@ package engine.bot;
  * The Trial and Error bot
  */
 
-import engine.solvers.RK4;
 
 /**
  * Notes:
@@ -15,12 +14,28 @@ import engine.solvers.RK4;
  * If collision is not avoidable -> run it and calculate the collision
  * Maybe: If collision can be used as an advantage
  */
+import engine.bot.CollisionChecker;
+import engine.solvers.golfgame;
 
+/**
+ * The type Trial and error bot.
+ */
 public class Trial_and_error_Bot implements BotInterface {
-    double gravity = g;
-    private RK4 rk4;
+    /**
+     * The Collision checker.
+     */
+    CollisionChecker collisionChecker;
+    /**
+     * The Golfgame.
+     */
+    golfgame golfgame;
+    // Gameplan: Compare the resulting Checkers and find the vector that fulfills both properties
 
-    public Trial_and_error_Bot() {
-        this.rk4 = new RK4();
+    public double[] Comparator(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole) {
+        double[][] heightVec = collisionChecker.heightChecker(map, x, friction, hole);
+        double[][] collisionVec = collisionChecker.collisionChecker(info, x, friction, hole);
+        return null;
     }
+
+
 }

@@ -1,5 +1,5 @@
 package ui;
 
-public class Map {
+public class MapImplement {
     // TODO: Implement the map inputted by the user
 }
