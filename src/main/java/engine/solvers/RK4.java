@@ -1,4 +1,8 @@
 package engine.solvers;
+
+/**
+ * The type Rk 4.
+ */
 public class RK4 implements MySolver{
     public boolean nextstep(MyFunction f, double[] x,double[] a, double[] dh,double dt){
         boolean equillium = true;
