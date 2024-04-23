@@ -87,7 +87,6 @@ public class test {
         m.plotTrajectory("target/classes/createdmap.png", "output/outplot.png", xpath);
         System.out.println(xpath.getLast()[0]+" "+xpath.getLast()[1]);
         System.out.println(g.getMinDistance());
-        
     }
 
 
