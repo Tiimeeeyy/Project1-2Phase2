@@ -2,6 +2,7 @@ package engine.solvers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Scanner;
 
 /**
@@ -15,7 +16,7 @@ public class test {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
         System.out.print("Enter a function: ");
         String func = scanner.nextLine();

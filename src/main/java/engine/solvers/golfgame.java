@@ -218,7 +218,7 @@ public class golfgame {
         initVars.put("x", x);
         initVars.put("y", y);
         ExpressionParser parser = new ExpressionParser(func, initVars);
-        System.out.println(parser.evaluate());
+        // System.out.println(parser.evaluate());
         return h;
     }
 }
