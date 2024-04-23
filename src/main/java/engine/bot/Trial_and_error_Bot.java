@@ -1,17 +1,10 @@
 package engine.bot;
-// TODO: Make the bot have a "neural network" to find path to hole
-// TODO: Take the inputs used in the other solver classes
-// -> output of the map is a 3 Dimensional double array
-// TODO: Handle cases for different lengths of certain terrain
-// TODO: Get the putts to under 5 m/s per putt
-// TODO: Take gravitational force into account
 
 // Import the RK4 Solver
 /**
  * The Trial and Error bot
  */
 
-import engine.solvers.RK4;
 
 /**
  * Notes:
@@ -21,25 +14,28 @@ import engine.solvers.RK4;
  * If collision is not avoidable -> run it and calculate the collision
  * Maybe: If collision can be used as an advantage
  */
+import engine.bot.CollisionChecker;
+import engine.solvers.golfgame;
 
+/**
+ * The type Trial and error bot.
+ */
 public class Trial_and_error_Bot implements BotInterface {
-    double gravity = g;
-    private RK4 rk4;
+    /**
+     * The Collision checker.
+     */
+    CollisionChecker collisionChecker;
+    /**
+     * The Golfgame.
+     */
+    golfgame golfgame;
+    // Gameplan: Compare the resulting Checkers and find the vector that fulfills both properties
 
-    public Trial_and_error_Bot() {
-        this.rk4 = new RK4();
+    public double[] Comparator(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole) {
+        double[][] heightVec = collisionChecker.heightChecker(map, x, friction, hole);
+        double[][] collisionVec = collisionChecker.collisionChecker(info, x, friction, hole);
+        return null;
     }
 
-    // Double[] x is the Array that contains the current position and the current Velocity
-    public boolean collisionChecker(double[][][] map, double[] x, double[] friction, double[] hole, double gravity) {
-
-        double[] direction = {hole[0] - x[0], hole[1] - x[1]};
-
-        return false;
-    }
-
-    public boolean heightChecker(double[][][] map, double[] x) {
-        return false;
-    }
 
 }
