@@ -1,11 +1,9 @@
 package engine.parser;
 
-
 import java.util.Map;
-
 import engine.parser.interfaces.IParser;
 
-public class ExpressionParser implements IParser{
+public class ExpressionParser implements IParser {
 
     private String funcExpression;
     private int position = 0;
@@ -17,12 +15,16 @@ public class ExpressionParser implements IParser{
     }
 
     public double evaluate() {
-        double finalResult = processAdditionSubtraction();
+        double finalResult = processExpression();
         if (position < funcExpression.length()) {
             System.out.println("Unexpected character: " + funcExpression.charAt(position));
             throw new Error("Unexpected character at position: " + position);
         }
         return finalResult;
+    }
+
+    private double processExpression() {
+        return processAdditionSubtraction();
     }
 
     private double processAdditionSubtraction() {
@@ -59,7 +61,7 @@ public class ExpressionParser implements IParser{
         double base = processParentheses();
         while (position < funcExpression.length() && funcExpression.charAt(position) == '^') {
             position++;
-            double exponent = processParentheses();
+            double exponent = processParentheses(); // Use processParentheses to allow for nested expressions
             base = Math.pow(base, exponent);
         }
         return base;
@@ -74,7 +76,7 @@ public class ExpressionParser implements IParser{
         double result = 0.0;
         if (position < funcExpression.length() && funcExpression.charAt(position) == '(') {
             position++;
-            result = processAdditionSubtraction();
+            result = processExpression(); 
             if (position < funcExpression.length() && funcExpression.charAt(position) == ')') {
                 position++;
             } else {
@@ -108,7 +110,7 @@ public class ExpressionParser implements IParser{
         if (token.equals("sin") || token.equals("cos") || token.equals("tan")) {
             if (position < funcExpression.length() && funcExpression.charAt(position) == '(') {
                 position++;
-                double arg = processAdditionSubtraction(); 
+                double arg = processExpression(); 
                 if (position < funcExpression.length() && funcExpression.charAt(position) == ')') {
                     position++;
                     switch (token) {
@@ -127,14 +129,16 @@ public class ExpressionParser implements IParser{
             } else {
                 throw new Error("Missing opening parenthesis for function argument");
             }
-        } else if (variables.variableMap.containsKey(token)) { 
+        } else if (variables.variableMap.containsKey(token)) {
             return variables.getVariable(token);
+        } else if (token.equals("e")) {
+            return Math.E;  // Recognize 'e' as the mathematical constant e
         } else {
             throw new Error("Unsupported function or variable: " + token);
         }
     }
     
-
+    
     private double processNumber() {
         int start = position;
         while (position < funcExpression.length() && (Character.isDigit(funcExpression.charAt(position)) || funcExpression.charAt(position) == '.')) {
@@ -159,4 +163,3 @@ public class ExpressionParser implements IParser{
         }
     }
 }
-
