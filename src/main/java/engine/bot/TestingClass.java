@@ -24,9 +24,9 @@ public class TestingClass {
         double gravity = 9.8; // Gravity is constant
 
         // Call the collisionChecker method
-        double[][] result = CollisionChecker.heightChecker(map, x, friction, hole);
+        // double[][] result = CollisionChecker.heightChecker(map, x, friction, hole);
 
         // Print the result
-        System.out.println(Arrays.toString(result));
+        // System.out.println(Arrays.toString(result));
     }
 }
