@@ -24,7 +24,7 @@ public class test {
         System.out.print("Enter a function: ");
         String func = scanner.nextLine();
         System.out.println("Your function: "+func);
-        System.out.println("Height: ");
+        System.out.println("Height for the every pixel: ");
         System.out.println(getHeightCoordinates(func));
 
         // params
