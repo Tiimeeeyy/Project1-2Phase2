@@ -6,10 +6,10 @@ import engine.solvers.golfphysics;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class CollisionChecker implements BotInterface {
+public class CollisionChecker {
     RK4 rk4;
 
-    public double[][] collisionChecker(double[][] info, double[] x, double[] friction, double[] hole) {
+    public double[][] collisionVectors(double[][] info, double[] x, double[] friction, double[] hole) {
         double[] direction = {hole[0] - x[0], hole[1] - x[1]};
         double magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
         direction[0] /= magnitude;

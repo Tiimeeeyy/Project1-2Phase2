@@ -6,6 +6,9 @@ package engine.bot;
  */
 public interface BotInterface {
 
-    public final double g = 9.81;
+    public double calculateScore(double[] vector, double[][] heightVec, double[][] collisionVec);
 
+    public double[] comparingVectors(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole);
+
+    public boolean checkHole(double[] x, double[] hole);
 }
