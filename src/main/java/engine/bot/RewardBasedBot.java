@@ -15,8 +15,8 @@ public class RewardBasedBot {
         this.golfgame = golfgame;
     }
 
-    public void makeDescisions(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole) {
-        // Arbitrary amount of plays to avoid infinite shot taking
+    public void makeDecisions(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole) {
+        // Arbitrary number of plays to avoid infinite shot-taking
         int maxPlays = 10;
         if (comparingAndScoring.checkHole(x, hole) || maxPlays == 0) {
         }
