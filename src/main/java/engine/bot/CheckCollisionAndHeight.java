@@ -6,7 +6,7 @@ import engine.solvers.golfphysics;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class CollisionChecker {
+public class CheckCollisionAndHeight {
     RK4 rk4;
 
     public double[][] collisionVectors(double[][] info, double[] x, double[] friction, double[] hole) {
@@ -27,9 +27,7 @@ public class CollisionChecker {
             while (speed > 0.001) {
                 double[] a = {friction[1], friction[0]};
                 double[] dh = {0, 0};
-                boolean equilibrium = rk4.nextstep(new golfphysics(), new double[]{
-                                position[0], position[1], velocity[0], velocity[1]},
-                        a, dh, 0.1);
+                boolean equilibrium = rk4.nextstep(new golfphysics(), new double[]{position[0], position[1], velocity[0], velocity[1]}, a, dh, 0.1);
 
                 position[0] += velocity[0] * 0.1;
                 position[1] += velocity[1] * 0.1;
@@ -69,14 +67,8 @@ public class CollisionChecker {
 
         double[][] velocities = new double[3][2];
         velocities[0] = new double[]{5 * direction[0], 5 * direction[1]};
-        velocities[1] = new double[]{
-                5 * Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1],
-                5 * Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]
-        };
-        velocities[2] = new double[]{
-                5 * Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1],
-                5 * Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]
-        };
+        velocities[1] = new double[]{5 * Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1], 5 * Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
+        velocities[2] = new double[]{5 * Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1], 5 * Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
         return velocities;
     }
 
@@ -96,9 +88,7 @@ public class CollisionChecker {
             while (speed > 0.001) {
                 double[] a = {friction[1], friction[0]};
                 double[] dh = {0, 0};
-                boolean equilibrium = rk4.nextstep(new golfphysics(), new double[]{
-                                position[0], position[1], velocity[0], velocity[1]},
-                        a, dh, 0.1);
+                boolean equilibrium = rk4.nextstep(new golfphysics(), new double[]{position[0], position[1], velocity[0], velocity[1]}, a, dh, 0.1);
 
                 position[0] += velocity[0] * 0.1;
                 position[1] += velocity[1] * 0.1;
@@ -110,9 +100,7 @@ public class CollisionChecker {
             int finalY = (int) Math.floor(position[1]);
             if (heightDifference(map, position)) {
                 double height = map[finalX][finalY][2];
-                heightVelocities.add(new double[]{
-                        position[0], position[1], velocity[0], velocity[1], height
-                });
+                heightVelocities.add(new double[]{position[0], position[1], velocity[0], velocity[1], height});
             }
         }
         heightVelocities.sort(Comparator.comparingDouble(a -> a[4]));

@@ -1,20 +1,20 @@
-import engine.bot.CollisionChecker;
-import engine.bot.Trial_and_error_Bot;
+import engine.bot.CheckCollisionAndHeight;
+import engine.bot.ComparingAndScoring;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Trial_and_error_BotTest {
+class ComparingAndScoringTest {
 
-    private Trial_and_error_Bot bot;
-    private CollisionChecker collisionChecker;
+    private ComparingAndScoring bot;
+    private CheckCollisionAndHeight checkCollisionAndHeight;
 
     @BeforeEach
     void setUp() {
-        collisionChecker = Mockito.mock(CollisionChecker.class);
-        bot = new Trial_and_error_Bot(collisionChecker);
+        checkCollisionAndHeight = Mockito.mock(CheckCollisionAndHeight.class);
+        bot = new ComparingAndScoring(checkCollisionAndHeight);
     }
 
     @Test
@@ -28,8 +28,8 @@ class Trial_and_error_BotTest {
         double[][] heightVec = new double[][]{{0, 0, 1, 1, 1}, {0, 0, 2, 2, 2}};
         double[][] collisionVec = new double[][]{{0, 0, 1, 1, 1}};
 
-        Mockito.when(collisionChecker.heightChecker(map, x, friction, hole)).thenReturn(heightVec);
-        Mockito.when(collisionChecker.collisionVectors(info, x, friction, hole)).thenReturn(collisionVec);
+        Mockito.when(checkCollisionAndHeight.heightChecker(map, x, friction, hole)).thenReturn(heightVec);
+        Mockito.when(checkCollisionAndHeight.collisionVectors(info, x, friction, hole)).thenReturn(collisionVec);
 
         double[] expected = {0, 0, 2, 2, 2};
         assertArrayEquals(expected, bot.comparingVectors(map, info, x, friction, hole));
@@ -46,8 +46,8 @@ class Trial_and_error_BotTest {
         double[][] heightVec = new double[0][0];
         double[][] collisionVec = new double[0][0];
 
-        Mockito.when(collisionChecker.heightChecker(map, x, friction, hole)).thenReturn(heightVec);
-        Mockito.when(collisionChecker.collisionVectors(info, x, friction, hole)).thenReturn(collisionVec);
+        Mockito.when(checkCollisionAndHeight.heightChecker(map, x, friction, hole)).thenReturn(heightVec);
+        Mockito.when(checkCollisionAndHeight.collisionVectors(info, x, friction, hole)).thenReturn(collisionVec);
 
         assertNull(bot.comparingVectors(map, info, x, friction, hole));
     }
