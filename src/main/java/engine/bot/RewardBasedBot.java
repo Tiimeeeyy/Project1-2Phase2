@@ -1,6 +1,6 @@
 package engine.bot;
 import engine.solvers.golfgame;
-
+// TODO: Implement the Function that makes the bot play the game!!!
 public class RewardBasedBot {
 
     private final CheckCollisionAndHeight checkCollisionAndHeight;

@@ -1,36 +1,4 @@
 package engine.bot;
-/**
- * The Trial and Error bot
- * <p>
- * Notes:
- * If no Obstacle -> velocity straight to the hole
- * Else -> Check 30-40° from the initial point for collisions
- * Then -> Go 30-40° from the point with velocity 5 m/s
- * If collision is not avoidable -> run it and calculate the collision
- * Maybe: If collision can be used as an advantage
- * <p>
- * Notes:
- * If no Obstacle -> velocity straight to the hole
- * Else -> Check 30-40° from the initial point for collisions
- * Then -> Go 30-40° from the point with velocity 5 m/s
- * If collision is not avoidable -> run it and calculate the collision
- * Maybe: If collision can be used as an advantage
- * <p>
- * Notes:
- * If no Obstacle -> velocity straight to the hole
- * Else -> Check 30-40° from the initial point for collisions
- * Then -> Go 30-40° from the point with velocity 5 m/s
- * If collision is not avoidable -> run it and calculate the collision
- * Maybe: If collision can be used as an advantage
- * <p>
- * Notes:
- * If no Obstacle -> velocity straight to the hole
- * Else -> Check 30-40° from the initial point for collisions
- * Then -> Go 30-40° from the point with velocity 5 m/s
- * If collision is not avoidable -> run it and calculate the collision
- * Maybe: If collision can be used as an advantage
- */
-
 
 /**
  * Notes:
@@ -42,18 +10,21 @@ package engine.bot;
  */
 
 /**
- * The type Trial and error bot.
+ * This class is responsible for comparing and scoring different vectors for the bot to "play" the game
+ * It uses the CheckCollisionAndHeight class to check for 1. collisions and 2. height differences.
  */
+
 public class ComparingAndScoring implements BotInterface {
-    /**
-     * The Collision checker.
-     */
     private final CheckCollisionAndHeight collisionChecker;
 
+    /**
+     * Constructor for the ComparingAndScoring class, lets us use the CheckCollisionAndHeight class.
+     *
+     * @param checkCollisionAndHeight
+     */
     public ComparingAndScoring(CheckCollisionAndHeight checkCollisionAndHeight) {
         this.collisionChecker = checkCollisionAndHeight;
     }
-    // Game-plan: Compare the resulting Checkers and find the vector that fulfills both properties
 
     public double calculateScore(double[] vector, double[][] heightVec, double[][] collisionVec) {
         double score = 0;
@@ -69,7 +40,7 @@ public class ComparingAndScoring implements BotInterface {
         // Check if the vector is in the heightVec
         for (double[] heightVector : heightVec) {
             if (vector[2] == heightVector[2] && vector[3] == heightVector[3]) {
-                score -= heightVector[4]; // Negative score for height gains
+                score -= heightVector[4]; // Low negative score for height gains
                 break;
             }
         }
@@ -79,7 +50,7 @@ public class ComparingAndScoring implements BotInterface {
 
     public double[] comparingVectors(double[][][] map, double[][] info, double[] x, double[] friction, double[] hole) {
         double[][] heightVec = collisionChecker.heightChecker(map, x, friction, hole);
-        double[][] collisionVec = collisionChecker.collisionVectors(info, x, friction, hole);
+        double[][] collisionVec = collisionChecker.calculateCollisionVectors(info, x, friction, hole);
 
         double[] bestVector = null;
         double bestScore = Double.NEGATIVE_INFINITY;

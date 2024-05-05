@@ -1,7 +1,6 @@
 package engine.bot;
 
 import engine.solvers.MyFunction;
-import engine.solvers.MySolver;
 
 import java.util.logging.Logger;
 
@@ -9,9 +8,20 @@ import java.util.logging.Logger;
  * The type Rk 4.
  */
 // I changed this method to avoid having to assign a Variable when using it in code.
+
 public class RungeKutta4Void{
+
     private static final Logger LOGGER = Logger.getLogger(RungeKutta4Void.class.getName());
 
+    /**
+     * Modification of the normal nextstep function, only not returning a boolean value
+     * but void, to avoid unnecessary Variable assignment -> improves code quality
+     * @param f The func
+     * @param x
+     * @param a
+     * @param dh
+     * @param dt
+     */
     public void nextstep(MyFunction f, double[] x, double[] a, double[] dh, double dt) {
         final int length = x.length;
         double[] gx1 = new double[length];
