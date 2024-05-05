@@ -82,7 +82,7 @@ public class test {
         MapHandler m=new MapHandler();
 
         m.createMap("target/classes/createdmap.png");
-        ArrayList<double[]> xpath=g.shoot(new RK4(), x, frictGrass, dt, hole,r,"target/classes/createdmap.png");
+        ArrayList<double[]> xpath=g.shoot(new RK4(), x, frictGrass, dt, hole,r,"target/classes/createdmap.png",true);
         System.out.println(Arrays.toString(xpath.get(0)));
         m.plotTrajectory("target/classes/createdmap.png", "output/outplot.png", xpath);
         System.out.println(xpath.getLast()[0]+" "+xpath.getLast()[1]);
