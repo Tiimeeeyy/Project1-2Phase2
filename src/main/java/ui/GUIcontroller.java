@@ -5,16 +5,20 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class GUIcontroller {
-    // TODO: remove the four input fields, only make one + parse it + display it invisibly
+    // TODO: Implement the user interface
+    // Calls to the objects in the FXML
     @FXML
     private TextField FunctionTextfield;
-    
-    public void Function(ActionEvent e) {
+
+    public void Function(ActionEvent e){
         String function = FunctionTextfield.getText();
-        System.out.println(function);
+
+//        if (!parser.ExpressionParser()){ //TODO: check parser to fix this ifelse statement
+//           return;
+//        } else System.out.println(function);
     }
 
-    public void setTokeniser(Tokeniser tokeniser) {
-        this.tokeniser = tokeniser;
-    }
+    //TODO: Connect main method variables with the four textfields
+    //variables accepts vars as str and double so cant do it the same as expression (which is a str)
+    //might wanna convert the strings it accepts into doubles
 }

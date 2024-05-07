@@ -28,7 +28,7 @@ public class RungeKutta4Void{
         double[] gx2 = new double[length];
         double[] gx3 = new double[length];
         double[] gx4 = new double[length];
-        double[] xTilda = new double[x.length];
+        double[] xTilda = new double[length];
 
         gx1 = f.ode(x, a, dh);
         for (int j = 0; j < x.length; j++) {
