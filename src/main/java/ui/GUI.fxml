@@ -15,7 +15,8 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <Button layoutX="268.0" layoutY="426.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="361.0" text="Display map" />
+            <Button layoutX="268.0" layoutY="470.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="361.0" text="Display map" />
+            <Button layoutX="268.0" layoutY="415.0" mnemonicParsing="false" onAction="#tokenizeFunction" prefHeight="42.0" prefWidth="362.0" text="Tokenize Function" />
             <TextField layoutX="168.0" layoutY="184.0" prefHeight="42.0" prefWidth="562.0" promptText="Insert function in format &quot;3 + 4 * 2&quot;">
                <font>
                   <Font size="14.0" />

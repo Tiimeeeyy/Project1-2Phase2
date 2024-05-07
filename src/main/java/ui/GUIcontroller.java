@@ -9,16 +9,18 @@ public class GUIcontroller {
     // Calls to the objects in the FXML
     @FXML
     private TextField FunctionTextfield;
+    private Tokeniser tokeniser = new Tokeniser();
 
-    public void Function(ActionEvent e){
+    public void tokenizeFunction(ActionEvent event) {
+        tokeniser.tokenise();
+    }
+    
+    public void Function(ActionEvent e) {
         String function = FunctionTextfield.getText();
-
-        if (!parser.ExpressionParser()){ //TODO: check parser to fix this ifelse statement
-           return
-        } else System.out.println(function); 
+        System.out.println(function);
     }
 
-    //TODO: Connect main method variables with the four textfields
-    //variables accepts vars as str and double so cant do it the same as expression (which is a str)
-    //might wanna convert the strings it accepts into doubles
+    public void setTokeniser(Tokeniser tokeniser) {
+        this.tokeniser = tokeniser;
+    }
 }

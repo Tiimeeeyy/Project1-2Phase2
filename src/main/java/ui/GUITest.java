@@ -15,6 +15,10 @@ public class GUITest extends Application {
         stage.setTitle("Graphic User Interface (in development)");
         stage.setScene(scene);
         stage.show();
+
+        Tokeniser tokeniser = new Tokeniser();
+        GUIcontroller controller = fxmlLoader.getController();
+        controller.setTokeniser(tokeniser);
     }
 
     public static void main(String[] args) {
