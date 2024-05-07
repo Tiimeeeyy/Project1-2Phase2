@@ -28,7 +28,7 @@ public class GUIcontroller {
         try {
             // Parse the function
             double result = parser.evaluate();
-            // Display the parsed result (you can modify this according to your UI)
+            // Display the parsed result
             System.out.println("Parsed result: " + result);
             ((TextInputControl) parsedResultLabel).setText("Parsed result: " + result);
         } catch (Exception ex) {
