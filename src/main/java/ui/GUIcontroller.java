@@ -5,8 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
 public class GUIcontroller {
-    // TODO: Implement the user interface
-    // Calls to the objects in the FXML
+    // TODO: remove the four input fields, only make one + parse it + display it invisibly
     @FXML
     private TextField FunctionTextfield;
     private Tokeniser tokeniser = new Tokeniser();
