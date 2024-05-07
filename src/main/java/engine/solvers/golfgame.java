@@ -32,14 +32,16 @@ public class golfgame {
      * @param mappath the dir path for the map image
      * @return the array list of the trajectory of the ball movement
      */
-    public ArrayList<double[]> shoot(MySolver solver, double[] x, double[] a, double dt,double[] hole, double r, String mappath){
+    public ArrayList<double[]> shoot(MySolver solver, double[] x, double[] a, double dt,double[] hole, double r, String mappath, boolean recording){
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
         MapHandler map=new MapHandler();
         xtrac.clear();
         xtrac.add(x.clone());
         
+        
         //Read the map, store the gradient 
         double[][][] mapgradient=map.readmap(mappath);
+        this.minDis=getDistance(x, hole);
         double dis=100;
 
         //loop untill ball stop or out of court
@@ -58,7 +60,9 @@ public class golfgame {
                 this.minDis=dis;
                 this.minCoordinate=x;
             }
-            xtrac.add(x.clone());
+            if (recording) {
+                xtrac.add(x.clone());
+            }
         }
 
         return xtrac;
