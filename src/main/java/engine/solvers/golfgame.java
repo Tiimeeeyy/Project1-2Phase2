@@ -38,8 +38,6 @@ public class golfgame {
         xtrac.clear();
         xtrac.add(x.clone());
         
-        
-        
         //Read the map, store the gradient 
         double[][][] mapgradient=map.readmap(mappath);
         double dis=100;
