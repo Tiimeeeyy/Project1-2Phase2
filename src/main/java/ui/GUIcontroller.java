@@ -8,11 +8,6 @@ public class GUIcontroller {
     // TODO: remove the four input fields, only make one + parse it + display it invisibly
     @FXML
     private TextField FunctionTextfield;
-    private Tokeniser tokeniser = new Tokeniser();
-
-    public void tokenizeFunction(ActionEvent event) {
-        tokeniser.tokenise();
-    }
     
     public void Function(ActionEvent e) {
         String function = FunctionTextfield.getText();
