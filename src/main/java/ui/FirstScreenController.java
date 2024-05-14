@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import engine.parser.ExpressionParser;
 
-public class GUIcontroller {
+public class FirstScreenController {
     
     @FXML
     private TextField FunctionTextfield;

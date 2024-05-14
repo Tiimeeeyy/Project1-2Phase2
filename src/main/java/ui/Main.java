@@ -16,8 +16,8 @@ public class Main extends Application {
 
     public static void openGUI() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/GUI.fxml"));
-            fxmlLoader.setController(new GUIcontroller());
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
+            fxmlLoader.setController(new FirstScreenController());
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
             primaryStage.setTitle("Graphic User Interface (in development)");
             primaryStage.setScene(scene);

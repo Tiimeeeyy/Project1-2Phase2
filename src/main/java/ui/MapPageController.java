@@ -34,14 +34,14 @@ public class MapPageController {
         );
 
         if (drawingCanvas != null) {
-            drawingCanvas.getGraphicsContext2D().setLineWidth(5);
+            drawingCanvas.getGraphicsContext2D().setLineWidth(10);
 
             drawingCanvas.setOnMouseDragged(event -> {
                 double x = event.getX();
                 double y = event.getY();
 
                 drawingCanvas.getGraphicsContext2D().setFill(colorChoiceBox.getValue().color);
-                drawingCanvas.getGraphicsContext2D().fillOval(x, y, 5, 5);
+                drawingCanvas.getGraphicsContext2D().fillOval(x, y, 20, 20);
             });
         } else {
             System.err.println("drawingCanvas is null");
