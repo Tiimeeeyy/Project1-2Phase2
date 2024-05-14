@@ -15,12 +15,15 @@ public class MapPageController {
     @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
 
-    private String heightFunction;
     private double[][] heightStorage;
+    private double minHeight;
+    private double maxHeight;
 
     public MapPageController(String function) {
-        this.heightFunction = function;
         this.heightStorage = getHeightCoordinates(function);
+        double[] heightRange = getHeightRange();
+        this.minHeight = heightRange[0];
+        this.maxHeight = heightRange[1];
     }
 
     public class ColorItem {
@@ -44,10 +47,11 @@ public class MapPageController {
             new ColorItem("Green", Color.web("#48992f")),
             new ColorItem("Water", Color.web("#077ef5"))
         );
+        
 
         if (drawingCanvas != null) {
             GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
-            gc.setLineWidth(10);
+            gc.setLineWidth(30);
 
             renderInitialMap(gc, Color.web("#48992f"));
 
@@ -59,12 +63,14 @@ public class MapPageController {
                 int ix = (int) x;
                 int iy = (int) y;
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
+                    double heightStep = (maxHeight - minHeight) / 100; 
+                    updateHeightMap(ix, iy, heightStep); 
                     double height = heightStorage[ix][iy];
                     Color baseColor = colorChoiceBox.getValue().color;
-                    Color heightColor = getModifiedColor(baseColor, height);
+                    Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
                     
                     gc.setFill(heightColor);
-                    gc.fillOval(x - 5, y - 5, 10, 10);
+                    gc.fillOval(x - 5, y - 5, 30, 30);
                 }
             });
         } else {
@@ -87,23 +93,52 @@ public class MapPageController {
                 heightStorage[i][j] = parser.evaluate();
             }
         }
+        System.out.println(heightStorage);
         return heightStorage;
+    }
+
+    private double[] getHeightRange() {
+        double minHeight = Double.MAX_VALUE;
+        double maxHeight = Double.MIN_VALUE;
+
+        for (int i = 0; i < 500; i++) {
+            for (int j = 0; j < 500; j++) {
+                double height = heightStorage[i][j];
+                if (height < minHeight) {
+                    minHeight = height;
+                }
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            }
+        }
+
+        return new double[]{minHeight, maxHeight};
     }
 
     private void renderInitialMap(GraphicsContext gc, Color baseColor) {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-                Color heightColor = getModifiedColor(baseColor, height);
+                Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
     }
 
-    private Color getModifiedColor(Color baseColor, double height) {
-        double normalizedHeight = Math.min(Math.max(height / 200, 0), 1); 
-        double brightnessFactor = 0.5 + normalizedHeight * 0.5; 
+    private void updateHeightMap(int x, int y, double heightStep) {
+        if (x >= 0 && x < 500 && y >= 0 && y < 500) {
+            heightStorage[x][y] += heightStep; 
+            System.out.println("Height at (" + x + ", " + y + "): " + heightStorage[x][y]);
+        } else {
+            System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
+        }
+    }
+
+    private Color getModifiedColor(Color baseColor, double height, double minHeight, double maxHeight) {
+        double normalizedHeight = (height - minHeight) / (maxHeight - minHeight); 
+        double brightnessFactor = 0.6 + normalizedHeight * 0.7; 
         Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
         System.out.println("Height: " + height + ", Base Color: " + baseColor + ", Modified Color: " + color);
         return color;
