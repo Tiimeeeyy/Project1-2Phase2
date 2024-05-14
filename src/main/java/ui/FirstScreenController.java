@@ -27,6 +27,7 @@ public class FirstScreenController {
         function = FunctionTextfield.getText();
 
         try {
+            // 255 - ((0.4 * (0.9 - e^(-(((x / 50 - 5)^2 + (y / 50 - 5)^2) / 8)))) * 200 + 80)
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
             fxmlLoader.setController(new MapPageController(function));
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
