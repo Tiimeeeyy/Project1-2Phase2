@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import engine.parser.ExpressionParser;
@@ -19,38 +20,29 @@ public class FirstScreenController {
     
     @FXML
     private TextField FunctionTextfield;
-    private Label parsedResultLabel;
+    private String function;
     
-    public void parseFunction(ActionEvent e) {
-        String function = FunctionTextfield.getText();
-        Map<String, Double> variables = new HashMap<>();
-        ExpressionParser parser = new ExpressionParser(function, variables);
-        
-        try {
-            double result = parser.evaluate();
-            System.out.println("Parsed result: " + result);
-           parsedResultLabel.setText("Parsed result: " + result);
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Parsing Error");
-            alert.setHeaderText("Failed to parse function");
-            alert.setContentText(ex.getMessage());
-            alert.showAndWait();
-           parsedResultLabel.setText("Parsing error: " + ex.getMessage());
-        }
-    }
 
     public void nextScreen(ActionEvent event) {
+        function = FunctionTextfield.getText();
+
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            fxmlLoader.setController(new MapPageController());
+            fxmlLoader.setController(new MapPageController(function));
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
-            stage.setTitle("Map");
+            stage.setTitle("Map Creating Screen");
             stage.show();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Creating Error");
+            alert.setHeaderText("Failed to proceed to the next screen, check the input values");
+            alert.setContentText(ex.getMessage());
+            alert.showAndWait();
             ex.printStackTrace();
         }
-    }    
+    }
+
+
 }

@@ -16,8 +16,8 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <Button layoutX="268.0" layoutY="236.0" mnemonicParsing="false" onAction="#parseFunction" prefHeight="42.0" prefWidth="362.0" text="Parse function" />
-            <Label fx:id="parsedResultLabel" layoutX="268.0" layoutY="300.0" text="" />
+            <!-- <Button layoutX="268.0" layoutY="236.0" mnemonicParsing="false" onAction="#parseFunction" prefHeight="42.0" prefWidth="362.0" text="Parse function" />
+            <Label fx:id="parsedResultLabel" layoutX="268.0" layoutY="300.0" text="" /> -->
             <Button layoutX="723.0" layoutY="236.0" mnemonicParsing="false" onAction="#nextScreen" prefHeight="42.0" prefWidth="77.0" text="See map" />
          </children>
       </AnchorPane>

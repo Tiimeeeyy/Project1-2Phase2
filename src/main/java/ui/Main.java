@@ -19,7 +19,7 @@ public class Main extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
             fxmlLoader.setController(new FirstScreenController());
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
-            primaryStage.setTitle("Graphic User Interface (in development)");
+            primaryStage.setTitle("First Screen");
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {

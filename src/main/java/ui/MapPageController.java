@@ -1,4 +1,8 @@
 package ui;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import engine.parser.ExpressionParser;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.paint.Color;
@@ -10,6 +14,15 @@ public class MapPageController {
 
     @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
+
+    private String heightFunction;
+    private ArrayList<Double> heightStorage = new ArrayList<Double>();
+
+
+    public MapPageController(String function){
+      this.heightFunction = function;  
+      this.heightStorage = getHeightCoordinates(function);
+    }
 
     public class ColorItem {
         private String name;
@@ -51,4 +64,18 @@ public class MapPageController {
     public void goBack() {
         Main.openGUI();
     }
+
+    public static ArrayList<Double> getHeightCoordinates(String func){
+        ArrayList<Double> heightStorage = new ArrayList<Double>();
+       for(double i = 0;i<500;i++){
+           for(double j = 0;j<500;j++){
+               HashMap<String, Double> currentCoordinates = new HashMap<>();
+               currentCoordinates.put("x", i);
+               currentCoordinates.put("y", j);
+               ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
+               heightStorage.add(parser.evaluate());
+           }
+       }
+       return heightStorage;
+   }    
 }
