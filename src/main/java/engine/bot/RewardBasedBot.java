@@ -1,5 +1,5 @@
 package engine.bot;
-import engine.solvers.golfgame;
+import engine.solvers.GolfGame;
 // TODO: Implement the Function that makes the bot play the game!!!
 public class RewardBasedBot {
 
@@ -7,9 +7,9 @@ public class RewardBasedBot {
 
     private final ComparingAndScoring comparingAndScoring;
 
-    private final golfgame golfgame;
+    private final GolfGame golfgame;
 
-    public RewardBasedBot(CheckCollisionAndHeight checkCollisionAndHeight, ComparingAndScoring comparingAndScoring, engine.solvers.golfgame golfgame) {
+    public RewardBasedBot(CheckCollisionAndHeight checkCollisionAndHeight, ComparingAndScoring comparingAndScoring, engine.solvers.GolfGame golfgame) {
         this.checkCollisionAndHeight = checkCollisionAndHeight;
         this.comparingAndScoring = comparingAndScoring;
         this.golfgame = golfgame;

@@ -1,58 +1,75 @@
 package engine.solvers;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import javax.imageio.ImageIO;
+import java.util.Arrays;
+import java.util.List;
 
-import engine.parser.ExpressionParser;
-
-import java.awt.Color;
-
-/**
- * The type Golfgame.
- */
-public class golfgame {
+/** 
+ * The main engine
+*/
+public class GolfGame {
     private double minDis=100;
     private boolean goal=false;
-    private double[] minCoordinate=new double[2];
+    private double[] minCoordinate=new double[4];
+    private double[] stopCoordinate=new double[4];
+
+    private MySolver solver;
+    private double[] a;
+    private double dt;
+    private double[] hole;
+    private double r;
+    private String mappath;
 
     /**
-     * Simulate the ball movement
-     *
-     * @param solver  the solver is going to be used. 
-     * @param x       the ball current status, coordinate and the velocity
-     * @param a       the frictions
-     * @param dt      the time step
-     * @param hole    the hole location
-     * @param r       the radius of hole
-     * @param mappath the dir path for the map image
-     * @return the array list of the trajectory of the ball movement
+     * Construct the game engine
+     * 
+     * @param solver    ODE sovler
+     * @param a         friction coefficients, [knetic fraction, static friction]
+     * @param dt        time step
+     * @param hole      position of the hole
+     * @param r         radius of the hole
+     * @param mappath   the path of the map
      */
-    public ArrayList<double[]> shoot(MySolver solver, double[] x, double[] a, double dt,double[] hole, double r, String mappath, boolean recording){
+    public GolfGame(MySolver solver, double[] a, double dt,double[] hole, double r, String mappath){
+        this.solver=solver;
+        this.a=a;
+        this.dt=dt;
+        this.hole=hole;
+        Utility.coordinateConvertor(this.hole);
+        this.r=r;
+        this.mappath=mappath;
+    }
+
+    /**
+     * shoot!
+     * 
+     * @param x             the starting position and velocity of the ball
+     * @param recording     whether save the trajectory. Disable recording in AI bot calculation to save memory. 
+     * @return              The trajectory of the ball. It is null if recording is false.
+     */
+    public ArrayList<double[]> shoot(double[] x,Boolean recording){
+        // cooridnateConvertor(x);
+        Utility.coordinateConvertor(x);
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
-        MapHandler map=new MapHandler();
         xtrac.clear();
         xtrac.add(x.clone());
+        MapHandler map=new MapHandler();
+        MyFunction golfPhysics=new golfphysics();
         
         
         //Read the map, store the gradient 
         double[][][] mapgradient=map.readmap(mappath);
         this.minDis=getDistance(x, hole);
         double dis=100;
-
         //loop untill ball stop or out of court
-        while (!solver.nextstep(new golfphysics(),x,a,mapgradient[(int)Math.floor(x[0]*10)][(int)Math.floor(x[1]*10)],dt)) {
+        while (!solver.nextstep(golfPhysics,x,a,mapgradient[(int)Math.floor(x[0]*10)][(int)Math.floor(x[1]*10)],dt)) {
             //check whether out of court
             if ((int)Math.floor(x[0]*10)>=mapgradient.length || (int)Math.floor(x[1]*10)>=mapgradient.length || (int)Math.floor(x[0]*10) <0 || (int)Math.floor(x[1]*10)<0) {
                 break;
             }
-            dis=getDistance(x, hole);
+            dis=getDistance(x, this.hole);
             if(dis<r){
                 System.out.println("Goal!!!");
+                this.minDis=0;
                 this.goal=true;
                 break;
             }
@@ -63,47 +80,70 @@ public class golfgame {
             if (recording) {
                 xtrac.add(x.clone());
             }
+            this.stopCoordinate=x.clone();
         }
-
         return xtrac;
     }
-
     /**
-     * Get distance between two points.
-     *
-     * @param src the cource
-     * @param des the desination
-     * @return the distance
+     * get the distance between two points
+     * 
+     * @param src   one of the point. Only read the src[0] and src[1] as coordination. 
+     * @param des   the other point.
+     * @return      the distance
      */
     public double getDistance (double[] src, double[] des){
         return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
     }
 
     /**
-     * Get min distance between the ball and the hole thoughout the whole trajectory.
-     *
-     * @return the minimune distance
+     * 
+     * @return  the miminal distance throughout the whole trajectory
      */
-    double getMinDistance(){
+    public double getMinDistance(){
         return this.minDis;
     }
 
     /**
-     * Get the location where the ball is the nearest to the hole.
-     *
-     * @return the coordinate in array
+     * 
+     * @return  the nearst point
      */
-    double[] getMinCoordinate(){
+    public double[] getMinCoordinate(){
         return this.minCoordinate;
     }
 
     /**
-     * Is goal?.
-     *
-     * @return the boolean
+     * 
+     * @return  whether goaled in this shot
      */
-    boolean isGoal(){
+    public boolean isGoal(){
         return this.goal;
     }
 
+    /**
+     * 
+     * @param x     the coordination of the ball
+     * @return      the distance between the ball and the hole
+     */
+    public double getHoleBallDistance(double[] x){
+        return Math.sqrt(Math.pow(x[0]-hole[0], 2)+Math.pow(x[1]-hole[1], 2));
+    }
+
+    /**
+     * 
+     * @return      the position of the ball
+     */
+    public double[] getHole(){
+        return this.hole;
+    }
+
+    /**
+     * 
+     * @return      the ball stop position
+     */
+    public double[] getStoppoint(){
+        return this.stopCoordinate;
+    }
+
+    
+    
 }
