@@ -37,7 +37,7 @@ public class FirstScreenController {
             stage.show();
         } catch (Exception ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Creating Error");
+            alert.setTitle("Error!");
             alert.setHeaderText("Failed to proceed to the next screen, check the input values");
             alert.setContentText(ex.getMessage());
             alert.showAndWait();
