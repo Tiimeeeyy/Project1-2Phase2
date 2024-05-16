@@ -13,6 +13,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -58,7 +59,14 @@
             <artifactId>javafx-fxml</artifactId>
             <version>17.0.1</version>
         </dependency>
+        <!-- Jzy3d dependency -->
+        <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -72,4 +80,10 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>jzy3d-repo</id>
+            <url>https://maven.jzy3d.org/releases</url>
+        </repository>
+    </repositories>
 </project>

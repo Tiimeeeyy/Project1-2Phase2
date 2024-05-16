@@ -5,6 +5,7 @@ module ui {
     requires java.desktop;
     requires javafx.graphics;
     requires javafx.base;
+    requires jzy3d.api;
 
     opens ui to javafx.fxml;
     exports ui;
