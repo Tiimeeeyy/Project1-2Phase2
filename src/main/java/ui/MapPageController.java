@@ -58,7 +58,7 @@ public class MapPageController {
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
-        
+
     }
 
     public class ColorItem {
@@ -216,6 +216,7 @@ public class MapPageController {
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
+        drawBallAndHole();
         System.out.println("Initial map rendered with green color.");
     }
 
@@ -242,4 +243,28 @@ public class MapPageController {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
     }
+    
+    private void drawBallAndHole() {
+        GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+    
+        // Центр холста
+        double centerX = drawingCanvas.getWidth() / 2;
+        double centerY = drawingCanvas.getHeight() / 2;
+    
+        // Пересчитываем координаты мячика и лунки относительно центра
+        double ballX = centerX + startBallPostion[0];
+        double ballY = centerY - startBallPostion[1];  // Инвертируем y для соответствия координатной системе
+        double holeX = centerX + HolePostion[0];
+        double holeY = centerY - HolePostion[1];  // Инвертируем y для соответствия координатной системе
+    
+        // Рисуем белый мячик
+        gc.setFill(Color.WHITE);
+        gc.fillOval(ballX - 5, ballY - 5, 10, 10);
+    
+        // Рисуем черную лунку
+        gc.setFill(Color.BLACK);
+        gc.fillOval(holeX - 5, holeY - 5, 10, 10);
+    }
+    
+    
 }
