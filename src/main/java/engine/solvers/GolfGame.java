@@ -34,7 +34,7 @@ public class GolfGame {
         this.a=a;
         this.dt=dt;
         this.hole=hole;
-        Utility.coordinateConvertor(this.hole);
+        Utility.cornerToCenter(this.hole);
         this.r=r;
         this.mappath=mappath;
     }
@@ -48,7 +48,7 @@ public class GolfGame {
      */
     public ArrayList<double[]> shoot(double[] x,Boolean recording){
         // cooridnateConvertor(x);
-        Utility.coordinateConvertor(x);
+        Utility.cornerToCenter(x);
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
         xtrac.clear();
         xtrac.add(x.clone());

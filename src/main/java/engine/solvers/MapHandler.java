@@ -118,11 +118,11 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
     }
-    public void renderMap(int[][] initialGreen, String mappath ){
+    public void renderMap(int[][] initialGreen, String mappath, double[] hole,double radius){
         BufferedImage image = null;
         int width=500;
         int height=500;
-        
+        int[] pixelHole=Utility.coordinateToPixel(hole);
         try {
             File input_file = new File(mappath);
             image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -144,6 +144,15 @@ public class MapHandler {
                         colortemp=new Color(0,g,180);
                     }
                     image.setRGB(i,j,colortemp.getRGB());
+                }
+            }
+            int intR=(int) Math.ceil(radius*10);
+            Color black=new Color(0,0,0);
+            for (int i = -intR; i <= intR; i++) {
+                for (int j =0; j <= intR-Math.abs(i); j++) {
+                    System.out.println(intR);
+                    image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
+                    image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
                 }
             }
             File outputfile=new File(mappath);

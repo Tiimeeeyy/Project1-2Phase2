@@ -185,7 +185,7 @@ public class MapPageController {
         saveCanvasAsPNG();
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
-        map.renderMap(this.initialGreen, path);
+        map.renderMap(this.initialGreen, path, HolePostion,radiusHole);
         // PauseTransition pause = new PauseTransition(Duration.seconds(1)); // задержка 1 секунда
         // pause.play();
 
