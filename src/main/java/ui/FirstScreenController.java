@@ -1,7 +1,7 @@
 package ui;
 
+import java.io.File;
 import java.io.IOException;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +35,25 @@ public class FirstScreenController {
             yHole = Double.parseDouble(Y_HOLE.getText());
         } catch (NumberFormatException e) {
             showAlert("Error!", "Invalid input for coordinates", "Please enter valid numbers for the coordinates.");
+            return;
+        }
+
+        try {
+            String userDir = System.getProperty("user.dir");
+            File resourcesDir = new File(userDir, "src/main/resources");
+            File file = new File(resourcesDir, "userInputMap.png");
+            
+            if (file.exists()) {
+                System.gc(); 
+                if (!file.delete()) {
+                    throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
+                } else {
+                    System.out.println("Existing file deleted: " + file.getAbsolutePath());
+                }
+            }
+        } catch (IOException ex) {
+            showAlert("Error!", "Failed to delete file", ex.getMessage());
+            ex.printStackTrace();
             return;
         }
 

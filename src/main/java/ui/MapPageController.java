@@ -4,6 +4,8 @@ import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
 import engine.solvers.Utility;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -11,6 +13,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -179,7 +182,17 @@ public class MapPageController {
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path);
-        Main.openThirdScreen();
+        // PauseTransition pause = new PauseTransition(Duration.seconds(1)); // задержка 1 секунда
+        // pause.play();
+
+        // pause.setOnFinished(event -> {
+        // try {
+            Main.openThirdScreen();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     showAlert(Alert.AlertType.ERROR, "Navigation Failed", "An error occurred while trying to open the third screen: " + e.getMessage());
+        // }
+        // });
     }
 
     public void goBack() {
@@ -260,7 +273,6 @@ public class MapPageController {
     private void drawBallAndHole() {
         GraphicsContext gc = overlayCanvas.getGraphicsContext2D();
     
-        // Центр холста
         double centerX = overlayCanvas.getWidth() / 2;
         double centerY = overlayCanvas.getHeight() / 2;
     
@@ -270,9 +282,9 @@ public class MapPageController {
         double holeY = centerY - HolePostion[1];  
     
         gc.setFill(Color.WHITE);
-        gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1);  // Мячик размером 1 пиксель
+        gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
     
         gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 1, holeY - 1, 2, 2);  // Лунка размером 2 пикселя
+        gc.fillOval(holeX - 1, holeY - 1, 2, 2);  
     }
 }
