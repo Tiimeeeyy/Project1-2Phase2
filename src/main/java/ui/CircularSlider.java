@@ -42,7 +42,7 @@ public class CircularSlider extends Region {
         double indicatorX = centerX + radius * Math.cos(angle);
         double indicatorY = centerY + radius * Math.sin(angle);
 
-        gc.setFill(Color.RED);
+        gc.setFill(Color.BLACK);
         gc.fillOval(indicatorX - 3, indicatorY - 3, 6, 6); 
     }
 

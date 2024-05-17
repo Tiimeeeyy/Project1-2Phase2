@@ -36,7 +36,6 @@ public class FirstScreenController {
             xHole = Double.parseDouble(X_HOLE.getText());
             yHole = Double.parseDouble(Y_HOLE.getText());
             radiusHole = Double.parseDouble(RADIUS_HOLE.getText());
-            System.out.println("Hole Radius: " + radiusHole);
         } catch (NumberFormatException e) {
             showAlert("Error!", "Invalid input for coordinates or radius", "Please enter valid numbers for the coordinates and radius.");
             return;
