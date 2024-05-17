@@ -201,7 +201,11 @@ public class MapPageController {
         } else {
             double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
             double brightnessFactor = 0.5 + normalizedHeight * 0.7;
-            Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
+            // Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
+            
+            int gr=(int)Math.floor(75+normalizedHeight*100);
+            Color color=Color.rgb(0, gr, 0);
+            
             return color;
         }
     }
@@ -210,9 +214,9 @@ public class MapPageController {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-                // Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
-                // this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
-                // gc.getPixelWriter().setColor(x, y, heightColor);
+                Color heightColor = getModifiedColor(baseColor, height);
+                this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
+                gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
