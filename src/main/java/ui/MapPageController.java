@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class MapPageController {
+    private static final double MAX_HEIGHT = 1.0;
+    private static final double MIN_HEIGHT = -1.0;
     @FXML
     private Canvas drawingCanvas;
 
@@ -29,14 +31,9 @@ public class MapPageController {
     private Slider widthSlider;
 
     private double[][] heightStorage;
-    private double minHeight;
-    private double maxHeight;
 
     public MapPageController(String function) {
         this.heightStorage = getHeightCoordinates(function);
-        double[] heightRange = getHeightRange();
-        this.minHeight = heightRange[0];
-        this.maxHeight = heightRange[1];
     }
 
     public class ColorItem {
@@ -60,7 +57,6 @@ public class MapPageController {
             new ColorItem("Grass", Color.web("#48992f")),
             new ColorItem("Water", Color.web("#077ef5")),
             new ColorItem("Tree", Color.web("#654321"))
-
         );
 
         if (drawingCanvas != null) {
@@ -77,11 +73,11 @@ public class MapPageController {
                 int ix = (int) x;
                 int iy = (int) y;
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
-                    double heightStep = (maxHeight - minHeight) / 100;
-                    updateHeightMap(ix, iy, heightStep);
+                    double heightStep = 0.1;
+                    updateHeightMap(ix, iy, heightStep, gc);
                     double height = heightStorage[ix][iy];
                     Color baseColor = colorChoiceBox.getValue().color;
-                    Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
+                    Color heightColor = getModifiedColor(baseColor, height);
 
                     gc.setFill(heightColor);
                     double brushWidth = widthSlider.getValue();
@@ -104,11 +100,8 @@ public class MapPageController {
                     }
                 }
             });
-            // drawingCanvas.setOnMouseDragged(handler);
-            // drawingCanvas.setOnMouseClicked(handler);
-        } else{
+        } else {
             System.err.println("drawingCanvas is null");
-
         }
     }
 
@@ -177,54 +170,50 @@ public class MapPageController {
                 heightStorage[i][j] = parser.evaluate();
             }
         }
-        // System.out.println(heightStorage);
         return heightStorage;
     }
 
-    private double[] getHeightRange() {
-        double minHeight = Double.MAX_VALUE;
-        double maxHeight = Double.MIN_VALUE;
-
-        for (int i = 0; i < 500; i++) {
-            for (int j = 0; j < 500; j++) {
-                double height = heightStorage[i][j];
-                if (height < minHeight) {
-                    minHeight = height;
-                }
-                if (height > maxHeight) {
-                    maxHeight = height;
-                }
-            }
+    private Color getModifiedColor(Color baseColor, double height) {
+        if(height < MIN_HEIGHT || height > MAX_HEIGHT) {
+            System.out.println("Height: " + height);
+            throw new Error("Out of range functions");
+        } else{
+            double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
+            double brightnessFactor = 0.3 + normalizedHeight * 0.7;
+            Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
+            return color;
         }
-
-        return new double[]{minHeight, maxHeight};
     }
+    
 
     private void renderInitialMap(GraphicsContext gc, Color baseColor) {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-                Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
+                Color heightColor = getModifiedColor(baseColor, height);
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
     }
 
-    private void updateHeightMap(int x, int y, double heightStep) {
+    private void updateHeightMap(int x, int y, double heightStep, GraphicsContext gc) {
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
             heightStorage[x][y] += heightStep;
-            // System.out.println("Height at (" + x + ", " + y + "): " + heightStorage[x][y]);
+            double height = heightStorage[x][y];
+            Color baseColor = colorChoiceBox.getValue().color;
+            Color heightColor = getModifiedColor(baseColor, height);
+            gc.setFill(heightColor);
+            double brushWidth = widthSlider.getValue();
+
+            if (colorChoiceBox.getValue().color.equals(Color.web("#654321"))) {
+                gc.fillOval(x - 5, y - 5, 5, 5);
+            } else {
+                gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
+            }
+
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
-    }
-
-    private Color getModifiedColor(Color baseColor, double height, double minHeight, double maxHeight) {
-        double normalizedHeight = (height - minHeight) / (maxHeight - minHeight);
-        double brightnessFactor = 0.6 + normalizedHeight * 0.7;
-        Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
-        // System.out.println("Height: " + height + ", Base Color: " + baseColor + ", Modified Color: " + color);
-        return color;
     }
 }
