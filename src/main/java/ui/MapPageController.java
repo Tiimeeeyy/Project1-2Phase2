@@ -11,9 +11,14 @@ import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import javafx.scene.canvas.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.PixelReader;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 
 public class MapPageController {
-    // TODO: make a box to change the width of the cursor
     // TODO: make a button to save the drawing as screenshot to /resource package
     // TODO: create alerts
     // TODO: create the third screen:
@@ -111,6 +116,52 @@ public class MapPageController {
             System.err.println("drawingCanvas is null");
 
         }
+    }
+
+    @FXML
+    private void saveCanvasAsPNG() {
+        try {
+            WritableImage writableImage = new WritableImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight());
+            drawingCanvas.snapshot(null, writableImage);
+
+            BufferedImage bufferedImage = new BufferedImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            PixelReader pixelReader = writableImage.getPixelReader();
+
+            for (int y = 0; y < writableImage.getHeight(); y++) {
+                for (int x = 0; x < writableImage.getWidth(); x++) {
+                    int argb = pixelReader.getArgb(x, y);
+                    bufferedImage.setRGB(x, y, argb);
+                }
+            }
+
+            String userDir = System.getProperty("user.dir");
+            File resourcesDir = new File(userDir, "src/main/resources");
+            if (!resourcesDir.exists()) {
+                showAlert(Alert.AlertType.ERROR, "Save Failed", "The directory you are trying to save to does not exist.");
+                return;
+            }
+
+            File file = new File(resourcesDir, "newMap.png");
+            boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
+            if (!imageWritten) {
+                throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
+            }
+
+            showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as newMap.png in the resources folder.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
+        }
+    }
+
+
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     public void goBack() {

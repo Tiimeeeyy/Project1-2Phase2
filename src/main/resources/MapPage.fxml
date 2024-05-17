@@ -17,5 +17,6 @@
       <Slider fx:id="widthSlider" layoutX="596.0" layoutY="170.0" prefWidth="150.0" min="1.0" max="50.0" value="30.0"/>
       <ChoiceBox fx:id="colorChoiceBox" layoutX="596.0" layoutY="215.0" prefHeight="25.0" prefWidth="150.0" />
       <Button layoutX="596.0" layoutY="43.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page" />
+      <Button layoutX="596.0" layoutY="100.0" mnemonicParsing="false" onAction="#saveCanvasAsPNG" prefHeight="26.0" prefWidth="150.0" text="Save as PNG" />
    </children>
 </AnchorPane>
