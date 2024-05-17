@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import javax.imageio.ImageIO;
 
 import engine.parser.ExpressionParser;
+import javafx.scene.image.Image;
 
 import java.awt.Color;
 
@@ -117,6 +118,41 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
     }
+    public void renderMap(int[][] initialGreen, String mappath ){
+        BufferedImage image = null;
+        int width=500;
+        int height=500;
+        
+        try {
+            File input_file = new File(mappath);
+            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            image = ImageIO.read(input_file);
+            width=image.getWidth();
+            height=image.getHeight();
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
+                    int r = (rgb >> 16) & 0xFF;   // Red component
+                    int b = rgb & 0xFF; 
+                    int g= (int) initialGreen[i][j]; // get the green
+                    Color colortemp=new Color(0,g,0);
+                    if (r>100) {
+                        colortemp=new Color(180,g,0);
+                    }else if (b>100) {
+                        colortemp=new Color(0,g,180);
+                    }
+                    image.setRGB(i,j,colortemp.getRGB());
+                }
+            }
+            File outputfile=new File(mappath);
+            ImageIO.write(image, "png", outputfile);
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+        
+        // Image image = new Image(getClass().getResource("/newMap.PNG").toExternalForm());
+    }
 
     private int heightFunction(double x, double y){
         // translate x,y from (0,500) to (-10,10), 
@@ -130,5 +166,10 @@ public class MapHandler {
         ExpressionParser parser = new ExpressionParser(func, initVars);
         
         return (int) parser.evaluate();
+    }
+
+    public static void main(String[] args) {
+        String s= MapHandler.class.getClass().getResource("/newMap.PNG").toExternalForm();
+        System.out.println(s);
     }
 }

@@ -3,6 +3,7 @@ package ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
+import engine.solvers.MapHandler;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -31,6 +32,7 @@ public class MapPageController {
     private double[][] heightStorage;
     private double minHeight;
     private double maxHeight;
+    private int[][] initialGreen=new int[500][500];
 
     public MapPageController(String function) {
         this.heightStorage = getHeightCoordinates(function);
@@ -159,6 +161,9 @@ public class MapPageController {
     @FXML
     private void saveCanvasAndContinue() {
         saveCanvasAsPNG();
+        MapHandler map=new MapHandler();
+        String path = System.getProperty("user.dir")+"/src/main/resources/newMap.png";
+        map.renderMap(this.initialGreen, path);
         Main.openThirdScreen();
     }
 
@@ -205,6 +210,7 @@ public class MapPageController {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
+                this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
