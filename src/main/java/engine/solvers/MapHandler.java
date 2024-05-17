@@ -168,8 +168,4 @@ public class MapHandler {
         return (int) parser.evaluate();
     }
 
-    public static void main(String[] args) {
-        String s= MapHandler.class.getClass().getResource("/newMap.PNG").toExternalForm();
-        System.out.println(s);
-    }
 }

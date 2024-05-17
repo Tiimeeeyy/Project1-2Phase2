@@ -205,7 +205,11 @@ public class MapPageController {
         } else {
             double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
             double brightnessFactor = 0.5 + normalizedHeight * 0.7;
-            Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
+            // Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
+            
+            int gr=(int)Math.floor(75+normalizedHeight*100);
+            Color color=Color.rgb(0, gr, 0);
+            
             return color;
         }
     }
