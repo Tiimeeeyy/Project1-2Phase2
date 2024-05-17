@@ -21,7 +21,7 @@ public class FirstScreenController {
     @FXML
     private TextField FunctionTextfield;
     private String function;
-    
+
 
     public void nextScreen(ActionEvent event) {
         function = FunctionTextfield.getText();
