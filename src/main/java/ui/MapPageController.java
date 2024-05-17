@@ -22,10 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import ui.MapPageController;
 
-
 public class MapPageController {
     private static final double MAX_HEIGHT = 1.0;
     private static final double MIN_HEIGHT = -1.0;
+
     @FXML
     private Canvas drawingCanvas;
 
@@ -83,20 +83,9 @@ public class MapPageController {
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
                     double heightStep = 0.1;
                     updateHeightMap(ix, iy, heightStep, gc);
-                    double height = heightStorage[ix][iy];
-                    Color baseColor = colorChoiceBox.getValue().color;
-                    Color heightColor = getModifiedColor(baseColor, height);
-
-                    gc.setFill(heightColor);
-                    double brushWidth = widthSlider.getValue();
-                    System.out.println("Color: " + colorChoiceBox.getValue().color + ", Brush width: " + brushWidth);
-                    if (colorChoiceBox.getValue().color.equals(Color.web("#654321"))) {
-                        gc.fillOval(x -  5, y - 5, 5, 5);
-                    } else {
-                        gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
-                    }
                 }
             };
+
             colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
                 if (newColor != null) {
                     if (newColor.color.equals(Color.web("#654321"))) {
@@ -111,10 +100,10 @@ public class MapPageController {
         } else {
             System.err.println("drawingCanvas is null");
         }
+        
         double[][] height = heightStorage;
         HeightMap3DChart chart3d = new HeightMap3DChart(height, chartPane);
         chart3d.display3DChart();
-
     }
 
     @FXML
@@ -176,8 +165,8 @@ public class MapPageController {
         for (int i = 0; i < 500; i++) {
             for (int j = 0; j < 500; j++) {
                 HashMap<String, Double> currentCoordinates = new HashMap<>();
-                currentCoordinates.put("x", (double) i/10-25);
-                currentCoordinates.put("y", (double) -j/10+25);
+                currentCoordinates.put("x", (double) i / 10 - 25);
+                currentCoordinates.put("y", (double) -j / 10 + 25);
                 ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
                 heightStorage[i][j] = parser.evaluate();
             }
@@ -186,17 +175,16 @@ public class MapPageController {
     }
 
     private Color getModifiedColor(Color baseColor, double height) {
-        if(height < MIN_HEIGHT || height > MAX_HEIGHT) {
+        if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             System.out.println("Height: " + height);
             throw new Error("Out of range functions");
-        } else{
+        } else {
             double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
-            double brightnessFactor = 0.3 + normalizedHeight * 0.7;
+            double brightnessFactor = 0.5 + normalizedHeight * 0.7;
             Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
             return color;
         }
     }
-    
 
     private void renderInitialMap(GraphicsContext gc, Color baseColor) {
         for (int x = 0; x < 500; x++) {
@@ -212,6 +200,11 @@ public class MapPageController {
     private void updateHeightMap(int x, int y, double heightStep, GraphicsContext gc) {
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
             heightStorage[x][y] += heightStep;
+            if (heightStorage[x][y] > MAX_HEIGHT) {
+                heightStorage[x][y] = MAX_HEIGHT;
+            } else if (heightStorage[x][y] < MIN_HEIGHT) {
+                heightStorage[x][y] = MIN_HEIGHT;
+            }
             double height = heightStorage[x][y];
             Color baseColor = colorChoiceBox.getValue().color;
             Color heightColor = getModifiedColor(baseColor, height);
@@ -223,7 +216,6 @@ public class MapPageController {
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
-
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
