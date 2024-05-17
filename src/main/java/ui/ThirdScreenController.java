@@ -2,6 +2,8 @@ package ui;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
@@ -25,7 +27,10 @@ public class ThirdScreenController {
     private Slider powerSlider;
 
     @FXML
-    private Pane circularSliderPane; 
+    private Pane circularSliderPane;
+
+    @FXML
+    private Canvas ballCanvas;
 
     private CircularSlider circularSlider;
     private double[] startBallPostion;
@@ -46,6 +51,8 @@ public class ThirdScreenController {
 
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateDirection(newVal));
         powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePower(newVal));
+
+        drawBallPosition();
     }
 
     private void updateDirection(Number newVal) {
@@ -101,6 +108,28 @@ public class ThirdScreenController {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Load Failed", "File not found: " + e.getMessage()));
+        }
+    }
+
+    private void drawBallPosition() {
+        if (ballCanvas != null) {
+            GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+            gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
+
+            double centerX = ballCanvas.getWidth() / 2;
+            double centerY = ballCanvas.getHeight() / 2;
+
+            double ballRadius = 1; 
+            double ballX = centerX + startBallPostion[0];
+            double ballY = centerY - startBallPostion[1];  
+
+
+            gc.setFill(javafx.scene.paint.Color.WHITE);
+            gc.fillOval(ballX - ballRadius / 2, ballY - ballRadius / 2, ballRadius, ballRadius);
+
+        
+        } else {
+            System.err.println("ballCanvas is null");
         }
     }
 
