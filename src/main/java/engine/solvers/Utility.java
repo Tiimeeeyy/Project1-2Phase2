@@ -11,7 +11,7 @@ public class Utility {
         x[1]=-(x[1]-25);
     }
     
-    // public static int heightToColor(double x){
-    //     return 
-    // }
+    public static int heightToColor(double x){
+        return (int) (x*50+125); 
+    }
 }

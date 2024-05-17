@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
-
-
+import engine.solvers.Utility;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,8 +25,8 @@ import java.io.IOException;
 import ui.MapPageController;
 
 public class MapPageController {
-    private static final double MAX_HEIGHT = 1.0;
-    private static final double MIN_HEIGHT = -1.0;
+    private static final double MAX_HEIGHT = 10.0;
+    private static final double MIN_HEIGHT = -10.0;
 
     @FXML
     private Canvas drawingCanvas;
@@ -78,10 +77,10 @@ public class MapPageController {
 
     public void initialize() {
         colorChoiceBox.getItems().addAll(
-            new ColorItem("Sand", Color.web("#d9be5c")),
-            new ColorItem("Grass", Color.web("#48992f")),
-            new ColorItem("Water", Color.web("#077ef5")),
-            new ColorItem("Tree", Color.web("#654321"))
+            new ColorItem("Sand", Color.rgb(180, 125, 0)),
+            new ColorItem("Grass", Color.rgb(0, 125, 0)),
+            new ColorItem("Water", Color.rgb(0, 125, 180)),
+            new ColorItem("Tree", Color.rgb(120, 60, 35))
         );
 
         if (drawingCanvas != null) {
@@ -105,7 +104,7 @@ public class MapPageController {
 
             colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
                 if (newColor != null) {
-                    if (newColor.color.equals(Color.web("#654321"))) {
+                    if (newColor.color.equals(Color.rgb(120, 60, 35))) {
                         drawingCanvas.setOnMouseClicked(handler);
                         drawingCanvas.setOnMouseDragged(null); // Disable dragging for dark brown
                     } else {
@@ -199,11 +198,11 @@ public class MapPageController {
             System.out.println("Height: " + height);
             throw new Error("Out of range functions");
         } else {
-            double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
-            double brightnessFactor = 0.5 + normalizedHeight * 0.7;
+            // double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
+            // double brightnessFactor = 0.5 + normalizedHeight * 0.7;
             // Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
             
-            int gr=(int)Math.floor(75+normalizedHeight*100);
+            int gr=Utility.heightToColor(height);
             Color color=Color.rgb(0, gr, 0);
             
             return color;
@@ -216,7 +215,6 @@ public class MapPageController {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height);
                 this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
-
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
@@ -234,11 +232,11 @@ public class MapPageController {
             }
             double height = heightStorage[x][y];
             Color baseColor = colorChoiceBox.getValue().color;
-            Color heightColor = getModifiedColor(baseColor, height);
-            gc.setFill(heightColor);
+            // Color heightColor = getModifiedColor(baseColor, height);
+            gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
 
-            if (colorChoiceBox.getValue().color.equals(Color.web("#654321"))) {
+            if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
                 gc.fillOval(x - 5, y - 5, 5, 5);
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);

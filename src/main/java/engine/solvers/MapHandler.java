@@ -136,7 +136,9 @@ public class MapHandler {
                     int b = rgb & 0xFF; 
                     int g= (int) initialGreen[i][j]; // get the green
                     Color colortemp=new Color(0,g,0);
-                    if (r>100) {
+                    if (r>30 && b>30) {
+                        colortemp=new Color(100,67,33);
+                    }else if (r>100) {
                         colortemp=new Color(180,g,0);
                     }else if (b>100) {
                         colortemp=new Color(0,g,180);
