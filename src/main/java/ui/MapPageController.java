@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
+
+
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -31,9 +33,6 @@ public class MapPageController {
     private Canvas drawingCanvas;
 
     @FXML
-    private Canvas coordinatesCanvas;
-
-    @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
 
     @FXML
@@ -46,9 +45,20 @@ public class MapPageController {
     private double minHeight;
     private double maxHeight;
     private int[][] initialGreen=new int[500][500];
+    private double[] startBallPostion = new double[2];
+    private double[] HolePostion = new double[2];
 
-    public MapPageController(String function) {
+
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole) {
         this.heightStorage = getHeightCoordinates(function);
+        startBallPostion[0] = xBall;
+        startBallPostion[1] = yBall;
+        HolePostion[0] = xHole;
+        HolePostion[1] = yHole;
+        System.out.println("Function: " + function);
+        System.out.println("Ball position: " + xBall + ", " + yBall);
+        System.out.println("Hole position: " + xHole + ", " + yHole);
+
     }
 
     public class ColorItem {
@@ -65,16 +75,6 @@ public class MapPageController {
             return name;
         }
     }
-
-    public void drawCoordinates(double x, double y) {
-        System.out.println("Drawing coordinates: (" + x + ", " + y + ")");
-        GraphicsContext gc = coordinatesCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, coordinatesCanvas.getWidth(), coordinatesCanvas.getHeight());
-        gc.setFill(Color.RED); // Set the color for drawing the coordinates
-        double circleSize = 100; // Set the size of the circle
-        gc.fillOval(x - circleSize / 2, y - circleSize / 2, circleSize, circleSize); // Draw a larger circle at the coordinates
-    }
-    
 
     public void initialize() {
         colorChoiceBox.getItems().addAll(
@@ -146,13 +146,13 @@ public class MapPageController {
                 return;
             }
 
-            File file = new File(resourcesDir, "newMap.png");
+            File file = new File(resourcesDir, "userInputMap.png");
             boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
             if (!imageWritten) {
                 throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
             }
 
-            showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as newMap.png in the resources folder.");
+            // showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as userInputMap.png in the resources folder.");
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
@@ -171,7 +171,7 @@ public class MapPageController {
     private void saveCanvasAndContinue() {
         saveCanvasAsPNG();
         MapHandler map=new MapHandler();
-        String path = System.getProperty("user.dir")+"/src/main/resources/newMap.png";
+        String path = System.getProperty("user.dir")+"/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path);
         Main.openThirdScreen();
     }
@@ -216,9 +216,11 @@ public class MapPageController {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height);
                 this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
+
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
+        drawBallAndHole();
         System.out.println("Initial map rendered with green color.");
     }
 
@@ -245,4 +247,28 @@ public class MapPageController {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
     }
+    
+    private void drawBallAndHole() {
+        GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+    
+        // Центр холста
+        double centerX = drawingCanvas.getWidth() / 2;
+        double centerY = drawingCanvas.getHeight() / 2;
+    
+        // Пересчитываем координаты мячика и лунки относительно центра
+        double ballX = centerX + startBallPostion[0];
+        double ballY = centerY - startBallPostion[1];  // Инвертируем y для соответствия координатной системе
+        double holeX = centerX + HolePostion[0];
+        double holeY = centerY - HolePostion[1];  // Инвертируем y для соответствия координатной системе
+    
+        // Рисуем белый мячик
+        gc.setFill(Color.WHITE);
+        gc.fillOval(ballX - 5, ballY - 5, 10, 10);
+    
+        // Рисуем черную лунку
+        gc.setFill(Color.BLACK);
+        gc.fillOval(holeX - 5, holeY - 5, 10, 10);
+    }
+    
+    
 }

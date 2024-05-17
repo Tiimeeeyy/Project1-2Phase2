@@ -23,7 +23,7 @@ public class ThirdScreenController {
 
     @FXML
     public void initialize() {
-        Image image = new Image(getClass().getResource("/newMap.PNG").toExternalForm());
+        Image image = new Image(getClass().getResource("/userInputMap.PNG").toExternalForm());
         mapImageView.setImage(image);
 
         // Add listeners or handlers if needed
