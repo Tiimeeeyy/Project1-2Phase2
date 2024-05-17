@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Pane layoutX="68.0" layoutY="43.0" prefHeight="483.0" prefWidth="426.0" style="-fx-border-color: black; -fx-border-width: 1px;">
-        <ImageView fx:id="mapImageView" fitHeight="483.0" fitWidth="426.0"/>
-    </Pane>
-    <Button layoutX="596.0" layoutY="43.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page"/>
-    <Slider fx:id="directionSlider" layoutX="596.0" layoutY="270.0" max="360.0" min="0.0" prefWidth="150.0" value="0.0"/>
-    <Slider fx:id="powerSlider" layoutX="596.0" layoutY="315.0" max="100.0" min="0.0" prefWidth="150.0" value="50.0"/>
+<AnchorPane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+       <Pane layoutX="68.0" layoutY="43.0" prefHeight="483.0" prefWidth="426.0" style="-fx-border-color: black; -fx-border-width: 1px;">
+          <children>
+              <ImageView fx:id="mapImageView" fitHeight="483.0" fitWidth="426.0" />
+          </children>
+       </Pane>
+       <Button layoutX="596.0" layoutY="43.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page" />
+       <Slider fx:id="powerSlider" layoutX="596.0" layoutY="315.0" max="100.0" min="0.0" prefWidth="150.0" value="50.0" />
+       <Pane fx:id="circularSliderPane" layoutX="596.0" layoutY="370.0" prefHeight="200.0" prefWidth="200.0" />
+   </children>
 </AnchorPane>

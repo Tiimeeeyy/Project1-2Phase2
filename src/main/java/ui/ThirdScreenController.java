@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,18 +22,39 @@ public class ThirdScreenController {
     private Button goBackButton;
 
     @FXML
-    private Slider directionSlider;
+    private Slider powerSlider;
 
     @FXML
-    private Slider powerSlider;
+    private Pane circularSliderPane; 
+
+    private CircularSlider circularSlider;
+    private double[] startBallPostion;
+    private double[] HolePostion;
+
+    public ThirdScreenController(double[] startBallPostion, double[] HolePostion) {
+        this.startBallPostion = startBallPostion;
+        this.HolePostion = HolePostion;
+        System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
+    }
 
     @FXML
     public void initialize() {
         loadNewImage();
 
-        // Add listeners or handlers if needed
-        // Example: directionSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateDirection(newVal));
-        // Example: powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePower(newVal));
+        circularSlider = new CircularSlider();
+        circularSliderPane.getChildren().add(circularSlider);
+
+        circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateDirection(newVal));
+        powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePower(newVal));
+    }
+
+    private void updateDirection(Number newVal) {
+        double[] directionVector = circularSlider.getDirectionVector();
+        System.out.println("Direction Vector: [" + directionVector[0] + ", " + directionVector[1] + "]");
+    }
+
+    private void updatePower(Number newVal) {
+        System.out.println("Power: " + newVal.doubleValue());
     }
 
     private void loadNewImage() {

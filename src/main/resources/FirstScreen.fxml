@@ -16,7 +16,7 @@
    <children>
       <AnchorPane prefHeight="600.0" prefWidth="900.0">
          <children>
-            <TextField fx:id="FunctionTextfield" layoutX="97.0" layoutY="164.0" prefHeight="42.0" prefWidth="702.0" promptText="Insert function">
+            <TextField fx:id="FunctionTextfield" layoutX="97.0" layoutY="164.0" prefHeight="42.0" prefWidth="702.0" promptText="Insert function" text="0.4 * (0.9 - e^(-(x^2 + y^2) / 8))">
                <font>
                   <Font size="14.0" />
                </font>
