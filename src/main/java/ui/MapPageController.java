@@ -87,7 +87,7 @@ public class MapPageController {
                     double brushWidth = widthSlider.getValue();
                     System.out.println("Color: " + colorChoiceBox.getValue().color + ", Brush width: " + brushWidth);
                     if (colorChoiceBox.getValue().color.equals(Color.web("#654321"))) {
-                        gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, 5, 5);
+                        gc.fillOval(x -  5, y - 5, 5, 5);
                     } else {
                         gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
                     }
