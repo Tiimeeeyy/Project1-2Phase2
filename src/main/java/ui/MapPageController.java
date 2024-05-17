@@ -7,16 +7,27 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 import javafx.scene.canvas.*;
 import javafx.scene.input.MouseEvent;
 
 public class MapPageController {
+    // TODO: make a box to change the width of the cursor
+    // TODO: make a button to save the drawing as screenshot to /resource package
+    // TODO: create alerts
+    // TODO: create the third screen:
+    //  (map as a picture, ball on it, input fields for the power/direction of the hit,
+    //  direction can be as a circle slider, and power as a normal slider,
+    //  arrow on the map to show the direction)
     @FXML
     private Canvas drawingCanvas;
 
     @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
+
+    @FXML
+    private Slider widthSlider;
 
     private double[][] heightStorage;
     private double minHeight;
@@ -74,11 +85,12 @@ public class MapPageController {
                     Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
             
                     gc.setFill(heightColor);
-                    System.out.println(colorChoiceBox.getValue().color);
+                    double brushWidth = widthSlider.getValue();
+                    System.out.println("Color: " + colorChoiceBox.getValue().color + ", Brush width: " + brushWidth);
                     if (colorChoiceBox.getValue().color.equals(Color.web("#654321"))) {
-                        gc.fillOval(x - 5, y - 5, 5, 5);
-                    } else{
-                        gc.fillOval(x - 5, y - 5, 30, 30);
+                        gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, 5, 5);
+                    } else {
+                        gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
                     }
                 }
             };
