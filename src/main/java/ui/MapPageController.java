@@ -238,7 +238,7 @@ public class MapPageController {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
             double height = heightStorage[x][y];
-            Color baseColor = colorChoiceBox.getValue().color;
+            Color baseColor = Color.rgb(180, initialGreen[x][y], 0);
             // Color heightColor = getModifiedColor(baseColor, height);
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
