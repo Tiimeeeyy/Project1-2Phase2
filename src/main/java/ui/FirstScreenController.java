@@ -1,49 +1,63 @@
 package ui;
+
+import java.io.IOException;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import engine.parser.ExpressionParser;
-
 public class FirstScreenController {
-    
     @FXML
     private TextField FunctionTextfield;
-    private String function;
+    @FXML
+    private TextField X_BALL;
+    @FXML
+    private TextField Y_BALL;
+    @FXML
+    private TextField X_HOLE;
+    @FXML
+    private TextField Y_HOLE;
 
+    private String function;
 
     public void nextScreen(ActionEvent event) {
         function = FunctionTextfield.getText();
+        double xBall, yBall, xHole, yHole;
+        try {
+            xBall = Double.parseDouble(X_BALL.getText());
+            yBall = Double.parseDouble(Y_BALL.getText());
+            xHole = Double.parseDouble(X_HOLE.getText());
+            yHole = Double.parseDouble(Y_HOLE.getText());
+        } catch (NumberFormatException e) {
+            showAlert("Error!", "Invalid input for coordinates", "Please enter valid numbers for the coordinates.");
+            return;
+        }
 
         try {
-            // 255 - ((0.4 * (0.9 - e^(-(((x / 50 - 5)^2 + (y / 50 - 5)^2) / 8)))) * 200 + 80)
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            fxmlLoader.setController(new MapPageController(function));
+            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole);
+            fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("Map Creating Screen");
             stage.show();
-        } catch (Exception ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error!");
-            alert.setHeaderText("Failed to proceed to the next screen, check the input values");
-            alert.setContentText(ex.getMessage());
-            alert.showAndWait();
+        } catch (IOException ex) {
+            showAlert("Error!", "Failed to proceed to the next screen", ex.getMessage());
             ex.printStackTrace();
         }
     }
 
-
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }

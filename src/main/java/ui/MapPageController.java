@@ -45,10 +45,20 @@ public class MapPageController {
     private double minHeight;
     private double maxHeight;
     private int[][] initialGreen=new int[500][500];
+    private double[] startBallPostion = new double[2];
+    private double[] HolePostion = new double[2];
 
 
-    public MapPageController(String function) {
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole) {
         this.heightStorage = getHeightCoordinates(function);
+        startBallPostion[0] = xBall;
+        startBallPostion[1] = yBall;
+        HolePostion[0] = xHole;
+        HolePostion[1] = yHole;
+        System.out.println("Function: " + function);
+        System.out.println("Ball position: " + xBall + ", " + yBall);
+        System.out.println("Hole position: " + xHole + ", " + yHole);
+        
     }
 
     public class ColorItem {
@@ -142,7 +152,7 @@ public class MapPageController {
                 throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
             }
 
-            showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as userInputMap.png in the resources folder.");
+            // showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as userInputMap.png in the resources folder.");
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
