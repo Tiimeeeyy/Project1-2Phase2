@@ -22,19 +22,23 @@ public class FirstScreenController {
     private TextField X_HOLE;
     @FXML
     private TextField Y_HOLE;
+    @FXML
+    private TextField RADIUS_HOLE;
 
     private String function;
 
     public void nextScreen(ActionEvent event) {
         function = FunctionTextfield.getText();
-        double xBall, yBall, xHole, yHole;
+        double xBall, yBall, xHole, yHole, radiusHole;
         try {
             xBall = Double.parseDouble(X_BALL.getText());
             yBall = Double.parseDouble(Y_BALL.getText());
             xHole = Double.parseDouble(X_HOLE.getText());
             yHole = Double.parseDouble(Y_HOLE.getText());
+            radiusHole = Double.parseDouble(RADIUS_HOLE.getText());
+            System.out.println("Hole Radius: " + radiusHole);
         } catch (NumberFormatException e) {
-            showAlert("Error!", "Invalid input for coordinates", "Please enter valid numbers for the coordinates.");
+            showAlert("Error!", "Invalid input for coordinates or radius", "Please enter valid numbers for the coordinates and radius.");
             return;
         }
 
@@ -59,7 +63,7 @@ public class FirstScreenController {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole);
+            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

@@ -47,16 +47,20 @@ public class MapPageController {
     private int[][] initialGreen = new int[500][500];
     private double[] startBallPostion = new double[2];
     private double[] HolePostion = new double[2];
+    private double radiusHole;
 
-    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole) {
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole) {
         this.heightStorage = getHeightCoordinates(function);
         startBallPostion[0] = xBall;
         startBallPostion[1] = yBall;
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
+        this.radiusHole = radiusHole;
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
+        System.out.println("Hole Radius: " + radiusHole);
+
     }
 
     public class ColorItem {
@@ -285,6 +289,6 @@ public class MapPageController {
         gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
     
         gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 1, holeY - 1, 2, 2);  
+        gc.fillOval(holeX - 1, holeY - 1, radiusHole, radiusHole);  
     }
 }

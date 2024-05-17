@@ -21,8 +21,6 @@
                   <Font size="14.0" />
                </font>
             </TextField>
-            <!-- <Button layoutX="268.0" layoutY="236.0" mnemonicParsing="false" onAction="#parseFunction" prefHeight="42.0" prefWidth="362.0" text="Parse function" />
-            <Label fx:id="parsedResultLabel" layoutX="268.0" layoutY="300.0" text="" /> -->
             <Button layoutX="723.0" layoutY="236.0" mnemonicParsing="false" onAction="#nextScreen" prefHeight="42.0" prefWidth="77.0" text="See map" />
             <HBox layoutX="104.0" layoutY="265.0" prefHeight="24.0" prefWidth="418.0">
                <children>
@@ -36,9 +34,11 @@
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Input the hole position:" />
                   <TextField fx:id="X_HOLE" prefHeight="31.0" prefWidth="41.0" promptText="X" />
                   <TextField fx:id="Y_HOLE" prefHeight="31.0" prefWidth="42.0" promptText="Y" />
+                  <TextField fx:id="RADIUS_HOLE" prefHeight="31.0" prefWidth="92.0" promptText="Radius" />
                </children>
             </HBox>
          </children>
       </AnchorPane>
+      <Text layoutX="10.0" layoutY="10.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Input the start position:" />
    </children>
 </Pane>
