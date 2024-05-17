@@ -5,9 +5,12 @@ import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.canvas.*;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +20,8 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import ui.MapPageController;
+
 
 public class MapPageController {
     private static final double MAX_HEIGHT = 1.0;
@@ -29,6 +34,9 @@ public class MapPageController {
 
     @FXML
     private Slider widthSlider;
+
+    @FXML
+    private Pane chartPane;
 
     private double[][] heightStorage;
 
@@ -103,6 +111,10 @@ public class MapPageController {
         } else {
             System.err.println("drawingCanvas is null");
         }
+        double[][] height = heightStorage;
+        HeightMap3DChart chart3d = new HeightMap3DChart(height, chartPane);
+        chart3d.display3DChart();
+
     }
 
     @FXML
