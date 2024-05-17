@@ -110,8 +110,8 @@ public class MapPageController {
         for (int i = 0; i < 500; i++) {
             for (int j = 0; j < 500; j++) {
                 HashMap<String, Double> currentCoordinates = new HashMap<>();
-                currentCoordinates.put("x", (double) i);
-                currentCoordinates.put("y", (double) j);
+                currentCoordinates.put("x", (double) i/10-25);
+                currentCoordinates.put("y", (double) -j/10+25);
                 ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
                 heightStorage[i][j] = parser.evaluate();
             }
