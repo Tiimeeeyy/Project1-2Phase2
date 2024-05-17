@@ -210,9 +210,9 @@ public class MapPageController {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-                // Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
-                // this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
-                // gc.getPixelWriter().setColor(x, y, heightColor);
+                Color heightColor = getModifiedColor(baseColor, height);
+                this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
+                gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
