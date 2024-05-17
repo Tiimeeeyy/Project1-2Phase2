@@ -136,13 +136,13 @@ public class MapPageController {
                 return;
             }
 
-            File file = new File(resourcesDir, "newMap.png");
+            File file = new File(resourcesDir, "userInputMap.png");
             boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
             if (!imageWritten) {
                 throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
             }
 
-            showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as newMap.png in the resources folder.");
+            showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as userInputMap.png in the resources folder.");
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
@@ -161,7 +161,7 @@ public class MapPageController {
     private void saveCanvasAndContinue() {
         saveCanvasAsPNG();
         MapHandler map=new MapHandler();
-        String path = System.getProperty("user.dir")+"/src/main/resources/newMap.png";
+        String path = System.getProperty("user.dir")+"/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path);
         Main.openThirdScreen();
     }
