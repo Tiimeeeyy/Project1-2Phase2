@@ -3,6 +3,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
@@ -13,7 +14,9 @@
             <Canvas fx:id="drawingCanvas" height="483.0" width="426.0" />
          </children>
       </Pane>
+      <Slider fx:id="widthSlider" layoutX="596.0" layoutY="170.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
       <ChoiceBox fx:id="colorChoiceBox" layoutX="596.0" layoutY="215.0" prefHeight="25.0" prefWidth="150.0" />
       <Button layoutX="596.0" layoutY="43.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page" />
+      <Button layoutX="596.0" layoutY="457.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Save and continue" />
    </children>
 </AnchorPane>

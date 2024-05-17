@@ -27,6 +27,19 @@ public class Main extends Application {
         }
     }
 
+    public static void openThirdScreen() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/ThirdScreen.fxml"));
+            fxmlLoader.setController(new ThirdScreenController());
+            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+            primaryStage.setTitle("Third Screen");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
