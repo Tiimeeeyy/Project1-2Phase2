@@ -191,7 +191,7 @@ public class MapPageController {
 
         // pause.setOnFinished(event -> {
         // try {
-        Main.openThirdScreen(startBallPostion, HolePostion);
+        Main.openThirdScreen(startBallPostion, HolePostion, radiusHole);
         // } catch (Exception e) {
         //     e.printStackTrace();
         //     showAlert(Alert.AlertType.ERROR, "Navigation Failed", "An error occurred while trying to open the third screen: " + e.getMessage());

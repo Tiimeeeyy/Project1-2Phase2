@@ -39,7 +39,7 @@ public class ThirdScreenController {
     private double[] startBallPostion;
     private double[] HolePostion;
 
-    public ThirdScreenController(double[] startBallPostion, double[] HolePostion) {
+    public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
