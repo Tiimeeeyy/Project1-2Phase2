@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
-
-<?import javafx.scene.control.Label?>
-<Pane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <AnchorPane prefHeight="600.0" prefWidth="900.0">
          <children>
-            <TextField fx:id="FunctionTextfield" layoutX="97.0" layoutY="100.0" prefHeight="42.0" prefWidth="702.0" promptText="Insert function">
+            <TextField fx:id="FunctionTextfield" layoutX="97.0" layoutY="164.0" prefHeight="42.0" prefWidth="702.0" promptText="Insert function">
                <font>
                   <Font size="14.0" />
                </font>
             </TextField>
-            <Label layoutX="97.0" layoutY="240.0" prefHeight="18.0" prefWidth="100.0" text="X Coordinate" />
-            <TextField layoutX="97.0" layoutY="274.0" prefHeight="42.0" prefWidth="100.0" promptText="X" fx:id="xCoordinateTextField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <Label layoutX="216.0" layoutY="240.0" prefHeight="18.0" prefWidth="100.0" text="Y Coordinate" />
-            <TextField fx:id="yCoordinateTextField" layoutX="216.0" layoutY="274.0" prefHeight="42.0" prefWidth="100.0" promptText="Y">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
+            <!-- <Button layoutX="268.0" layoutY="236.0" mnemonicParsing="false" onAction="#parseFunction" prefHeight="42.0" prefWidth="362.0" text="Parse function" />
+            <Label fx:id="parsedResultLabel" layoutX="268.0" layoutY="300.0" text="" /> -->
             <Button layoutX="723.0" layoutY="236.0" mnemonicParsing="false" onAction="#nextScreen" prefHeight="42.0" prefWidth="77.0" text="See map" />
          </children>
       </AnchorPane>
