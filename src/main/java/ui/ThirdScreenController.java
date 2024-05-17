@@ -49,10 +49,13 @@ public class ThirdScreenController {
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
 
-        circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> updateDirection(newVal));
-        powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> updatePower(newVal));
+        circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            updateDirection(newVal);
+            drawBallAndArrow();
+        });
+        powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> drawBallAndArrow());
 
-        drawBallPosition();
+        drawBallAndArrow();
     }
 
     private void updateDirection(Number newVal) {
@@ -111,7 +114,7 @@ public class ThirdScreenController {
         }
     }
 
-    private void drawBallPosition() {
+    private void drawBallAndArrow() {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
@@ -123,11 +126,17 @@ public class ThirdScreenController {
             double ballX = centerX + startBallPostion[0];
             double ballY = centerY - startBallPostion[1];  
 
-
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX - ballRadius / 2, ballY - ballRadius / 2, ballRadius, ballRadius);
 
-        
+            double[] directionVector = circularSlider.getDirectionVector();
+            double arrowLength = powerSlider.getValue() * 5;
+            double arrowX = ballX + directionVector[0] * arrowLength;
+            double arrowY = ballY - directionVector[1] * arrowLength;
+
+            gc.setStroke(javafx.scene.paint.Color.RED);
+            gc.setLineWidth(1);
+            gc.strokeLine(ballX, ballY, arrowX, arrowY);
         } else {
             System.err.println("ballCanvas is null");
         }
