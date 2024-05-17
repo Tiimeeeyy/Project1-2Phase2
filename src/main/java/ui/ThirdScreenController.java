@@ -24,6 +24,9 @@ public class ThirdScreenController {
     private Button goBackButton;
 
     @FXML
+    private Button hitButton;
+
+    @FXML
     private Slider powerSlider;
 
     @FXML
@@ -140,6 +143,18 @@ public class ThirdScreenController {
         } else {
             System.err.println("ballCanvas is null");
         }
+    }
+
+    @FXML
+    private void hit() {
+        double[] directionVector = circularSlider.getDirectionVector();
+        double power = powerSlider.getValue();
+        System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
+        System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
+
+        // call the engine to calculate the trajectory
+
+        // drawBallAndArrow();
     }
 
     @FXML

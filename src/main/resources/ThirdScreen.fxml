@@ -23,5 +23,6 @@
        <Button layoutX="521.0" layoutY="495.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page" />
        <Slider fx:id="powerSlider" layoutX="511.0" layoutY="139.0" max="5.0" min="0.0" prefWidth="150.0" showTickLabels="true" showTickMarks="true" value="2.0" />
        <Pane fx:id="circularSliderPane" layoutX="705.0" layoutY="53.0" prefHeight="142.0" prefWidth="150.0" />
+       <Button layoutX="780.0" layoutY="240.0" mnemonicParsing="false" onAction="#hit" text="HIT!" />
    </children>
 </AnchorPane>
