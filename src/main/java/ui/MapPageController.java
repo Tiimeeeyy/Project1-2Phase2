@@ -1,21 +1,17 @@
 package ui;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
-
-
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.canvas.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelReader;
@@ -23,7 +19,6 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import ui.MapPageController;
 
 public class MapPageController {
     private static final double MAX_HEIGHT = 1.0;
@@ -31,6 +26,9 @@ public class MapPageController {
 
     @FXML
     private Canvas drawingCanvas;
+
+    @FXML
+    private Canvas overlayCanvas;
 
     @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
@@ -42,12 +40,9 @@ public class MapPageController {
     private Pane chartPane;
 
     private double[][] heightStorage;
-    private double minHeight;
-    private double maxHeight;
-    private int[][] initialGreen=new int[500][500];
+    private int[][] initialGreen = new int[500][500];
     private double[] startBallPostion = new double[2];
     private double[] HolePostion = new double[2];
-
 
     public MapPageController(String function, double xBall, double yBall, double xHole, double yHole) {
         this.heightStorage = getHeightCoordinates(function);
@@ -58,7 +53,6 @@ public class MapPageController {
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
-
     }
 
     public class ColorItem {
@@ -114,6 +108,9 @@ public class MapPageController {
                     }
                 }
             });
+
+            // Make overlayCanvas transparent and disable mouse events
+            overlayCanvas.setMouseTransparent(true);
         } else {
             System.err.println("drawingCanvas is null");
         }
@@ -121,6 +118,8 @@ public class MapPageController {
         double[][] height = heightStorage;
         HeightMap3DChart chart3d = new HeightMap3DChart(height, chartPane);
         chart3d.display3DChart();
+
+        drawBallAndHole();
     }
 
     @FXML
@@ -147,12 +146,18 @@ public class MapPageController {
             }
 
             File file = new File(resourcesDir, "userInputMap.png");
+            
+            
+            if (file.exists()) {
+                if (!file.delete()) {
+                    throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
+                }
+            }
             boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
             if (!imageWritten) {
                 throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
             }
 
-            // showAlert(Alert.AlertType.INFORMATION, "Save Successful", "Canvas has been saved as userInputMap.png in the resources folder.");
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
@@ -170,8 +175,8 @@ public class MapPageController {
     @FXML
     private void saveCanvasAndContinue() {
         saveCanvasAsPNG();
-        MapHandler map=new MapHandler();
-        String path = System.getProperty("user.dir")+"/src/main/resources/userInputMap.png";
+        MapHandler map = new MapHandler();
+        String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path);
         Main.openThirdScreen();
     }
@@ -196,7 +201,6 @@ public class MapPageController {
 
     private Color getModifiedColor(Color baseColor, double height) {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
-            System.out.println("Height: " + height);
             throw new Error("Out of range functions");
         } else {
             double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
@@ -211,12 +215,11 @@ public class MapPageController {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height);
-                this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
+                this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
-        drawBallAndHole();
         System.out.println("Initial map rendered with green color.");
     }
 
@@ -243,28 +246,23 @@ public class MapPageController {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
     }
-    
+
     private void drawBallAndHole() {
-        GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+        GraphicsContext gc = overlayCanvas.getGraphicsContext2D();
     
         // Центр холста
-        double centerX = drawingCanvas.getWidth() / 2;
-        double centerY = drawingCanvas.getHeight() / 2;
+        double centerX = overlayCanvas.getWidth() / 2;
+        double centerY = overlayCanvas.getHeight() / 2;
     
-        // Пересчитываем координаты мячика и лунки относительно центра
         double ballX = centerX + startBallPostion[0];
-        double ballY = centerY - startBallPostion[1];  // Инвертируем y для соответствия координатной системе
+        double ballY = centerY - startBallPostion[1];  
         double holeX = centerX + HolePostion[0];
-        double holeY = centerY - HolePostion[1];  // Инвертируем y для соответствия координатной системе
+        double holeY = centerY - HolePostion[1];  
     
-        // Рисуем белый мячик
         gc.setFill(Color.WHITE);
-        gc.fillOval(ballX - 5, ballY - 5, 10, 10);
+        gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1);  // Мячик размером 1 пиксель
     
-        // Рисуем черную лунку
         gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 5, holeY - 5, 10, 10);
+        gc.fillOval(holeX - 1, holeY - 1, 2, 2);  // Лунка размером 2 пикселя
     }
-    
-    
 }

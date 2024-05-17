@@ -11,7 +11,12 @@
    <children>
       <Pane layoutX="68.0" layoutY="43.0" prefHeight="483.0" prefWidth="426.0" style="-fx-border-color: black; -fx-border-width: 1px;">
          <children>
-            <Canvas fx:id="drawingCanvas" height="483.0" width="426.0" />
+            <AnchorPane prefHeight="483.0" prefWidth="426.0">
+               <children>
+                  <Canvas fx:id="drawingCanvas" height="483.0" width="426.0" />
+                  <Canvas fx:id="overlayCanvas" height="483.0" width="426.0" />
+               </children>
+            </AnchorPane>
          </children>
       </Pane>
       <Slider fx:id="widthSlider" layoutX="596.0" layoutY="170.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
