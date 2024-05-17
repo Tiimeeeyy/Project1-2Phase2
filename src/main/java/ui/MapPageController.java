@@ -19,12 +19,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class MapPageController {
-    // TODO: make a button to save the drawing as screenshot to /resource package
-    // TODO: create alerts
-    // TODO: create the third screen:
-    //  (map as a picture, ball on it, input fields for the power/direction of the hit,
-    //  direction can be as a circle slider, and power as a normal slider,
-    //  arrow on the map to show the direction)
     @FXML
     private Canvas drawingCanvas;
 
@@ -42,7 +36,7 @@ public class MapPageController {
         this.heightStorage = getHeightCoordinates(function);
         double[] heightRange = getHeightRange();
         this.minHeight = heightRange[0];
-        this.maxHeight = heightRange[1];   
+        this.maxHeight = heightRange[1];
     }
 
     public class ColorItem {
@@ -68,7 +62,7 @@ public class MapPageController {
             new ColorItem("Tree", Color.web("#654321"))
 
         );
-        
+
         if (drawingCanvas != null) {
             GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
             gc.setLineWidth(30);
@@ -79,16 +73,16 @@ public class MapPageController {
                 double x = event.getX();
                 double y = event.getY();
                 System.out.println("Mouse event at: " + x + ", " + y);
-            
+
                 int ix = (int) x;
                 int iy = (int) y;
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
-                    double heightStep = (maxHeight - minHeight) / 100; 
-                    updateHeightMap(ix, iy, heightStep); 
+                    double heightStep = (maxHeight - minHeight) / 100;
+                    updateHeightMap(ix, iy, heightStep);
                     double height = heightStorage[ix][iy];
                     Color baseColor = colorChoiceBox.getValue().color;
                     Color heightColor = getModifiedColor(baseColor, height, minHeight, maxHeight);
-            
+
                     gc.setFill(heightColor);
                     double brushWidth = widthSlider.getValue();
                     System.out.println("Color: " + colorChoiceBox.getValue().color + ", Brush width: " + brushWidth);
@@ -154,14 +148,18 @@ public class MapPageController {
         }
     }
 
-
-
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void saveCanvasAndContinue() {
+        saveCanvasAsPNG();
+        Main.openThirdScreen();
     }
 
     public void goBack() {
@@ -215,7 +213,7 @@ public class MapPageController {
 
     private void updateHeightMap(int x, int y, double heightStep) {
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
-            heightStorage[x][y] += heightStep; 
+            heightStorage[x][y] += heightStep;
             // System.out.println("Height at (" + x + ", " + y + "): " + heightStorage[x][y]);
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
@@ -223,8 +221,8 @@ public class MapPageController {
     }
 
     private Color getModifiedColor(Color baseColor, double height, double minHeight, double maxHeight) {
-        double normalizedHeight = (height - minHeight) / (maxHeight - minHeight); 
-        double brightnessFactor = 0.6 + normalizedHeight * 0.7; 
+        double normalizedHeight = (height - minHeight) / (maxHeight - minHeight);
+        double brightnessFactor = 0.6 + normalizedHeight * 0.7;
         Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
         // System.out.println("Height: " + height + ", Base Color: " + baseColor + ", Modified Color: " + color);
         return color;
