@@ -30,6 +30,9 @@ public class MapPageController {
     private Canvas drawingCanvas;
 
     @FXML
+    private Canvas coordinatesCanvas;
+
+    @FXML
     private ChoiceBox<ColorItem> colorChoiceBox;
 
     @FXML
@@ -58,6 +61,16 @@ public class MapPageController {
             return name;
         }
     }
+
+    public void drawCoordinates(double x, double y) {
+        System.out.println("Drawing coordinates: (" + x + ", " + y + ")");
+        GraphicsContext gc = coordinatesCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, coordinatesCanvas.getWidth(), coordinatesCanvas.getHeight());
+        gc.setFill(Color.RED); // Set the color for drawing the coordinates
+        double circleSize = 100; // Set the size of the circle
+        gc.fillOval(x - circleSize / 2, y - circleSize / 2, circleSize, circleSize); // Draw a larger circle at the coordinates
+    }
+    
 
     public void initialize() {
         colorChoiceBox.getItems().addAll(
