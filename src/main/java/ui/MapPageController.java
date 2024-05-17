@@ -238,8 +238,12 @@ public class MapPageController {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
             double height = heightStorage[x][y];
-            Color baseColor = Color.rgb(180, initialGreen[x][y], 0);
-            // Color heightColor = getModifiedColor(baseColor, height);
+            Color baseColor=Color.rgb(0, initialGreen[x][y], 0);
+            if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
+                baseColor=Color.rgb(120, 60, 35);
+            }else{
+                baseColor = Color.rgb((int)(colorChoiceBox.getValue().color.getRed()*255), initialGreen[x][y], (int)(colorChoiceBox.getValue().color.getBlue()*255));
+            }// Color heightColor = getModifiedColor(baseColor, height);
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
 
