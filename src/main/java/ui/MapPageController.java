@@ -279,7 +279,6 @@ public class MapPageController {
     
         double centerX = overlayCanvas.getWidth() / 2;
         double centerY = overlayCanvas.getHeight() / 2;
-    
         double ballX = centerX + startBallPostion[0];
         double ballY = centerY - startBallPostion[1];  
         double holeX = centerX + HolePostion[0];

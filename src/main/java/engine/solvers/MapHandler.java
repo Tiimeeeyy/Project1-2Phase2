@@ -51,7 +51,7 @@ public class MapHandler {
         for (int i = 0; i < width-1; i++) {
             for (int j = 0; j < height-1; j++) {
                 for(int k=0;k<2;k++){
-                    gradient[i][j][k]=(double) (gAry[i+1-k][j+k]-gAry[i][j])/12.75; //scaled down, if (0-255)/12.75 then (0-20)
+                    gradient[i][j][k]=Utility.colorToHeight(gAry[i+1-k][j+k])-Utility.colorToHeight(gAry[i][j]) ; //scaled down, if (0-255)/12.75 then (0-20)
                 }
             }
         }
@@ -150,7 +150,6 @@ public class MapHandler {
             Color black=new Color(0,0,0);
             for (int i = -intR; i <= intR; i++) {
                 for (int j =0; j <= intR-Math.abs(i); j++) {
-                    System.out.println(intR);
                     image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
                     image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
                 }
@@ -161,8 +160,6 @@ public class MapHandler {
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
-        
-        // Image image = new Image(getClass().getResource("/newMap.PNG").toExternalForm());
     }
 
     private int heightFunction(double x, double y){

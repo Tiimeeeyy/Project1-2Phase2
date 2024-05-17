@@ -14,6 +14,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+
+import engine.solvers.GolfBall;
+import engine.solvers.GolfGame;
+import engine.solvers.RK4;
 
 public class ThirdScreenController {
 
@@ -38,10 +43,13 @@ public class ThirdScreenController {
     private CircularSlider circularSlider;
     private double[] startBallPostion;
     private double[] HolePostion;
+    private GolfGame golfGame;
 
     public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
+        double[] a={0.05,0.12};
+        this.golfGame=new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
     }
 
@@ -153,6 +161,8 @@ public class ThirdScreenController {
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         // call the engine to calculate the trajectory
+        double[] x={startBallPostion[0],startBallPostion[1],directionVector[0],directionVector[1]};
+        ArrayList<double[]> xpath=this.golfGame.shoot(x, true);
 
         // drawBallAndArrow();
     }
