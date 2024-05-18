@@ -25,8 +25,8 @@
       <Slider fx:id="widthSlider" layoutX="1090.0" layoutY="380.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
       <ChoiceBox fx:id="colorChoiceBox" layoutX="1090.0" layoutY="288.0" prefHeight="34.0" prefWidth="150.0" />
       <ChoiceBox fx:id="mapSizeChoiceBox" layoutX="1090.0" layoutY="458.0" prefHeight="34.0" prefWidth="150.0" />
-      <Button layoutX="54.0" layoutY="648.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="187.0" text="Return to previous page" />
-      <Button layoutX="1090.0" layoutY="648.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Save and continue" />
+      <Button layoutX="54.0" layoutY="648.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="187.0" text="Back" />
+      <Button layoutX="1090.0" layoutY="648.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Next" />
       <Button layoutX="1090.0" layoutY="508.0" mnemonicParsing="false" onAction="#changeMapSize" prefHeight="26.0" prefWidth="150.0" text="Change" />
       <Text layoutX="1090.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Surface" wrappingWidth="47.0">
          <font>
