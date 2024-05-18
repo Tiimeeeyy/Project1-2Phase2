@@ -18,8 +18,10 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+
 import engine.solvers.GolfGame;
 import engine.solvers.RK4;
+import engine.solvers.Utility;
 
 public class ThirdScreenController {
 
@@ -57,7 +59,7 @@ public class ThirdScreenController {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
         double[] a={0.05,0.12};
-        this.golfGame=new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources");
+        this.golfGame=new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
     }
 
@@ -140,8 +142,8 @@ public class ThirdScreenController {
             double centerY = ballCanvas.getHeight() / 2;
 
             double ballRadius = 1; 
-            double ballX = centerX + startBallPostion[0];
-            double ballY = centerY - startBallPostion[1];  
+            double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
+            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
 
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX - ballRadius / 2, ballY - ballRadius / 2, ballRadius, ballRadius);
@@ -169,7 +171,7 @@ public class ThirdScreenController {
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         // call the engine to calculate the trajectory
-        double[] x = {startBallPostion[0], startBallPostion[1], directionVector[0], directionVector[1]};
+        double[] x = {startBallPostion[0], startBallPostion[1], power*directionVector[0], power*directionVector[1]};
         ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
 
         // Update ball position and shot count
