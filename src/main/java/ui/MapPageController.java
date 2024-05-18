@@ -52,15 +52,20 @@ public class MapPageController {
     private double[] HolePostion = new double[2];
     private double radiusHole;
     private int mapSize;
+    private String function;
+
+    GraphicsContext gc;
 
     public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole) {
         this.heightStorage = getHeightCoordinates(function);
+        this.function=function;
         startBallPostion[0] = xBall;
         startBallPostion[1] = yBall;
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = mapSize;
+        // this.gc=drawingCanvas.getGraphicsContext2D();
 
         // Utility.ratio=500/(1.5*Math.max(Math.abs(xBall), Math.max(Math.abs(yBall), Math.max(Math.abs(xHole), Math.max(Math.abs(yHole), Math.max(Math.abs(xBall-xHole), Math.abs(yBall-yHole)))))));
         
@@ -101,10 +106,10 @@ public class MapPageController {
         mapSizeChoiceBox.setValue(mapSize);
 
         if (drawingCanvas != null) {
-            GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+            this.gc = drawingCanvas.getGraphicsContext2D();
             gc.setLineWidth(30);
 
-            renderInitialMap(gc, Color.web("#48992f"));
+            renderInitialMap();
 
             EventHandler<MouseEvent> handler = event -> {
                 double x = event.getX();
@@ -115,7 +120,7 @@ public class MapPageController {
                 int iy = (int) y;
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
                     double heightStep = 0.1;
-                    updateHeightMap(ix, iy, heightStep, gc);
+                    updateHeightMap(ix, iy, heightStep);
                 }
             };
 
@@ -206,7 +211,13 @@ public class MapPageController {
     @FXML
     private void changeMapSize() {
         int selectedMapSize = mapSizeChoiceBox.getValue();
+        Utility.ratio=500.0/selectedMapSize;
+        this.heightStorage = getHeightCoordinates(function);
+        renderInitialMap();
+        drawBallAndHole();
+
         System.out.println("Selected map size: " + selectedMapSize + " meters");
+
     }
 
     public void goBack() {
@@ -227,7 +238,7 @@ public class MapPageController {
         return heightStorage;
     }
 
-    private Color getModifiedColor(Color baseColor, double height) {
+    private Color getModifiedColor(double height) {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
         } else {
@@ -244,21 +255,20 @@ public class MapPageController {
         }
     }
 
-    private void renderInitialMap(GraphicsContext gc, Color baseColor) {
+    private void renderInitialMap() {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-
-                Color heightColor = getModifiedColor(baseColor, height);
+                Color heightColor = getModifiedColor( height);
                 this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
-                gc.getPixelWriter().setColor(x, y, heightColor);
+                this.gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
     }
 
-    private void updateHeightMap(int x, int y, double heightStep, GraphicsContext gc) {
+    private void updateHeightMap(int x, int y, double heightStep) {
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
             heightStorage[x][y] += heightStep;
             if (heightStorage[x][y] > MAX_HEIGHT) {
@@ -301,17 +311,17 @@ public class MapPageController {
     }
 
     private void drawBallAndHole() {
-        GraphicsContext gc = overlayCanvas.getGraphicsContext2D();
+        GraphicsContext gc2 = overlayCanvas.getGraphicsContext2D();
     
         double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
         double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
         double holeX = Utility.coordinateToPixel_X(HolePostion[0]);
         double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);;  
     
-        gc.setFill(Color.WHITE);
-        gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
+        gc2.setFill(Color.WHITE);
+        gc2.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
     
-        gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);  
+        gc2.setFill(Color.BLACK);
+        gc2.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);  
     }
 }
