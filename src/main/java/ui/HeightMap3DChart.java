@@ -1,11 +1,15 @@
 package ui;
+
 import javafx.scene.layout.Pane;
 import org.jfree.chart3d.Chart3D;
 import org.jfree.chart3d.Chart3DFactory;
+import org.jfree.chart3d.data.Range;
 import org.jfree.chart3d.data.function.Function3D;
 import org.jfree.chart3d.fx.Chart3DViewer;
 import org.jfree.chart3d.plot.XYZPlot;
-import org.jfree.chart3d.data.Range;
+import org.jfree.chart3d.renderer.xyz.SurfaceRenderer;
+// import org.jfree.chart3d.paint.ColorScale;
+
 import java.awt.Color;
 
 public class HeightMap3DChart {
@@ -39,6 +43,11 @@ public class HeightMap3DChart {
         // Create a chart with the function
         Chart3D chart = Chart3DFactory.createSurfaceChart("", "", function, "X", "Y", "Z");
 
+        XYZPlot plot = (XYZPlot) chart.getPlot();
+        SurfaceRenderer renderer = (SurfaceRenderer) plot.getRenderer();
+        SingleColorScale colorScale = new SingleColorScale(Color.GREEN);
+        renderer.setColorScale(colorScale);
+        chart.setChartBoxColor(new Color(255, 255, 255, 0));
 
         // Display the chart in a JavaFX Chart3DViewer
         return new Chart3DViewer(chart);
@@ -53,6 +62,26 @@ public class HeightMap3DChart {
         viewer.prefHeightProperty().bind(root.heightProperty());
         Pane chartPane = new Pane(viewer);
         root.getChildren().add(chartPane);
+    }
 
+    /**
+     * A simple color scale implementation to use a single color for the surface.
+     */
+    private static class SingleColorScale implements org.jfree.chart3d.renderer.ColorScale {
+        private Color color;
+
+        public SingleColorScale(Color color) {
+            this.color = color;
+        }
+
+        @Override
+        public Color valueToColor(double value) {
+            return color;
+        }
+
+        @Override
+        public Range getRange() {
+            return new Range(0, 1);
+        }
     }
 }

@@ -1,4 +1,5 @@
 package ui;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -11,29 +12,44 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
-        openGUI();
+        startScreen();
     }
 
-    public static void openGUI() {
+    public static void startScreen() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
-            fxmlLoader.setController(new FirstScreenController());
-            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
-            primaryStage.setTitle("First Screen");
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/StartScreen.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 613, 404);
+            primaryStage.setTitle("Title Screen");
             primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void openThirdScreen(double[] startBallPostion, double[] HolePostion, double radiusHole) {
+    public static void openGUI() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+            primaryStage.setTitle("First Screen");
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void openThirdScreen(double[] startBallPosition, double[] holePosition, double radiusHole) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/ThirdScreen.fxml"));
-            fxmlLoader.setController(new ThirdScreenController(startBallPostion,HolePostion,radiusHole ));
+            ThirdScreenController controller = new ThirdScreenController(startBallPosition, holePosition, radiusHole);
+            fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             primaryStage.setTitle("Third Screen");
             primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,5 +59,4 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }
