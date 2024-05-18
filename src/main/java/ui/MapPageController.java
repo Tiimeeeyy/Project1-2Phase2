@@ -285,6 +285,6 @@ public class MapPageController {
         gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
     
         gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 1, holeY - 1, radiusHole, radiusHole);  
+        gc.fillOval(holeX - 1, holeY - 1, radiusHole*Utility.ratio, radiusHole*Utility.ratio);  
     }
 }
