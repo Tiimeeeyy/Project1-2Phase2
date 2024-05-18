@@ -1,19 +1,20 @@
 package ui;
 
-import javafx.application.Application;
-import javafx.scene.text.Text;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.stage.Stage;
 
-public class StartScreen extends Application {
+public class StartScreen {
 
-    public Text putting;
-
-    public static void main(String[] args) {
-        launch(args);
+    @FXML
+    private void startGame(ActionEvent event) {
+        Main.openGUI();
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-
+    @FXML
+    private void exitGame(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
     }
 }

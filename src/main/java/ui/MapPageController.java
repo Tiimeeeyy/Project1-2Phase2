@@ -38,6 +38,9 @@ public class MapPageController {
     private ChoiceBox<ColorItem> colorChoiceBox;
 
     @FXML
+    private ChoiceBox<Integer> mapSizeChoiceBox;
+
+    @FXML
     private Slider widthSlider;
 
     @FXML
@@ -50,14 +53,13 @@ public class MapPageController {
     private double radiusHole;
     private int mapSize;
 
-    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, int mapSize) {
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole) {
         this.heightStorage = getHeightCoordinates(function);
         startBallPostion[0] = xBall;
         startBallPostion[1] = yBall;
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
-        this.mapSize = mapSize;
         Utility.ratio=500/(1.5*Math.sqrt(Math.pow(xBall-xHole, 2)+Math.pow(yBall-yHole, 2)));
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
@@ -89,6 +91,9 @@ public class MapPageController {
             new ColorItem("Water", Color.rgb(0, 125, 180)),
             new ColorItem("Tree", Color.rgb(120, 60, 35))
         );
+
+        mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
+        mapSizeChoiceBox.setValue(mapSize);
 
         if (drawingCanvas != null) {
             GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
@@ -189,18 +194,14 @@ public class MapPageController {
         saveCanvasAsPNG();
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
-        map.renderMap(this.initialGreen, path, HolePostion,radiusHole);
-        // PauseTransition pause = new PauseTransition(Duration.seconds(1)); // задержка 1 секунда
-        // pause.play();
-
-        // pause.setOnFinished(event -> {
-        // try {
+        map.renderMap(this.initialGreen, path, HolePostion, radiusHole);
         Main.openThirdScreen(startBallPostion, HolePostion, radiusHole);
-        // } catch (Exception e) {
-        //     e.printStackTrace();
-        //     showAlert(Alert.AlertType.ERROR, "Navigation Failed", "An error occurred while trying to open the third screen: " + e.getMessage());
-        // }
-        // });
+    }
+
+    @FXML
+    private void changeMapSize() {
+        int selectedMapSize = mapSizeChoiceBox.getValue();
+        System.out.println("Selected map size: " + selectedMapSize + " meters");
     }
 
     public void goBack() {
@@ -225,8 +226,8 @@ public class MapPageController {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
         } else {
-            int gr=Utility.heightToColor(height);
-            Color color=Color.rgb(0, gr, 0);
+            int gr = Utility.heightToColor(height);
+            Color color = Color.rgb(0, gr, 0);
             return color;
         }
     }
@@ -236,7 +237,7 @@ public class MapPageController {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height);
-                this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
+                this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
@@ -252,12 +253,12 @@ public class MapPageController {
             } else if (heightStorage[x][y] < MIN_HEIGHT) {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
-            Color baseColor=Color.rgb(0, initialGreen[x][y], 0);
+            Color baseColor = Color.rgb(0, initialGreen[x][y], 0);
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
-                baseColor=Color.rgb(120, 60, 35);
-            }else{
-                baseColor = Color.rgb((int)(colorChoiceBox.getValue().color.getRed()*255), initialGreen[x][y], (int)(colorChoiceBox.getValue().color.getBlue()*255));
-            }// Color heightColor = getModifiedColor(baseColor, height);
+                baseColor = Color.rgb(120, 60, 35);
+            } else {
+                baseColor = Color.rgb((int) (colorChoiceBox.getValue().color.getRed() * 255), initialGreen[x][y], (int) (colorChoiceBox.getValue().color.getBlue() * 255));
+            }
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
 
@@ -274,8 +275,6 @@ public class MapPageController {
     private void drawBallAndHole() {
         GraphicsContext gc = overlayCanvas.getGraphicsContext2D();
     
-        // double centerX = overlayCanvas.getWidth() / 2;
-        // double centerY = overlayCanvas.getHeight() / 2;
         double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
         double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
         double holeX = Utility.coordinateToPixel_X(HolePostion[0]);
@@ -285,6 +284,6 @@ public class MapPageController {
         gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
     
         gc.setFill(Color.BLACK);
-        gc.fillOval(holeX - 1, holeY - 1, radiusHole*Utility.ratio, radiusHole*Utility.ratio);  
+        gc.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);  
     }
 }

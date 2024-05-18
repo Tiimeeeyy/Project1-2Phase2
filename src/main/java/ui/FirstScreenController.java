@@ -11,7 +11,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.scene.control.ChoiceBox;
 
 public class FirstScreenController {
     @FXML
@@ -27,16 +26,12 @@ public class FirstScreenController {
     @FXML
     private TextField RADIUS_HOLE;
 
-    @FXML
-    private ChoiceBox<Integer> mapSizeChoiceBox;
-
 
     private String function;
 
     @FXML
     public void initialize() {
-        mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
-        mapSizeChoiceBox.setValue(5); // Default value
+
     }
 
     public void nextScreen(ActionEvent event) {
@@ -49,7 +44,6 @@ public class FirstScreenController {
             xHole = Double.parseDouble(X_HOLE.getText());
             yHole = Double.parseDouble(Y_HOLE.getText());
             radiusHole = Double.parseDouble(RADIUS_HOLE.getText());
-            mapSize = mapSizeChoiceBox.getValue();
         } catch (NumberFormatException e) {
             showAlert("Error!", "Invalid input for coordinates or radius", "Please enter valid numbers for the coordinates and radius.");
             return;
@@ -76,7 +70,7 @@ public class FirstScreenController {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, mapSize);
+            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -87,6 +81,11 @@ public class FirstScreenController {
             showAlert("Error!", "Failed to proceed to the next screen", ex.getMessage());
             ex.printStackTrace();
         }
+    }
+
+    @FXML
+    private void goBack(ActionEvent event) {
+        Main.startScreen();
     }
 
     private void showAlert(String title, String header, String content) {
