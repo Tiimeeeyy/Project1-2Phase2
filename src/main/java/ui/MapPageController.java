@@ -234,7 +234,7 @@ public class MapPageController {
             int gr=Utility.heightToColor(height);
 
             if(height<0){
-                Color color=Color.rgb(0, 0, gr);
+                Color color=Color.rgb(0, gr, 180);
                 return color;
             }else{
                 // System.out.println(height +"  "+ gr);
