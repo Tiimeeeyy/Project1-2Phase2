@@ -13,7 +13,7 @@ public class Utility {
     }
     
     public static int heightToColor(double x){
-        return (int) (x*50+125); 
+        return (int) (x*50.0+125); 
     }
     public static double colorToHeight(int x){
         return (double) ((x-125)/50.0); 
