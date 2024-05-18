@@ -7,22 +7,22 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="1080.0" maxWidth="1920.0" minHeight="720.0" minWidth="1280.0" prefHeight="720.0" prefWidth="1280.0" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Pane layoutX="68.0" layoutY="43.0" prefHeight="483.0" prefWidth="426.0" style="-fx-border-color: black; -fx-border-width: 1px;">
+      <Pane fx:id="chartPane" layoutX="583.0" layoutY="110.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="450.0" />
+      <Pane layoutX="54.0" layoutY="110.0" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black; -fx-border-width: 1px;">
          <children>
-            <AnchorPane prefHeight="483.0" prefWidth="426.0">
+            <AnchorPane prefHeight="500.0" prefWidth="500.0">
                <children>
-                  <Canvas fx:id="drawingCanvas" height="483.0" width="426.0" />
-                  <Canvas fx:id="overlayCanvas" height="483.0" width="426.0" />
+                  <Canvas fx:id="drawingCanvas" height="500.0" width="500.0" />
+                  <Canvas fx:id="overlayCanvas" height="500.0" width="500.0" />
                </children>
             </AnchorPane>
          </children>
       </Pane>
-      <Slider fx:id="widthSlider" layoutX="596.0" layoutY="170.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
-      <ChoiceBox fx:id="colorChoiceBox" layoutX="596.0" layoutY="215.0" prefHeight="25.0" prefWidth="150.0" />
-      <Button layoutX="596.0" layoutY="43.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0" prefWidth="150.0" text="Return to previous page" />
-      <Button layoutX="596.0" layoutY="100.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Save and continue" />
-      <Pane fx:id="chartPane" layoutX="516.0" layoutY="273.0" minHeight="200.0" minWidth="311.0" prefHeight="200.0" prefWidth="311.0" />
+      <Slider fx:id="widthSlider" layoutX="1071.0" layoutY="430.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
+      <ChoiceBox fx:id="colorChoiceBox" layoutX="1071.0" layoutY="368.0" prefHeight="34.0" prefWidth="150.0" />
+      <Button layoutX="1053.0" layoutY="265.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="187.0" text="Return to previous page" />
+      <Button layoutX="1071.0" layoutY="313.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Save and continue" />
    </children>
 </AnchorPane>

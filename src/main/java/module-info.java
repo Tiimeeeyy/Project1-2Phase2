@@ -13,4 +13,5 @@ module ui {
 
     opens ui to javafx.fxml;
     exports ui;
+    exports engine.bot;
 }

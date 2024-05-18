@@ -31,7 +31,7 @@ public class Main extends Application {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/ThirdScreen.fxml"));
             fxmlLoader.setController(new ThirdScreenController(startBallPostion,HolePostion,radiusHole ));
-            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+            Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             primaryStage.setTitle("Third Screen");
             primaryStage.setScene(scene);
             primaryStage.show();

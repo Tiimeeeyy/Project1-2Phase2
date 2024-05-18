@@ -4,6 +4,9 @@ import org.jfree.chart3d.Chart3D;
 import org.jfree.chart3d.Chart3DFactory;
 import org.jfree.chart3d.data.function.Function3D;
 import org.jfree.chart3d.fx.Chart3DViewer;
+import org.jfree.chart3d.plot.XYZPlot;
+import org.jfree.chart3d.data.Range;
+import java.awt.Color;
 
 public class HeightMap3DChart {
     private double[][] heightStorage;
@@ -34,7 +37,8 @@ public class HeightMap3DChart {
         };
 
         // Create a chart with the function
-        Chart3D chart = Chart3DFactory.createSurfaceChart("Surface Plot", "", function, "X", "Y", "Z");
+        Chart3D chart = Chart3DFactory.createSurfaceChart("", "", function, "X", "Y", "Z");
+
 
         // Display the chart in a JavaFX Chart3DViewer
         return new Chart3DViewer(chart);
@@ -46,7 +50,7 @@ public class HeightMap3DChart {
     public void display3DChart() {
         Chart3DViewer viewer = createChart();
         viewer.prefWidthProperty().bind(root.widthProperty());
-        viewer.prefHeightProperty().bind(root.widthProperty());
+        viewer.prefHeightProperty().bind(root.heightProperty());
         Pane chartPane = new Pane(viewer);
         root.getChildren().add(chartPane);
 

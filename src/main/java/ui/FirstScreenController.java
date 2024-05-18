@@ -64,7 +64,7 @@ public class FirstScreenController {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
             MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole);
             fxmlLoader.setController(controller);
-            Scene scene = new Scene(fxmlLoader.load(), 900, 600);
+            Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.setTitle("Map Creating Screen");

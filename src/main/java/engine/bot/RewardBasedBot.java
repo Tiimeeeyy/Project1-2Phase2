@@ -1,5 +1,7 @@
 package engine.bot;
+
 import engine.solvers.GolfGame;
+
 // TODO: Implement the Function that makes the bot play the game!!!
 public class RewardBasedBot {
 
@@ -19,6 +21,8 @@ public class RewardBasedBot {
         // Arbitrary number of plays to avoid infinite shot-taking
         int maxPlays = 10;
         if (comparingAndScoring.checkHole(x, hole) || maxPlays == 0) {
+
+
         }
     }
 }
