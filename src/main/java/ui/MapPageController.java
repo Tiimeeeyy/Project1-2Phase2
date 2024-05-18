@@ -210,8 +210,8 @@ public class MapPageController {
         for (int i = 0; i < 500; i++) {
             for (int j = 0; j < 500; j++) {
                 HashMap<String, Double> currentCoordinates = new HashMap<>();
-                currentCoordinates.put("x", (double) i / 10 - 25);
-                currentCoordinates.put("y", (double) -j / 10 + 25);
+                currentCoordinates.put("x", Utility.pixelToCoordinate_X(i));
+                currentCoordinates.put("y", Utility.pixelToCoordinate_Y(j));
                 ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
                 heightStorage[i][j] = parser.evaluate();
             }
@@ -223,13 +223,8 @@ public class MapPageController {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
         } else {
-            // double normalizedHeight = (height - MIN_HEIGHT) / (MAX_HEIGHT - MIN_HEIGHT);
-            // double brightnessFactor = 0.5 + normalizedHeight * 0.7;
-            // Color color = baseColor.deriveColor(0, 1, brightnessFactor, 1);
-            
             int gr=Utility.heightToColor(height);
             Color color=Color.rgb(0, gr, 0);
-            
             return color;
         }
     }
@@ -240,7 +235,6 @@ public class MapPageController {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(baseColor, height);
                 this.initialGreen[x][y]=(int) Math.round(heightColor.getGreen()*255);
-                this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
                 gc.getPixelWriter().setColor(x, y, heightColor);
             }
@@ -256,7 +250,6 @@ public class MapPageController {
             } else if (heightStorage[x][y] < MIN_HEIGHT) {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
-            double height = heightStorage[x][y];
             Color baseColor=Color.rgb(0, initialGreen[x][y], 0);
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
                 baseColor=Color.rgb(120, 60, 35);
@@ -279,12 +272,12 @@ public class MapPageController {
     private void drawBallAndHole() {
         GraphicsContext gc = overlayCanvas.getGraphicsContext2D();
     
-        double centerX = overlayCanvas.getWidth() / 2;
-        double centerY = overlayCanvas.getHeight() / 2;
-        double ballX = centerX + startBallPostion[0];
-        double ballY = centerY - startBallPostion[1];  
-        double holeX = centerX + HolePostion[0];
-        double holeY = centerY - HolePostion[1];  
+        // double centerX = overlayCanvas.getWidth() / 2;
+        // double centerY = overlayCanvas.getHeight() / 2;
+        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
+        double holeX = Utility.coordinateToPixel_X(HolePostion[0]);
+        double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);;  
     
         gc.setFill(Color.WHITE);
         gc.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 

@@ -79,7 +79,7 @@ public class MapHandler {
             height=image.getHeight();
             System.out.println("map readed to plot");
             for (int i = 0; i < trajectory.size(); i++) {
-                image.setRGB((int) Math.floor(trajectory.get(i)[0]*10), (int) Math.floor(trajectory.get(i)[1]*10), Color.RED.getRGB());
+                image.setRGB(Utility.coordinateToPixel_X(trajectory.get(i)[0]), Utility.coordinateToPixel_Y(trajectory.get(i)[1]), Color.RED.getRGB());
             }
             
             File outputfile=new File(plotMap);
@@ -106,7 +106,7 @@ public class MapHandler {
             image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             for (int i = 0; i < 500; i++) {
                 for (int j = 0; j < 500; j++) {
-                    Color color=new Color(0,heightFunction(i, j),0);
+                    Color color=new Color(0,heightFunction(Utility.pixelToCoordinate_X(i), Utility.pixelToCoordinate_Y(j)),0);
                     image.setRGB(i, j, color.getRGB());
                 }
             }
@@ -146,10 +146,10 @@ public class MapHandler {
                     image.setRGB(i,j,colortemp.getRGB());
                 }
             }
-            int intR=(int) Math.ceil(radius*10);
+            int intR=(int) Math.ceil(radius*Utility.ratio);
             Color black=new Color(0,0,0);
             for (int i = -intR; i <= intR; i++) {
-                for (int j =0; j <= intR-Math.abs(i); j++) {
+                for (int j =0; j <= Math.ceil(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
                     image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
                     image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
                 }
