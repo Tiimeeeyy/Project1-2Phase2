@@ -60,6 +60,7 @@ public class MapPageController {
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
+        this.mapSize = mapSize;
         Utility.ratio=500/(1.5*Math.sqrt(Math.pow(xBall-xHole, 2)+Math.pow(yBall-yHole, 2)));
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
@@ -89,7 +90,9 @@ public class MapPageController {
             new ColorItem("Sand", Color.rgb(180, 125, 0)),
             new ColorItem("Grass", Color.rgb(0, 125, 0)),
             new ColorItem("Water", Color.rgb(0, 125, 180)),
-            new ColorItem("Tree", Color.rgb(120, 60, 35))
+            new ColorItem("Tree", Color.rgb(120, 60, 35)),
+            new ColorItem("Lift ground", Color.rgb(0, 125, 0)),
+            new ColorItem("Lower ground", Color.rgb(0, 125, 0))
         );
 
         mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
@@ -253,20 +256,34 @@ public class MapPageController {
             } else if (heightStorage[x][y] < MIN_HEIGHT) {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
-            Color baseColor = Color.rgb(0, initialGreen[x][y], 0);
+            Color baseColor=Color.rgb(0, initialGreen[x][y], 0);
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
-                baseColor = Color.rgb(120, 60, 35);
-            } else {
-                baseColor = Color.rgb((int) (colorChoiceBox.getValue().color.getRed() * 255), initialGreen[x][y], (int) (colorChoiceBox.getValue().color.getBlue() * 255));
-            }
+                baseColor=Color.rgb(120, 60, 35);
+            }else{
+                baseColor = Color.rgb((int)(colorChoiceBox.getValue().color.getRed()*255), initialGreen[x][y], (int)(colorChoiceBox.getValue().color.getBlue()*255));
+            }// Color heightColor = getModifiedColor(baseColor, height);
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
-
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
                 gc.fillOval(x - 5, y - 5, 5, 5);
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
+            //lift ground
+            if (colorChoiceBox.getId().equals("Lift ground")) {
+                // Color black=new Color(0,0,0);
+                // int intR=(int) Math.ceil(brushWidth);
+                // for (int i = -intR; i <= intR; i++) {
+                //     for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
+                //         gc.getPixelWriter().
+                //         image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
+                //         image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
+
+                //         gc.getPixelWriter().setColor(x, y, heightColor);
+                //     }
+                // }
+            }
+
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }

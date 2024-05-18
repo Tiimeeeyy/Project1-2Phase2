@@ -159,10 +159,10 @@ public class MapHandler {
                     image.setRGB(i,j,colortemp.getRGB());
                 }
             }
-            int intR=(int) Math.ceil(radius*Utility.ratio);
+            int intR=(int) Math.floor(radius*Utility.ratio);
             Color black=new Color(0,0,0);
             for (int i = -intR; i <= intR; i++) {
-                for (int j =0; j <= Math.ceil(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
+                for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
                     image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
                     image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
                 }
