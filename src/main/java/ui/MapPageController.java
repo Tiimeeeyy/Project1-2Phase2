@@ -282,6 +282,7 @@ public class MapPageController {
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
+
             //lift ground
             if (colorChoiceBox.getId().equals("Lift ground")) {
                 // Color black=new Color(0,0,0);

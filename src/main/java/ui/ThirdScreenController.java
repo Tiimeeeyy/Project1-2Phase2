@@ -18,7 +18,6 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
-
 import engine.solvers.GolfGame;
 import engine.solvers.RK4;
 import engine.solvers.Utility;
@@ -49,6 +48,12 @@ public class ThirdScreenController {
     @FXML
     private Label shotCountLabel;
 
+    @FXML
+    private Label directionLabel;
+
+    @FXML
+    private Label powerLabel;
+
     private CircularSlider circularSlider;
     private double[] startBallPostion;
     private double[] HolePostion;
@@ -66,24 +71,33 @@ public class ThirdScreenController {
     @FXML
     public void initialize() {
         loadNewImage();
-
+    
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
-
+    
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             updateDirection(newVal);
             drawBallAndArrow();
         });
-        powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> drawBallAndArrow());
-
+        powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            updatePower(newVal);
+            drawBallAndArrow();
+        });
+    
         drawBallAndArrow();
         updateBallPositionLabel();
         updateShotCountLabel();
     }
+    
 
     private void updateDirection(Number newVal) {
         double[] directionVector = circularSlider.getDirectionVector();
+        directionLabel.setText(String.format("Direction: [%.2f, %.2f]", directionVector[0], directionVector[1]));
         System.out.println("Direction Vector: [" + directionVector[0] + ", " + directionVector[1] + "]");
+    }
+
+    private void updatePower(Number newVal) {
+        powerLabel.setText(String.format("Power: %.2f", newVal.doubleValue()));
     }
 
     private void loadNewImage() {
@@ -105,7 +119,7 @@ public class ThirdScreenController {
                 if (file.isFile() && file.getName().equals("userInputMap.png")) {
                     String fileUrl = file.toURI().toURL().toExternalForm();
                     System.out.println("Loading image from: " + fileUrl);
-                    Image image = new Image(new FileInputStream(file));  
+                    Image image = new Image(new FileInputStream(file));
 
                     if (image.isError()) {
                         System.err.println("Error loading image: " + image.getException());
@@ -116,8 +130,8 @@ public class ThirdScreenController {
                     mapImageView.setImage(image);
                     System.out.println("Image width: " + image.getWidth() + ", height: " + image.getHeight());
                     System.out.println("ImageView width: " + mapImageView.getFitWidth() + ", height: " + mapImageView.getFitHeight());
-                    
-                    return; 
+
+                    return;
                 }
             }
 
@@ -137,31 +151,50 @@ public class ThirdScreenController {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
-
+    
             double centerX = ballCanvas.getWidth() / 2;
             double centerY = ballCanvas.getHeight() / 2;
-
-            double ballRadius = 1; 
+    
+            double ballRadius = 5; // Changed for better visibility
             double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
-            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
-
+            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
+    
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX - ballRadius / 2, ballY - ballRadius / 2, ballRadius, ballRadius);
-
+    
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
             double arrowX = ballX + directionVector[0] * arrowLength;
-            double arrowY = ballY - directionVector[1] * arrowLength;
-
+            double arrowY = ballY + directionVector[1] * arrowLength;
+    
             gc.setStroke(javafx.scene.paint.Color.RED);
-            gc.setLineWidth(1);
+            gc.setLineWidth(2);
+    
+            // Draw the arrow shaft
             gc.strokeLine(ballX, ballY, arrowX, arrowY);
-
+    
+            // Draw the arrowhead
+            drawArrowhead(gc, arrowX, arrowY, directionVector);
+    
             updateBallPositionLabel();
         } else {
             System.err.println("ballCanvas is null");
         }
     }
+    
+    private void drawArrowhead(GraphicsContext gc, double x, double y, double[] direction) {
+        double arrowHeadSize = 10;
+        double angle = Math.atan2(direction[1], direction[0]);
+    
+        double x1 = x - arrowHeadSize * Math.cos(angle - Math.PI / 6);
+        double y1 = y - arrowHeadSize * Math.sin(angle - Math.PI / 6);
+        double x2 = x - arrowHeadSize * Math.cos(angle + Math.PI / 6);
+        double y2 = y - arrowHeadSize * Math.sin(angle + Math.PI / 6);
+    
+        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.fillPolygon(new double[]{x, x1, x2}, new double[]{y, y1, y2}, 3);
+    }
+    
 
     @FXML
     private void hit() {
@@ -171,7 +204,7 @@ public class ThirdScreenController {
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         // call the engine to calculate the trajectory
-        double[] x = {startBallPostion[0], startBallPostion[1], power*directionVector[0], power*directionVector[1]};
+        double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
         ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
 
         // Update ball position and shot count
