@@ -115,11 +115,14 @@ public class ExpressionParser implements IParser {
                     position++;
                     switch (token) {
                         case "sin":
-                            return Math.sin(Math.toRadians(arg));
+                            // return Math.sin(Math.toRadians(arg));
+                            return Math.sin(arg);
                         case "cos":
-                            return Math.cos(Math.toRadians(arg));
+                            // return Math.cos(Math.toRadians(arg));
+                            return Math.cos(arg);
                         case "tan":
-                            return Math.tan(Math.toRadians(arg));
+                            // return Math.tan(Math.toRadians(arg));
+                            return Math.tan(arg);
                         default:
                             throw new Error("Unsupported trigonometric function: " + token);
                     }
