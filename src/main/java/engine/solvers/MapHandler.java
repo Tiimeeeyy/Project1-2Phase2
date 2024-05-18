@@ -41,6 +41,8 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
         int[][] gAry=new int[width][height];
+        redAry=new int[width][height];
+        blueAry=new int[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
@@ -50,7 +52,7 @@ public class MapHandler {
             }
         }
 
-        double[][][] gradient=new double[width][height][2];
+        gradient=new double[width][height][2];
         for (int i = 0; i < width-1; i++) {
             for (int j = 0; j < height-1; j++) {
                 for(int k=0;k<2;k++){

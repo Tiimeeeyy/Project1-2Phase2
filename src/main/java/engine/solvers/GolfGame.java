@@ -78,6 +78,12 @@ public class GolfGame {
 
             if (pixelX>=mapgradient.length || pixelY>=mapgradient[0].length || pixelX<0 || pixelY<0) {
                 this.message="Out of boundary!";
+                System.out.println("Out of boundary!");
+                x=x0.clone();
+                this.stopCoordinate=x0.clone();
+                if (recording) {
+                    xtrac.add(x.clone());
+                }
                 break;
             }
             dis=getDistance(x, this.hole);
@@ -91,10 +97,10 @@ public class GolfGame {
             //check whether in water.
             if (blueElm[pixelX][pixelY]>=100) {
                 this.message="In Water! Start again.";
+                System.out.println("In Water! Start again.");
                 x=x0.clone();
                 this.stopCoordinate=x0.clone();
                 if (recording) {
-                    xtrac.clear();
                     xtrac.add(x.clone());
                 }
                 break;
