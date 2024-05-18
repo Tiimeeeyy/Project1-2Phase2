@@ -58,11 +58,13 @@ public class MapPageController {
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = mapSize;
+        Utility.ratio=500/(1.5*Math.sqrt(Math.pow(xBall-xHole, 2)+Math.pow(yBall-yHole, 2)));
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
         System.out.println("Hole Radius: " + radiusHole);
         System.out.println("Map Size: " + mapSize);
+        System.out.println("Map ratio: " + Utility.ratio);
     }
 
     public class ColorItem {
