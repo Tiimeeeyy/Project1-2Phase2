@@ -58,17 +58,14 @@ public class MapPageController {
 
     public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole) {
         this.heightStorage = getHeightCoordinates(function);
-        this.function=function;
+        this.function = function;
         startBallPostion[0] = xBall;
         startBallPostion[1] = yBall;
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = mapSize;
-        // this.gc=drawingCanvas.getGraphicsContext2D();
 
-        // Utility.ratio=500/(1.5*Math.max(Math.abs(xBall), Math.max(Math.abs(yBall), Math.max(Math.abs(xHole), Math.max(Math.abs(yHole), Math.max(Math.abs(xBall-xHole), Math.abs(yBall-yHole)))))));
-        
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
@@ -211,13 +208,12 @@ public class MapPageController {
     @FXML
     private void changeMapSize() {
         int selectedMapSize = mapSizeChoiceBox.getValue();
-        Utility.ratio=500.0/selectedMapSize;
+        Utility.ratio = 500.0 / selectedMapSize;
         this.heightStorage = getHeightCoordinates(function);
         renderInitialMap();
         drawBallAndHole();
 
         System.out.println("Selected map size: " + selectedMapSize + " meters");
-
     }
 
     public void goBack() {
@@ -242,14 +238,14 @@ public class MapPageController {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
         } else {
-            int gr=Utility.heightToColor(height);
+            int gr = Utility.heightToColor(height);
 
-            if(height<0){
-                Color color=Color.rgb(0, gr, 180);
+            if (height < 0) {
+                Color color = Color.rgb(0, gr, 180);
                 return color;
-            }else{
+            } else {
                 // System.out.println(height +"  "+ gr);
-                Color color=Color.rgb(0, gr, 0);
+                Color color = Color.rgb(0, gr, 0);
                 return color;
             }
         }
@@ -259,7 +255,7 @@ public class MapPageController {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
-                Color heightColor = getModifiedColor( height);
+                Color heightColor = getModifiedColor(height);
                 this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
                 this.gc.getPixelWriter().setColor(x, y, heightColor);
@@ -276,12 +272,12 @@ public class MapPageController {
             } else if (heightStorage[x][y] < MIN_HEIGHT) {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
-            Color baseColor=Color.rgb(0, initialGreen[x][y], 0);
+            Color baseColor = Color.rgb(0, initialGreen[x][y], 0);
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
-                baseColor=Color.rgb(120, 60, 35);
-            }else{
-                baseColor = Color.rgb((int)(colorChoiceBox.getValue().color.getRed()*255), initialGreen[x][y], (int)(colorChoiceBox.getValue().color.getBlue()*255));
-            }// Color heightColor = getModifiedColor(baseColor, height);
+                baseColor = Color.rgb(120, 60, 35);
+            } else {
+                baseColor = Color.rgb((int) (colorChoiceBox.getValue().color.getRed() * 255), initialGreen[x][y], (int) (colorChoiceBox.getValue().color.getBlue() * 255));
+            }
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
@@ -289,22 +285,6 @@ public class MapPageController {
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
-
-            //lift ground
-            if (colorChoiceBox.getId().equals("Lift ground")) {
-                // Color black=new Color(0,0,0);
-                // int intR=(int) Math.ceil(brushWidth);
-                // for (int i = -intR; i <= intR; i++) {
-                //     for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
-                //         gc.getPixelWriter().
-                //         image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
-                //         image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
-
-                //         gc.getPixelWriter().setColor(x, y, heightColor);
-                //     }
-                // }
-            }
-
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
@@ -312,16 +292,23 @@ public class MapPageController {
 
     private void drawBallAndHole() {
         GraphicsContext gc2 = overlayCanvas.getGraphicsContext2D();
-    
+
+        clearBallAndHole(gc2);
+
         double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
-        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);  
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
         double holeX = Utility.coordinateToPixel_X(HolePostion[0]);
-        double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);;  
-    
+        double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);
+
         gc2.setFill(Color.WHITE);
-        gc2.fillOval(ballX - 0.5, ballY - 0.5, 1, 1); 
-    
+        gc2.fillOval(ballX - 0.5, ballY - 0.5, 1, 1);
+
         gc2.setFill(Color.BLACK);
-        gc2.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);  
+        gc2.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);
+    }
+
+    private void clearBallAndHole(GraphicsContext gc2) {
+        // Очистка предыдущих позиций мяча и дырки
+        gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
     }
 }
