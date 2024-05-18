@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.scene.control.ChoiceBox;
 
 public class FirstScreenController {
     @FXML
@@ -25,8 +26,10 @@ public class FirstScreenController {
     private TextField Y_HOLE;
     @FXML
     private TextField RADIUS_HOLE;
+
     @FXML
     private ChoiceBox<Integer> mapSizeChoiceBox;
+
 
     private String function;
 
