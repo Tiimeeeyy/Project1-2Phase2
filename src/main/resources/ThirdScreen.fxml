@@ -18,7 +18,7 @@
                 <Canvas fx:id="ballCanvas" height="483.0" width="426.0" />
             </children>
         </Pane>
-        <Button layoutX="63.0" layoutY="652.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="201.0" text="Back" />
+        <!-- <Button layoutX="63.0" layoutY="652.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="201.0" text="Back" /> -->
         <Slider fx:id="powerSlider" layoutX="978.0" layoutY="281.0" max="5.0" min="0.0" prefWidth="150.0" showTickLabels="true" showTickMarks="true" value="2.0" />
         <Pane fx:id="circularSliderPane" layoutX="978.0" layoutY="380.0" prefHeight="139.0" prefWidth="150.0" />
         <Button alignment="CENTER" layoutX="1142.0" layoutY="325.0" mnemonicParsing="false" onAction="#hit" prefHeight="55.0" prefWidth="55.0" text="HIT!" />
