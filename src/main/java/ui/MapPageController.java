@@ -232,9 +232,15 @@ public class MapPageController {
             throw new Error("Out of range functions");
         } else {
             int gr=Utility.heightToColor(height);
-            // System.out.println(height +"  "+ gr);
-            Color color=Color.rgb(0, gr, 0);
-            return color;
+
+            if(height<0){
+                Color color=Color.rgb(0, 0, gr);
+                return color;
+            }else{
+                // System.out.println(height +"  "+ gr);
+                Color color=Color.rgb(0, gr, 0);
+                return color;
+            }
         }
     }
 
@@ -242,6 +248,7 @@ public class MapPageController {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
+
                 Color heightColor = getModifiedColor(baseColor, height);
                 this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
 
@@ -272,6 +279,7 @@ public class MapPageController {
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
+
             //lift ground
             if (colorChoiceBox.getId().equals("Lift ground")) {
                 // Color black=new Color(0,0,0);

@@ -17,7 +17,7 @@ public class CircularSlider extends Region {
     public CircularSlider() {
         canvas = new Canvas(100, 100);
         value = new SimpleDoubleProperty(0);
-        maxValue = new SimpleDoubleProperty(100); 
+        maxValue = new SimpleDoubleProperty(100);
 
         getChildren().add(canvas);
         drawSlider();
@@ -32,7 +32,7 @@ public class CircularSlider extends Region {
 
         double centerX = canvas.getWidth() / 2;
         double centerY = canvas.getHeight() / 2;
-        double radius = Math.min(centerX, centerY) - 5; 
+        double radius = Math.min(centerX, centerY) - 5;
 
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(2);
@@ -42,8 +42,13 @@ public class CircularSlider extends Region {
         double indicatorX = centerX + radius * Math.cos(angle);
         double indicatorY = centerY + radius * Math.sin(angle);
 
-        gc.setFill(Color.BLACK);
-        gc.fillOval(indicatorX - 3, indicatorY - 3, 6, 6); 
+        gc.setFill(Color.RED);
+        gc.fillOval(indicatorX - 3, indicatorY - 3, 6, 6);
+
+        // Drawing the arrow from the center to the indicator
+        gc.setStroke(Color.BLUE);
+        gc.setLineWidth(2);
+        gc.strokeLine(centerX, centerY, indicatorX, indicatorY);
     }
 
     private void handleMouse(MouseEvent event) {
