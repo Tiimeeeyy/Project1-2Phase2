@@ -12,9 +12,9 @@
 
 <AnchorPane maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Pane layoutX="63.0" layoutY="110.0" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black; -fx-border-width: 1px;">
+        <Pane layoutX="63.0" layoutY="110.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black; -fx-border-width: 1px;">
             <children>
-                <ImageView fx:id="mapImageView" fitHeight="483.0" fitWidth="426.0" />
+                <ImageView fx:id="mapImageView" fitHeight="500.0" fitWidth="500.0" />
                 <Canvas fx:id="ballCanvas" height="483.0" width="426.0" />
             </children>
         </Pane>
