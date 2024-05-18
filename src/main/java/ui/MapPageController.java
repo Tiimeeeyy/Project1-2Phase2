@@ -61,7 +61,9 @@ public class MapPageController {
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = mapSize;
-        Utility.ratio=500/(1.5*Math.sqrt(Math.pow(xBall-xHole, 2)+Math.pow(yBall-yHole, 2)));
+
+        // Utility.ratio=500/(1.5*Math.max(Math.abs(xBall), Math.max(Math.abs(yBall), Math.max(Math.abs(xHole), Math.max(Math.abs(yHole), Math.max(Math.abs(xBall-xHole), Math.abs(yBall-yHole)))))));
+        
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
@@ -229,8 +231,9 @@ public class MapPageController {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
         } else {
-            int gr = Utility.heightToColor(height);
-            Color color = Color.rgb(0, gr, 0);
+            int gr=Utility.heightToColor(height);
+            // System.out.println(height +"  "+ gr);
+            Color color=Color.rgb(0, gr, 0);
             return color;
         }
     }
