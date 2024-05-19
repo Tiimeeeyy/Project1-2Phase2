@@ -365,7 +365,7 @@ public class MapPageController {
         gc2.fillOval(ballX - 0.5, ballY - 0.5, 0.1* Utility.ratio, 0.1* Utility.ratio);
 
         gc2.setFill(Color.BLACK);
-        gc2.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);
+        gc2.fillOval(holeX - radiusHole * Utility.ratio, holeY - radiusHole * Utility.ratio, 2*radiusHole * Utility.ratio, 2*radiusHole * Utility.ratio);
     }
 
     private void clearBallAndHole(GraphicsContext gc2) {
