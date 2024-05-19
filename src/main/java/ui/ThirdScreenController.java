@@ -158,7 +158,7 @@ public class ThirdScreenController {
         for (double[] point : fullTrajectory) {
             double x = Utility.coordinateToPixel_X(point[0]);
             double y = Utility.coordinateToPixel_Y(point[1]);
-            gc.fillOval(x - 1, y - 1, 1, 1); 
+            gc.fillOval(x - 1, y - 1, 1, 1);
         }
     }
 
@@ -222,39 +222,42 @@ public class ThirdScreenController {
         // Call the engine to calculate the trajectory
         double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
         ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
-    
+
         // Update ball position and shot count
-        double[] finalPosition = {startBallPostion[0], startBallPostion[1]};
         if (xpath != null && !xpath.isEmpty()) {
-            for (double[] point : xpath) {
-                if (isInWater(point[0], point[1])) {
-                    logEvent(String.format("The ball landed in water at (%.2f, %.2f).", point[0], point[1]));
-                    break;  // Stop updating the position if the ball hits the water
-                } else {
-                    finalPosition = point;
-                    fullTrajectory.add(finalPosition);
-                }
-            }
+            fullTrajectory.addAll(xpath);  // Add new trajectory points to the full trajectory
+            double[] finalPosition = xpath.get(xpath.size() - 1);
             startBallPostion[0] = finalPosition[0];
             startBallPostion[1] = finalPosition[1];
             shotCount++;
         }
     
         String shotLog = String.format(
-            "Shot %d: Hit from to (%.2f, %.2f) with power %.2f.",
-            shotCount, finalPosition[0], finalPosition[1], power);
+            "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
+            shotCount, startBallPostion[0], startBallPostion[1], power);
         logEvent(shotLog);
-    
-        // Check if the ball reached the hole
-        if (isInHole(finalPosition[0], finalPosition[1])) {
-            logEvent(String.format("The ball reached the hole at (%.2f, %.2f).", finalPosition[0], finalPosition[1]));
-        }
-    
-        // Draw the updated scene
         drawBallAndArrow();
         updateShotCountLabel();
+
+        // message is always printed when the ball hit the water once
+        try{
+            String message = golfGame.getMessage();
+            if (message.contains("Water")) {
+                logEvent("!!--The ball landed in water--!!");
+                showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
+            } else if (golfGame.isGoal()){
+                logEvent("CONGRATULATIONS! The ball reached the hole.");
+                showAlert(Alert.AlertType.INFORMATION, "Goal!", "The ball reached the hole.");
+            } else {
+                // logEvent("The ball is still in play.");
+            }
+        } catch (Exception e) {
+            // System.out.println("Error in message");
+        }
+        
+        
+
     }
-    
 
     private void logEvent(String message) {
         Platform.runLater(() -> {
@@ -283,15 +286,5 @@ public class ThirdScreenController {
             alert.setContentText(message);
             alert.showAndWait();
         });
-    }
-
-    private boolean isInWater(double x, double y) {
-        // logic for water
-        return false; 
-    }
-
-    private boolean isInHole(double x, double y) {
-        // logic for hole
-        return false; 
     }
 }
