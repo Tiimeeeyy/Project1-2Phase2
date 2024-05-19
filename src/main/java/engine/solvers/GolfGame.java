@@ -59,6 +59,9 @@ public class GolfGame {
         MyFunction golfPhysics=new golfphysics();
         double[] fric=a.clone();
         
+        //clear previous
+        this.message="";
+        this.goal=false;
         
         //Read the map, store the gradient 
         map.readmap(mappath);
