@@ -38,9 +38,9 @@ public class CircularSlider extends Region {
         gc.setLineWidth(2);
         gc.strokeOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
 
-        double angle = Math.toRadians(value.get() * 360 / maxValue.get());
-        double indicatorX = centerX + radius * Math.cos(angle);
-        double indicatorY = centerY + radius * Math.sin(angle);
+        double angle = Math.toRadians((value.get() / maxValue.get()) * 360);
+        double indicatorX = centerX + radius * Math.cos(angle - Math.PI / 2);
+        double indicatorY = centerY + radius * Math.sin(angle - Math.PI / 2);
 
         gc.setFill(Color.RED);
         gc.fillOval(indicatorX - 3, indicatorY - 3, 6, 6);
@@ -57,12 +57,12 @@ public class CircularSlider extends Region {
         double dx = event.getX() - centerX;
         double dy = event.getY() - centerY;
 
-        double angle = Math.atan2(dy, dx);
+        double angle = Math.atan2(dy, dx) + Math.PI / 2;
         if (angle < 0) {
             angle += 2 * Math.PI;
         }
 
-        double newValue = angle * maxValue.get() / (2 * Math.PI);
+        double newValue = (angle / (2 * Math.PI)) * maxValue.get();
         value.set(newValue);
         drawSlider();
     }
@@ -89,9 +89,10 @@ public class CircularSlider extends Region {
     }
 
     public double[] getDirectionVector() {
-        double angle = Math.toRadians(value.get() * 360 / maxValue.get());
+        double angle = Math.toRadians((value.get() / maxValue.get()) * 360 - 90);
         double x = Math.cos(angle);
         double y = Math.sin(angle);
-        return new double[]{x, y};
+        return new double[]{x, -y};
     }
+    
 }

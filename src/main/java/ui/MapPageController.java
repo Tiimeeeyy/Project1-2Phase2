@@ -185,6 +185,7 @@ public class MapPageController {
             if (mapSize == 50) {
                 GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
                 gc.setFill( Color.rgb(0, 0, 150));
+                // 12???
                 gc.setLineWidth(12);
 
                 gc.fillRect(0, 0, 500, 2);

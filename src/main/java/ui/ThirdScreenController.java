@@ -152,20 +152,16 @@ public class ThirdScreenController {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
     
-            double centerX = ballCanvas.getWidth() / 2;
-            double centerY = ballCanvas.getHeight() / 2;
-    
-            double ballRadius = 5; // Changed for better visibility
             double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
             double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
     
             gc.setFill(javafx.scene.paint.Color.WHITE);
-            gc.fillOval(ballX - ballRadius / 2, ballY - ballRadius / 2, ballRadius, ballRadius);
+            gc.fillOval(ballX - 5, ballY - 5, 10, 10);
     
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
             double arrowX = ballX + directionVector[0] * arrowLength;
-            double arrowY = ballY + directionVector[1] * arrowLength;
+            double arrowY = ballY - directionVector[1] * arrowLength; 
     
             gc.setStroke(javafx.scene.paint.Color.RED);
             gc.setLineWidth(2);
@@ -184,7 +180,7 @@ public class ThirdScreenController {
     
     private void drawArrowhead(GraphicsContext gc, double x, double y, double[] direction) {
         double arrowHeadSize = 10;
-        double angle = Math.atan2(direction[1], direction[0]);
+        double angle = Math.atan2(-direction[1], direction[0]); 
     
         double x1 = x - arrowHeadSize * Math.cos(angle - Math.PI / 6);
         double y1 = y - arrowHeadSize * Math.sin(angle - Math.PI / 6);
