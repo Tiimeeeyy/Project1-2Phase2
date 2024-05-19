@@ -103,7 +103,7 @@ public class MapPageController {
 
     public void initialize() {
         colorChoiceBox.getItems().addAll(
-            new ColorItem("Sand", Color.rgb(180, 125, 0)),
+            new ColorItem("Sand", Color.rgb(160, 125, 0)),
             new ColorItem("Grass", Color.rgb(0, 125, 0)),
             new ColorItem("Water", Color.rgb(0, 125, 180)),
             new ColorItem("Tree", Color.rgb(120, 60, 35)),
@@ -323,14 +323,21 @@ public class MapPageController {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
             Color baseColor = Color.rgb(0, Math.min(255, initialGreen[x][y]), 0);
-            if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
+            if (colorChoiceBox.getValue().name.equals("Tree")) {
                 baseColor = Color.rgb(120, 60, 35);
-            } else {
-                baseColor = Color.rgb(
-                    (int) (colorChoiceBox.getValue().color.getRed() * 255),
-                    Math.min(255, initialGreen[x][y]),
-                    (int) (colorChoiceBox.getValue().color.getBlue() * 255)
-                );
+            } 
+            // else {
+            //     baseColor = Color.rgb(
+            //         (int) (colorChoiceBox.getValue().color.getRed() * 255),
+            //         Math.min(255, initialGreen[x][y]),
+            //         (int) (colorChoiceBox.getValue().color.getBlue() * 255)
+            //     );
+            // }
+            if (colorChoiceBox.getValue().name.equals("Sand")) {
+                baseColor=Color.rgb(160, Math.max(100, Math.min(255, initialGreen[x][y])),0);
+            }
+            if (colorChoiceBox.getValue().name.equals("Water")) {
+                baseColor=Color.rgb(0, Math.min(255, initialGreen[x][y]),180);
             }
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
