@@ -28,7 +28,6 @@
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" layoutX="650.0" layoutY="380.0" mouseTransparent="true" stroke="BLACK" strokeType="INSIDE" width="200.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" layoutX="878.0" layoutY="110.0" mouseTransparent="true" stroke="BLACK" strokeType="INSIDE" width="200.0" />
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" layoutX="650.0" layoutY="110.0" mouseTransparent="true" stroke="BLACK" strokeType="INSIDE" width="200.0" />
-        <!-- <Button layoutX="63.0" layoutY="652.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="201.0" text="Back" /> -->
         <Slider fx:id="powerSlider" layoutX="675.0" layoutY="178.0" max="5.0" min="0.0" prefWidth="150.0" showTickLabels="true" showTickMarks="true" value="2.0" />
         <Pane fx:id="circularSliderPane" layoutX="928.0" layoutY="141.0" prefHeight="139.0" prefWidth="150.0" />
         <Button alignment="CENTER" layoutX="884.0" layoutY="525.0" mnemonicParsing="false" onAction="#hit" prefHeight="55.0" prefWidth="189.0" text="HIT!" />
