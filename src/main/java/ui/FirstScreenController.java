@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -25,7 +24,10 @@ public class FirstScreenController {
     private TextField Y_HOLE;
     @FXML
     private TextField RADIUS_HOLE;
-
+    @FXML
+    private TextField TREE_RADIUS;
+    @FXML
+    private TextField GRASS_FRICTION;
 
     private String function;
 
@@ -36,18 +38,22 @@ public class FirstScreenController {
 
     public void nextScreen(ActionEvent event) {
         function = FunctionTextfield.getText();
-        double xBall, yBall, xHole, yHole, radiusHole;
-        int mapSize;
+        double xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFriction;
         try {
             xBall = Double.parseDouble(X_BALL.getText());
             yBall = Double.parseDouble(Y_BALL.getText());
             xHole = Double.parseDouble(X_HOLE.getText());
             yHole = Double.parseDouble(Y_HOLE.getText());
             radiusHole = Double.parseDouble(RADIUS_HOLE.getText());
+            treeRadius = Double.parseDouble(TREE_RADIUS.getText());
+            grassFriction = Double.parseDouble(GRASS_FRICTION.getText());
         } catch (NumberFormatException e) {
             showAlert("Error!", "Invalid input for coordinates or radius", "Please enter valid numbers for the coordinates and radius.");
             return;
         }
+
+        System.out.println("Tree Radius: " + treeRadius);
+        System.out.println("Grass Friction: " + grassFriction);
 
         try {
             String userDir = System.getProperty("user.dir");
@@ -70,7 +76,7 @@ public class FirstScreenController {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole);
+            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFriction);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

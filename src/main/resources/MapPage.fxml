@@ -15,32 +15,37 @@
          <children>
             <AnchorPane prefHeight="500.0" prefWidth="500.0">
                <children>
-                  <Canvas fx:id="drawingCanvas" height="500.0" width="500.0" />
-                  <Canvas fx:id="overlayCanvas" height="500.0" width="500.0" />
+                  <Canvas fx:id="drawingCanvas" height="500.0" width="500.0"/>
+                  <Canvas fx:id="overlayCanvas" height="500.0" width="500.0"/>
                </children>
             </AnchorPane>
          </children>
       </Pane>
-      <Pane fx:id="chartPane" layoutX="54.0" layoutY="110.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="450.0" />
-      <Slider fx:id="widthSlider" layoutX="1090.0" layoutY="380.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0" />
-      <ChoiceBox fx:id="colorChoiceBox" layoutX="1090.0" layoutY="288.0" prefHeight="34.0" prefWidth="150.0" />
-      <ChoiceBox fx:id="mapSizeChoiceBox" layoutX="1090.0" layoutY="458.0" prefHeight="34.0" prefWidth="150.0" />
-      <Button layoutX="54.0" layoutY="648.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="187.0" text="Back" />
-      <Button layoutX="1090.0" layoutY="648.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Next" />
-      <Button layoutX="1090.0" layoutY="508.0" mnemonicParsing="false" onAction="#changeMapSize" prefHeight="26.0" prefWidth="150.0" text="Change" />
+      <Pane fx:id="chartPane" layoutX="54.0" layoutY="110.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="450.0"/>
+      <Slider fx:id="widthSlider" layoutX="1090.0" layoutY="380.0" max="50.0" min="1.0" prefWidth="150.0" value="30.0"/>
+      <ChoiceBox fx:id="colorChoiceBox" layoutX="1090.0" layoutY="288.0" prefHeight="34.0" prefWidth="150.0"/>
+      <ChoiceBox fx:id="mapSizeChoiceBox" layoutX="1090.0" layoutY="458.0" prefHeight="34.0" prefWidth="150.0"/>
+      <Button layoutX="54.0" layoutY="648.0" mnemonicParsing="false" onAction="#goBack" prefHeight="34.0" prefWidth="187.0" text="Back"/>
+      <Button layoutX="1090.0" layoutY="648.0" mnemonicParsing="false" onAction="#saveCanvasAndContinue" prefHeight="26.0" prefWidth="150.0" text="Next"/>
+      <Button layoutX="1090.0" layoutY="508.0" mnemonicParsing="false" onAction="#changeMapSize" prefHeight="26.0" prefWidth="150.0" text="Change"/>
       <Text layoutX="1090.0" layoutY="274.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Surface" wrappingWidth="47.0">
          <font>
-            <Font size="14.0" />
+            <Font size="14.0"/>
          </font>
       </Text>
-      <Text layoutX="1090.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Thickness" wrappingWidth="61.0">
+      <Text layoutX="1090.0" layoutY="365.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Brush" wrappingWidth="61.0">
          <font>
-            <Font size="14.0" />
+            <Font size="14.0"/>
          </font>
       </Text>
       <Text layoutX="1090.0" layoutY="444.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Map Size" wrappingWidth="61.0">
          <font>
-            <Font size="14.0" />
+            <Font size="14.0"/>
+         </font>
+      </Text>
+      <Text fx:id="mapSizeText" layoutX="583.0" layoutY="90.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Map size in meters: 50" wrappingWidth="200.0">
+         <font>
+            <Font size="16.0"/>
          </font>
       </Text>
    </children>

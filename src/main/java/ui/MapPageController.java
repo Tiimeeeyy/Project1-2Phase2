@@ -13,6 +13,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -46,6 +47,9 @@ public class MapPageController {
     @FXML
     private Pane chartPane;
 
+    @FXML
+    private Text mapSizeText;
+
     private double[][] heightStorage;
     private int[][] initialGreen = new int[500][500];
     private double[] startBallPostion = new double[2];
@@ -53,10 +57,12 @@ public class MapPageController {
     private double radiusHole;
     private int mapSize;
     private String function;
+    private double treeRadius;
+    private double grassFriction;
 
     GraphicsContext gc;
 
-    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole) {
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFriction) {
         this.heightStorage = getHeightCoordinates(function);
         this.function = function;
         startBallPostion[0] = xBall;
@@ -64,7 +70,10 @@ public class MapPageController {
         HolePostion[0] = xHole;
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
-        this.mapSize = mapSize;
+        this.mapSize = 50;
+
+        this.grassFriction = grassFriction;
+        this.treeRadius = treeRadius;
 
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
@@ -72,6 +81,9 @@ public class MapPageController {
         System.out.println("Hole Radius: " + radiusHole);
         System.out.println("Map Size: " + mapSize);
         System.out.println("Map ratio: " + Utility.ratio);
+
+        System.out.println("Tree Radius: " + treeRadius);
+        System.out.println("Grass Friction: " + grassFriction);
     }
 
     public class ColorItem {
@@ -101,6 +113,14 @@ public class MapPageController {
 
         mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
         mapSizeChoiceBox.setValue(mapSize);
+        mapSizeText.setText("Map size in meters: " + mapSize);
+
+        mapSizeChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSize, newSize) -> {
+            if (newSize != null) {
+                mapSize = newSize;
+                mapSizeText.setText("Map size in meters: " + mapSize);
+            }
+        });
 
         if (drawingCanvas != null) {
             this.gc = drawingCanvas.getGraphicsContext2D();
@@ -151,27 +171,46 @@ public class MapPageController {
         try {
             WritableImage writableImage = new WritableImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight());
             drawingCanvas.snapshot(null, writableImage);
-
+    
             BufferedImage bufferedImage = new BufferedImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
             PixelReader pixelReader = writableImage.getPixelReader();
-
+    
             for (int y = 0; y < writableImage.getHeight(); y++) {
                 for (int x = 0; x < writableImage.getWidth(); x++) {
                     int argb = pixelReader.getArgb(x, y);
                     bufferedImage.setRGB(x, y, argb);
                 }
             }
+    
+            if (mapSize == 50) {
+                GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+                gc.setFill( Color.rgb(0, 0, 150));
+                gc.setLineWidth(12);
 
+                gc.fillRect(0, 0, 500, 2);
+                gc.fillRect(0, 498, 500, 2);
+                gc.fillRect(0, 0, 2, 500);
+                gc.fillRect(498, 0, 2, 500);
+    
+                drawingCanvas.snapshot(null, writableImage);
+                pixelReader = writableImage.getPixelReader();
+                for (int y = 0; y < writableImage.getHeight(); y++) {
+                    for (int x = 0; x < writableImage.getWidth(); x++) {
+                        int argb = pixelReader.getArgb(x, y);
+                        bufferedImage.setRGB(x, y, argb);
+                    }
+                }
+            }
+    
             String userDir = System.getProperty("user.dir");
             File resourcesDir = new File(userDir, "src/main/resources");
             if (!resourcesDir.exists()) {
                 showAlert(Alert.AlertType.ERROR, "Save Failed", "The directory you are trying to save to does not exist.");
                 return;
             }
-
+    
             File file = new File(resourcesDir, "userInputMap.png");
-            
-            
+    
             if (file.exists()) {
                 if (!file.delete()) {
                     throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
@@ -181,12 +220,13 @@ public class MapPageController {
             if (!imageWritten) {
                 throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
             }
-
+    
         } catch (IOException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
         }
     }
+    
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
@@ -239,12 +279,12 @@ public class MapPageController {
             throw new Error("Out of range functions");
         } else {
             int gr = Utility.heightToColor(height);
+            gr = Math.max(0, Math.min(255, gr));
 
             if (height < 0) {
-                Color color = Color.rgb(0, gr, 180);
+                Color color = Color.rgb(0, gr, 150);
                 return color;
             } else {
-                // System.out.println(height +"  "+ gr);
                 Color color = Color.rgb(0, gr, 0);
                 return color;
             }
@@ -257,11 +297,20 @@ public class MapPageController {
                 double height = heightStorage[x][y];
                 Color heightColor = getModifiedColor(height);
                 this.initialGreen[x][y] = (int) Math.round(heightColor.getGreen() * 255);
-
+    
                 this.gc.getPixelWriter().setColor(x, y, heightColor);
             }
         }
         System.out.println("Initial map rendered with green color.");
+    
+        if (mapSize == 50) {
+            gc.setFill(Color.BLUE);
+            gc.setLineWidth(2);
+            gc.fillRect(0, 0, 500, 2);
+            gc.fillRect(0, 498, 500, 2);
+            gc.fillRect(0, 0, 2, 500);
+            gc.fillRect(498, 0, 2, 500);
+        }
     }
 
     private void updateHeightMap(int x, int y, double heightStep) {
@@ -272,11 +321,15 @@ public class MapPageController {
             } else if (heightStorage[x][y] < MIN_HEIGHT) {
                 heightStorage[x][y] = MIN_HEIGHT;
             }
-            Color baseColor = Color.rgb(0, initialGreen[x][y], 0);
+            Color baseColor = Color.rgb(0, Math.min(255, initialGreen[x][y]), 0);
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
                 baseColor = Color.rgb(120, 60, 35);
             } else {
-                baseColor = Color.rgb((int) (colorChoiceBox.getValue().color.getRed() * 255), initialGreen[x][y], (int) (colorChoiceBox.getValue().color.getBlue() * 255));
+                baseColor = Color.rgb(
+                    (int) (colorChoiceBox.getValue().color.getRed() * 255),
+                    Math.min(255, initialGreen[x][y]),
+                    (int) (colorChoiceBox.getValue().color.getBlue() * 255)
+                );
             }
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
@@ -301,14 +354,13 @@ public class MapPageController {
         double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);
 
         gc2.setFill(Color.WHITE);
-        gc2.fillOval(ballX - 0.5, ballY - 0.5, 1, 1);
+        gc2.fillOval(ballX - 0.5, ballY - 0.5, 0.1* Utility.ratio, 0.1* Utility.ratio);
 
         gc2.setFill(Color.BLACK);
         gc2.fillOval(holeX - 1, holeY - 1, radiusHole * Utility.ratio, radiusHole * Utility.ratio);
     }
 
     private void clearBallAndHole(GraphicsContext gc2) {
-        // Очистка предыдущих позиций мяча и дырки
         gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
     }
 }
