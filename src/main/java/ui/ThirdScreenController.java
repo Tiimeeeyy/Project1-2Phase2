@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -54,27 +55,31 @@ public class ThirdScreenController {
     @FXML
     private Label powerLabel;
 
+    @FXML
+    private TextArea logTextArea;
+
     private CircularSlider circularSlider;
     private double[] startBallPostion;
     private double[] HolePostion;
     private GolfGame golfGame;
     private int shotCount = 0;
+    private ArrayList<double[]> fullTrajectory = new ArrayList<>();
 
     public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
-        double[] a={0.05,0.12};
-        this.golfGame=new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
+        double[] a = {0.05, 0.12};
+        this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
     }
 
     @FXML
     public void initialize() {
         loadNewImage();
-    
+
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
-    
+
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             updateDirection(newVal);
             drawBallAndArrow();
@@ -83,12 +88,11 @@ public class ThirdScreenController {
             updatePower(newVal);
             drawBallAndArrow();
         });
-    
+
         drawBallAndArrow();
         updateBallPositionLabel();
         updateShotCountLabel();
     }
-    
 
     private void updateDirection(Number newVal) {
         double[] directionVector = circularSlider.getDirectionVector();
@@ -147,72 +151,115 @@ public class ThirdScreenController {
         }
     }
 
+    private void drawTrajectory() {
+        GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+        gc.setFill(javafx.scene.paint.Color.RED);
+
+        for (double[] point : fullTrajectory) {
+            double x = Utility.coordinateToPixel_X(point[0]);
+            double y = Utility.coordinateToPixel_Y(point[1]);
+            gc.fillOval(x - 1, y - 1, 1, 1); 
+        }
+    }
+
     private void drawBallAndArrow() {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
-    
+
+            // Draw the full trajectory
+            drawTrajectory();
+
             double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
             double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
-    
+
             gc.setFill(javafx.scene.paint.Color.WHITE);
-            gc.fillOval(ballX - 5, ballY - 5, 10, 10);
-    
+            gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
+
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
             double arrowX = ballX + directionVector[0] * arrowLength;
-            double arrowY = ballY - directionVector[1] * arrowLength; 
-    
+            double arrowY = ballY - directionVector[1] * arrowLength;
+
             gc.setStroke(javafx.scene.paint.Color.RED);
             gc.setLineWidth(2);
-    
+
             // Draw the arrow shaft
             gc.strokeLine(ballX, ballY, arrowX, arrowY);
-    
+
             // Draw the arrowhead
             drawArrowhead(gc, arrowX, arrowY, directionVector);
-    
+
             updateBallPositionLabel();
         } else {
             System.err.println("ballCanvas is null");
         }
     }
-    
+
     private void drawArrowhead(GraphicsContext gc, double x, double y, double[] direction) {
         double arrowHeadSize = 10;
-        double angle = Math.atan2(-direction[1], direction[0]); 
-    
+        double angle = Math.atan2(-direction[1], direction[0]);
+
         double x1 = x - arrowHeadSize * Math.cos(angle - Math.PI / 6);
         double y1 = y - arrowHeadSize * Math.sin(angle - Math.PI / 6);
         double x2 = x - arrowHeadSize * Math.cos(angle + Math.PI / 6);
         double y2 = y - arrowHeadSize * Math.sin(angle + Math.PI / 6);
-    
+
         gc.setFill(javafx.scene.paint.Color.RED);
         gc.fillPolygon(new double[]{x, x1, x2}, new double[]{y, y1, y2}, 3);
     }
-    
 
     @FXML
     private void hit() {
+        // Clear the trajectory before each new hit
+        fullTrajectory.clear();
+    
         double[] directionVector = circularSlider.getDirectionVector();
         double power = powerSlider.getValue();
         System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
-
-        // call the engine to calculate the trajectory
+    
+        // Call the engine to calculate the trajectory
         double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
         ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
-
+    
         // Update ball position and shot count
+        double[] finalPosition = {startBallPostion[0], startBallPostion[1]};
         if (xpath != null && !xpath.isEmpty()) {
-            double[] finalPosition = xpath.get(xpath.size() - 1);
+            for (double[] point : xpath) {
+                if (isInWater(point[0], point[1])) {
+                    logEvent(String.format("The ball landed in water at (%.2f, %.2f).", point[0], point[1]));
+                    break;  // Stop updating the position if the ball hits the water
+                } else {
+                    finalPosition = point;
+                    fullTrajectory.add(finalPosition);
+                }
+            }
             startBallPostion[0] = finalPosition[0];
             startBallPostion[1] = finalPosition[1];
             shotCount++;
         }
-
+    
+        String shotLog = String.format(
+            "Shot %d: Hit from to (%.2f, %.2f) with power %.2f.",
+            shotCount, finalPosition[0], finalPosition[1], power);
+        logEvent(shotLog);
+    
+        // Check if the ball reached the hole
+        if (isInHole(finalPosition[0], finalPosition[1])) {
+            logEvent(String.format("The ball reached the hole at (%.2f, %.2f).", finalPosition[0], finalPosition[1]));
+        }
+    
+        // Draw the updated scene
         drawBallAndArrow();
         updateShotCountLabel();
+    }
+    
+
+    private void logEvent(String message) {
+        Platform.runLater(() -> {
+            logTextArea.appendText(message + "\n");
+        });
     }
 
     @FXML
@@ -236,5 +283,15 @@ public class ThirdScreenController {
             alert.setContentText(message);
             alert.showAndWait();
         });
+    }
+
+    private boolean isInWater(double x, double y) {
+        // logic for water
+        return false; 
+    }
+
+    private boolean isInHole(double x, double y) {
+        // logic for hole
+        return false; 
     }
 }
