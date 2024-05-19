@@ -152,7 +152,7 @@ public class MapHandler {
                     if (r>30 && b>30) {
                         colortemp=new Color(100,67,33);
                     }else if (r>100) {
-                        colortemp=new Color(180,g,0);
+                        colortemp=new Color(160,g,0);
                     }else if (b>100) {
                         colortemp=new Color(0,g,180);
                     }
