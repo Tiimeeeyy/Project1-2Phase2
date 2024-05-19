@@ -10,7 +10,7 @@ import java.util.Random;
 import javax.swing.text.Utilities;
 
 public class AiBotGA {
-    private int popSize=20;
+    private int popSize=50;
     private char[] vocab={'0','1'};
     private double mutationRate=0.01;
     private double[] solution=new double[4];
@@ -54,7 +54,6 @@ public class AiBotGA {
     void initialPopulation(Individual[] pop, double[] x){
        
         Random rand=new Random();
-        HeapSort sort=new HeapSort();
         char[][] indi=new char[2][10];
 
         // set 1 try of direct shoot 
