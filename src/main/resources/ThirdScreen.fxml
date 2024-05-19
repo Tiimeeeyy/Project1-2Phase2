@@ -22,7 +22,7 @@
         <Pane layoutX="63.0" layoutY="110.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="500.0" style="-fx-border-color: black; -fx-border-width: 1px;">
             <children>
                 <ImageView fx:id="mapImageView" fitHeight="500.0" fitWidth="500.0" />
-                <Canvas fx:id="ballCanvas" height="483.0" width="426.0" />
+                <Canvas fx:id="ballCanvas" height="500.0" width="500.0" />
             </children>
         </Pane>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="200.0" layoutX="650.0" layoutY="380.0" mouseTransparent="true" stroke="BLACK" strokeType="INSIDE" width="200.0" />
