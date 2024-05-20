@@ -112,10 +112,8 @@ public class GolfGame {
             //ckeck hit the tree
             if (treeAry[pixelX][pixelY]) {
                         if (!bounceCheck) {
-                            System.out.println("before"+x[2]+"  "+x[3]);
                             double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
                             bouncingHandler(x, normVec);
-                            System.out.println("after"+x[2]+"  "+x[3]);
                             bounceCheck=true;
                         }
             }else{
