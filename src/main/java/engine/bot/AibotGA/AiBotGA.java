@@ -2,12 +2,10 @@ package engine.bot.AibotGA;
 
 
 import engine.solvers.GolfGame;
-import engine.solvers.Utility;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.text.Utilities;
 
 public class AiBotGA {
     private int popSize=50;

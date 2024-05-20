@@ -1,11 +1,4 @@
 package engine.solvers;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Scanner;
-
-import engine.parser.ExpressionParser;
 
 public class test {
 

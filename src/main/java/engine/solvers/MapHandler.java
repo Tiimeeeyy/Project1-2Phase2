@@ -1,17 +1,14 @@
 package engine.solvers;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
 import engine.parser.ExpressionParser;
-import javafx.scene.image.Image;
 
 import java.awt.Color;
 
@@ -194,7 +191,7 @@ public class MapHandler {
 
     private int heightFunction(double x, double y){
         // translate x,y from (0,500) to (-10,10), 
-        int h=(int) (255-(((0.4*(0.9-Math.exp(-(Math.pow(x/50-5, 2)+Math.pow(y/50-5, 2))/8))))*200+80));
+        // int h=(int) (255-(((0.4*(0.9-Math.exp(-(Math.pow(x/50-5, 2)+Math.pow(y/50-5, 2))/8))))*200+80));
 
 
         String func = "255 - ((0.4 * (0.9 - e^(-(((x / 50 - 5)^2 + (y / 50 - 5)^2) / 8)))) * 200 + 80)";
