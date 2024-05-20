@@ -35,39 +35,40 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Start Position:">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Start Position(X,Y):" wrappingWidth="122.90234375" GridPane.rowIndex="2">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="X_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="X" GridPane.columnIndex="1" />
-                  <TextField fx:id="Y_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="Y" GridPane.columnIndex="2" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hole Position:" GridPane.rowIndex="2">
+                  <TextField fx:id="X_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="61.0" promptText="X" text="1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="Y_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="63.0" promptText="Y" text="1" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hole Position(X,Y,R):" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="X_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="X" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="Y_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="Y" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                  <TextField fx:id="RADIUS_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefColumnCount="0" prefHeight="30.0" prefWidth="128.0" promptText="Radius" snapToPixel="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tree Radius:" GridPane.rowIndex="1">
+                  <TextField fx:id="X_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="60.0" promptText="X" text="12" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="Y_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="64.0" promptText="Y" text="12" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                  <TextField fx:id="RADIUS_HOLE" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefColumnCount="0" prefHeight="30.0" prefWidth="128.0" promptText="Radius" snapToPixel="false" text="0.15" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tree Radius:">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="TREE_RADIUS" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="m" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Grass Friction:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                  <TextField fx:id="TREE_RADIUS" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="m" text="0.15" GridPane.columnIndex="1" />
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Grass Friction(K,S):" wrappingWidth="122.2099609375" GridPane.rowIndex="1">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="GRASS_FRICTION" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="m" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                  <TextField fx:id="GRASS_FRICTION_KINETIC" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="K" text="0.1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Button alignment="CENTER" mnemonicParsing="false" onAction="#nextScreen" prefHeight="38.0" prefWidth="167.0" text="Next" GridPane.columnIndex="3" GridPane.rowIndex="4">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
                   <Button mnemonicParsing="false" onAction="#goBack" prefHeight="38.0" prefWidth="113.0" text="Back" GridPane.rowIndex="4" />
+                  <TextField fx:id="GRASS_FRICTION_STATIC" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="S" text="0.15" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <GridPane layoutX="200.0" layoutY="17.0" pickOnBounds="false" prefHeight="260.0" prefWidth="500.0">

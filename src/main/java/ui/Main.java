@@ -41,10 +41,10 @@ public class Main extends Application {
         }
     }
 
-    public static void openThirdScreen(double[] startBallPosition, double[] holePosition, double radiusHole) {
+    public static void openThirdScreen(double[] startBallPosition, double[] holePosition, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/ThirdScreen.fxml"));
-            ThirdScreenController controller = new ThirdScreenController(startBallPosition, holePosition, radiusHole);
+            ThirdScreenController controller = new ThirdScreenController(startBallPosition, holePosition, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             primaryStage.setTitle("Third Screen");

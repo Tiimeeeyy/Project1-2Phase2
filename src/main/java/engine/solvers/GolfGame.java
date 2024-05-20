@@ -20,7 +20,6 @@ public class GolfGame {
     private double[] hole;
     private double r;
     private String mappath;
-
     private String message;
 
     /**

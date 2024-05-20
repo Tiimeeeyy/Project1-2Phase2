@@ -12,12 +12,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.ButtonType;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import engine.solvers.GolfGame;
 import engine.solvers.RK4;
@@ -62,13 +64,20 @@ public class ThirdScreenController {
     private double[] startBallPostion;
     private double[] HolePostion;
     private GolfGame golfGame;
+    private double grassFrictionKINETIC;
+    private double grassFrictionSTATIC;
     private int shotCount = 0;
     private ArrayList<double[]> fullTrajectory = new ArrayList<>();
+    private boolean REACHED_THE_HOLE;
 
-    public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole) {
+    public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
-        double[] a = {0.05, 0.12};
+        this.grassFrictionKINETIC = grassFrictionKINETIC;
+        this.grassFrictionSTATIC = grassFrictionSTATIC;
+        this.REACHED_THE_HOLE = false;
+        // grass friction?
+        double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
     }
@@ -182,10 +191,10 @@ public class ThirdScreenController {
             double arrowY = ballY - directionVector[1] * arrowLength;
 
             gc.setStroke(javafx.scene.paint.Color.RED);
-            gc.setLineWidth(2);
+            gc.setLineWidth(0.07 * Utility.ratio);
 
             // Draw the arrow shaft
-            gc.strokeLine(ballX, ballY, arrowX, arrowY);
+            gc.strokeLine(ballX + 0.5, ballY + 0.5, arrowX, arrowY);
 
             // Draw the arrowhead
             drawArrowhead(gc, arrowX, arrowY, directionVector);
@@ -197,7 +206,7 @@ public class ThirdScreenController {
     }
 
     private void drawArrowhead(GraphicsContext gc, double x, double y, double[] direction) {
-        double arrowHeadSize = 10;
+        double arrowHeadSize = 5;
         double angle = Math.atan2(-direction[1], direction[0]);
 
         double x1 = x - arrowHeadSize * Math.cos(angle - Math.PI / 6);
@@ -211,52 +220,72 @@ public class ThirdScreenController {
 
     @FXML
     private void hit() {
-        // Clear the trajectory before each new hit
-        fullTrajectory.clear();
-    
-        double[] directionVector = circularSlider.getDirectionVector();
-        double power = powerSlider.getValue();
-        System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
-        System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
-    
-        // Call the engine to calculate the trajectory
-        double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
-        ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
+        if(!REACHED_THE_HOLE){
+            // Clear the trajectory before each new hit
+            fullTrajectory.clear();
 
-        // Update ball position and shot count
-        if (xpath != null && !xpath.isEmpty()) {
-            fullTrajectory.addAll(xpath);  // Add new trajectory points to the full trajectory
-            double[] finalPosition = xpath.get(xpath.size() - 1);
-            startBallPostion[0] = finalPosition[0];
-            startBallPostion[1] = finalPosition[1];
-            shotCount++;
-        }
-    
-        String shotLog = String.format(
-            "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
-            shotCount, startBallPostion[0], startBallPostion[1], power);
-        logEvent(shotLog);
-        drawBallAndArrow();
-        updateShotCountLabel();
+            double[] directionVector = circularSlider.getDirectionVector();
+            double power = powerSlider.getValue();
+            System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
+            System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
-        // message is always printed when the ball hit the water once
-        try{
-            String message = golfGame.getMessage();
-            if (message.contains("Water")) {
-                logEvent("!!--The ball landed in water--!!");
-                showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
-            } else if (golfGame.isGoal()){
-                logEvent("CONGRATULATIONS! The ball reached the hole.");
-                showAlert(Alert.AlertType.INFORMATION, "Goal!", "The ball reached the hole.");
-            } else {
-                // logEvent("The ball is still in play.");
+            // Call the engine to calculate the trajectory
+            double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
+            ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
+
+            // Update ball position and shot count
+            if (xpath != null && !xpath.isEmpty()) {
+                fullTrajectory.addAll(xpath);  // Add new trajectory points to the full trajectory
+                double[] finalPosition = xpath.get(xpath.size() - 1);
+                startBallPostion[0] = finalPosition[0];
+                startBallPostion[1] = finalPosition[1];
+                shotCount++;
             }
-        } catch (Exception e) {
-            // System.out.println("Error in message");
-        }
-        
-        
 
+            String shotLog = String.format(
+                "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
+                shotCount, startBallPostion[0], startBallPostion[1], power);
+            logEvent(shotLog);
+            drawBallAndArrow();
+            updateShotCountLabel();
+
+            // message is always printed when the ball hit the water once
+            try {
+                String message = golfGame.getMessage();
+                if (message.contains("Water")) {
+                    logEvent("!!--The ball landed in water--!!");
+                    showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
+                } else if (golfGame.isGoal()) {
+                    this.REACHED_THE_HOLE = true;
+                    logEvent("CONGRATULATIONS! The ball reached the hole.");
+                    showGoalAlert();
+                } else {
+                    // logEvent("The ball is still in play.");
+                }
+            } catch (Exception e) {
+                // System.out.println("Error in message");
+            }
+        } else{
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Goal!");
+            alert.setHeaderText("Goal Reached, The ball has already reached the hole.");
+            alert.setContentText("Would you like to go back or see the stats?");
+            
+            ButtonType backButton = new ButtonType("Back");
+            ButtonType seeStatsButton = new ButtonType("See the stat");
+            
+            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == backButton) {
+                    goBack();
+                } else if (result.get() == seeStatsButton) {
+                    showStats();
+                }
+            }
+        }
+       
     }
 
     private void logEvent(String message) {
@@ -287,4 +316,38 @@ public class ThirdScreenController {
             alert.showAndWait();
         });
     }
+
+    private void showGoalAlert() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Goal!");
+            alert.setHeaderText("CONGRATULATIONS! The ball reached the hole.");
+            alert.setContentText("Would you like to go back or see the stats?");
+            
+            ButtonType backButton = new ButtonType("Back");
+            ButtonType seeStatsButton = new ButtonType("See the stat");
+            
+            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == backButton) {
+                    goBack();
+                } else if (result.get() == seeStatsButton) {
+                    showStats();
+                }
+            }
+        });
+    }
+    private void showStats() {
+        StringBuilder stats = new StringBuilder();
+        stats.append("Total Shots: ").append(shotCount).append("\n");
+        stats.append("Game Log:\n");
+        stats.append(logTextArea.getText());
+    
+        logEvent("Showing stats.");
+    
+        showAlert(Alert.AlertType.INFORMATION, "Stats:", stats.toString());
+    }
+    
 }

@@ -27,7 +27,10 @@ public class FirstScreenController {
     @FXML
     private TextField TREE_RADIUS;
     @FXML
-    private TextField GRASS_FRICTION;
+    private TextField GRASS_FRICTION_KINETIC;
+
+    @FXML
+    private TextField GRASS_FRICTION_STATIC;
 
     private String function;
 
@@ -38,7 +41,7 @@ public class FirstScreenController {
 
     public void nextScreen(ActionEvent event) {
         function = FunctionTextfield.getText();
-        double xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFriction;
+        double xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC;
         try {
             xBall = Double.parseDouble(X_BALL.getText());
             yBall = Double.parseDouble(Y_BALL.getText());
@@ -46,14 +49,18 @@ public class FirstScreenController {
             yHole = Double.parseDouble(Y_HOLE.getText());
             radiusHole = Double.parseDouble(RADIUS_HOLE.getText());
             treeRadius = Double.parseDouble(TREE_RADIUS.getText());
-            grassFriction = Double.parseDouble(GRASS_FRICTION.getText());
+            grassFrictionKINETIC = Double.parseDouble(GRASS_FRICTION_KINETIC.getText());
+            grassFrictionSTATIC = Double.parseDouble(GRASS_FRICTION_STATIC.getText());
         } catch (NumberFormatException e) {
             showAlert("Error!", "Invalid input for coordinates or radius", "Please enter valid numbers for the coordinates and radius.");
             return;
         }
 
         System.out.println("Tree Radius: " + treeRadius);
-        System.out.println("Grass Friction: " + grassFriction);
+        System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
+        System.out.println("Grass Friction STATIC: " + grassFrictionKINETIC);
+
+
 
         try {
             String userDir = System.getProperty("user.dir");
@@ -76,7 +83,7 @@ public class FirstScreenController {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
-            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFriction);
+            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -102,3 +109,37 @@ public class FirstScreenController {
         alert.showAndWait();
     }
 }
+
+
+//         
+// if (function.isEmpty()) {
+//     showAlert("Error!", "Invalid input for function", "Please enter a valid function.");
+//     return;
+// }
+// if(grassFrictionKINETIC>=0.05 && grassFrictionKINETIC<=0.1){
+//     System.out.println("Grass Friction KINETIC is valid");
+// }else{
+//     showAlert("Error!", "Invalid input for Grass Friction KINETIC", "Please enter a value between 0.05 and 0.1.");
+//     return;
+// }
+
+// if (grassFrictionSTATIC>=0.1 && grassFrictionSTATIC<=0.2){
+//     System.out.println("Grass Friction STATIC is valid");
+// }else{
+//     showAlert("Error!", "Invalid input for Grass Friction STATIC", "Please enter a value between 0.1 and 0.2.");
+//     return;
+// }
+
+// if (treeRadius>=0.05 && treeRadius<=0.15){
+//     System.out.println("Tree Radius is valid");
+// }else{  
+//     showAlert("Error!", "Invalid input for Tree Radius", "Please enter a value between 0.05 and 0.15.");
+//     return;
+// }
+
+// if (radiusHole>=0.05 && radiusHole<=0.15){
+//     System.out.println("Hole Radius is valid");
+// }else{  
+//     showAlert("Error!", "Invalid input for Hole Radius", "Please enter a value between 0.05 and 0.1.");
+//     return;
+// }
