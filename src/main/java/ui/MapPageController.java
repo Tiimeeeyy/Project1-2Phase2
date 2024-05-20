@@ -58,11 +58,12 @@ public class MapPageController {
     private int mapSize;
     private String function;
     private double treeRadius;
-    private double grassFriction;
+    private double grassFrictionKINETIC;
+    private double grassFrictionSTATIC;
 
     GraphicsContext gc;
 
-    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFriction) {
+    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.heightStorage = getHeightCoordinates(function);
         this.function = function;
         startBallPostion[0] = xBall;
@@ -72,7 +73,8 @@ public class MapPageController {
         this.radiusHole = radiusHole;
         this.mapSize = 50;
 
-        this.grassFriction = grassFriction;
+        this.grassFrictionKINETIC = grassFrictionKINETIC;
+        this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.treeRadius = treeRadius;
 
         System.out.println("Function: " + function);
@@ -83,7 +85,9 @@ public class MapPageController {
         System.out.println("Map ratio: " + Utility.ratio);
 
         System.out.println("Tree Radius: " + treeRadius);
-        System.out.println("Grass Friction: " + grassFriction);
+        System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
+        System.out.println("Grass Friction STATIC: " + grassFrictionSTATIC);
+
     }
 
     public class ColorItem {
@@ -182,26 +186,26 @@ public class MapPageController {
                 }
             }
     
-            if (mapSize == 50) {
-                GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
-                gc.setFill( Color.rgb(0, 0, 150));
-                // 12???
-                gc.setLineWidth(12);
+            // if (mapSize == 50) {
+            GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+            gc.setFill( Color.rgb(0, 0, 150));
+            // 12???
+            gc.setLineWidth(12);
 
-                gc.fillRect(0, 0, 500, 2);
-                gc.fillRect(0, 498, 500, 2);
-                gc.fillRect(0, 0, 2, 500);
-                gc.fillRect(498, 0, 2, 500);
-    
-                drawingCanvas.snapshot(null, writableImage);
-                pixelReader = writableImage.getPixelReader();
-                for (int y = 0; y < writableImage.getHeight(); y++) {
-                    for (int x = 0; x < writableImage.getWidth(); x++) {
-                        int argb = pixelReader.getArgb(x, y);
-                        bufferedImage.setRGB(x, y, argb);
-                    }
+            gc.fillRect(0, 0, 500, 2);
+            gc.fillRect(0, 498, 500, 2);
+            gc.fillRect(0, 0, 2, 500);
+            gc.fillRect(498, 0, 2, 500);
+
+            drawingCanvas.snapshot(null, writableImage);
+            pixelReader = writableImage.getPixelReader();
+            for (int y = 0; y < writableImage.getHeight(); y++) {
+                for (int x = 0; x < writableImage.getWidth(); x++) {
+                    int argb = pixelReader.getArgb(x, y);
+                    bufferedImage.setRGB(x, y, argb);
                 }
             }
+            // }
     
             String userDir = System.getProperty("user.dir");
             File resourcesDir = new File(userDir, "src/main/resources");
@@ -243,7 +247,7 @@ public class MapPageController {
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path, HolePostion, radiusHole);
-        Main.openThirdScreen(startBallPostion, HolePostion, radiusHole);
+        Main.openThirdScreen(startBallPostion, HolePostion, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
     }
 
     @FXML
@@ -304,14 +308,14 @@ public class MapPageController {
         }
         System.out.println("Initial map rendered with green color.");
     
-        if (mapSize == 50) {
-            gc.setFill(Color.BLUE);
-            gc.setLineWidth(2);
-            gc.fillRect(0, 0, 500, 2);
-            gc.fillRect(0, 498, 500, 2);
-            gc.fillRect(0, 0, 2, 500);
-            gc.fillRect(498, 0, 2, 500);
-        }
+        // borders
+        gc.setFill(Color.BLUE);
+        gc.setLineWidth(2);
+        gc.fillRect(0, 0, 500, 2);
+        gc.fillRect(0, 498, 500, 2);
+        gc.fillRect(0, 0, 2, 500);
+        gc.fillRect(498, 0, 2, 500);
+        
     }
 
     private void updateHeightMap(int x, int y, double heightStep) {
@@ -342,7 +346,7 @@ public class MapPageController {
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
-                gc.fillOval(x - 5, y - 5, 5, 5);
+                gc.fillOval(x - 5, y - 5, 2*treeRadius*Utility.ratio, 2*treeRadius*Utility.ratio);
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
