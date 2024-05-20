@@ -1,5 +1,8 @@
 package ui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -69,6 +72,7 @@ public class ThirdScreenController {
     private int shotCount = 0;
     private ArrayList<double[]> fullTrajectory = new ArrayList<>();
     private boolean REACHED_THE_HOLE;
+    private Timeline timeline;
 
     public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.startBallPostion = startBallPostion;
@@ -90,10 +94,18 @@ public class ThirdScreenController {
         circularSliderPane.getChildren().add(circularSlider);
 
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (timeline != null && timeline.getStatus() == Timeline.Status.RUNNING) {
+                timeline.stop();
+                moveBallToEndOfTrajectory();
+            }
             updateDirection(newVal);
             drawBallAndArrow();
         });
         powerSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (timeline != null && timeline.getStatus() == Timeline.Status.RUNNING) {
+                timeline.stop();
+                moveBallToEndOfTrajectory();
+            }
             updatePower(newVal);
             drawBallAndArrow();
         });
@@ -160,14 +172,14 @@ public class ThirdScreenController {
         }
     }
 
-    private void drawTrajectory() {
-        GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+    private void drawTrajectory(GraphicsContext gc, int currentIndex) {
         gc.setFill(javafx.scene.paint.Color.RED);
 
-        for (double[] point : fullTrajectory) {
+        for (int i = 0; i <= currentIndex; i++) {
+            double[] point = fullTrajectory.get(i);
             double x = Utility.coordinateToPixel_X(point[0]);
             double y = Utility.coordinateToPixel_Y(point[1]);
-            gc.fillOval(x - 1, y - 1, 1, 1);
+            gc.fillOval(x, y, 1, 1);
         }
     }
 
@@ -175,9 +187,6 @@ public class ThirdScreenController {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
-
-            // Draw the full trajectory
-            drawTrajectory();
 
             double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
             double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
@@ -220,7 +229,7 @@ public class ThirdScreenController {
 
     @FXML
     private void hit() {
-        if(!REACHED_THE_HOLE){
+        if (!REACHED_THE_HOLE) {
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
 
@@ -246,26 +255,11 @@ public class ThirdScreenController {
                 "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
                 shotCount, startBallPostion[0], startBallPostion[1], power);
             logEvent(shotLog);
-            drawBallAndArrow();
             updateShotCountLabel();
+            // Animate the ball movement along the trajectory
+            animateBallMovement(fullTrajectory, power);
 
-            // message is always printed when the ball hit the water once
-            try {
-                String message = golfGame.getMessage();
-                if (message.contains("Water")) {
-                    logEvent("!!--The ball landed in water--!!");
-                    showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
-                } else if (golfGame.isGoal()) {
-                    this.REACHED_THE_HOLE = true;
-                    logEvent("CONGRATULATIONS! The ball reached the hole.");
-                    showGoalAlert();
-                } else {
-                    // logEvent("The ball is still in play.");
-                }
-            } catch (Exception e) {
-                // System.out.println("Error in message");
-            }
-        } else{
+        } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Goal!");
             alert.setHeaderText("Goal Reached, The ball has already reached the hole.");
@@ -285,7 +279,86 @@ public class ThirdScreenController {
                 }
             }
         }
-       
+    }
+
+    private void animateBallMovement(ArrayList<double[]> trajectory, double power) {
+        timeline = new Timeline();
+        
+        // duration is inversely proportional to power???
+        double duration = 20 / power; 
+        
+        for (int i = 0; i < trajectory.size(); i++) {
+            final int index = i;
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(duration * i), event -> {
+                double[] point = trajectory.get(index);
+                startBallPostion[0] = point[0];
+                startBallPostion[1] = point[1];
+                drawBallAndTrajectory(index);
+                updateBallPositionLabel();
+            });
+            timeline.getKeyFrames().add(keyFrame);
+        }
+        timeline.setOnFinished(event -> {
+            updateShotCountLabel();
+            handlePostAnimation();
+        });
+        timeline.play();
+    }
+
+    private void handlePostAnimation() {
+        // message is always printed when the ball hit the water once
+        try {
+            String message = golfGame.getMessage();
+            if (message.contains("Water")) {
+                logEvent("!!--The ball landed in water--!!");
+                showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
+            } else if (golfGame.isGoal()) {
+                this.REACHED_THE_HOLE = true;
+                logEvent("CONGRATULATIONS! The ball reached the hole.");
+                showGoalAlert();
+            }
+        } catch (Exception e) {
+            // System.out.println("Error in message");
+        }
+    }
+
+    private void moveBallToEndOfTrajectory() {
+        if (!fullTrajectory.isEmpty()) {
+            double[] finalPosition = fullTrajectory.get(fullTrajectory.size() - 1);
+            startBallPostion[0] = finalPosition[0];
+            startBallPostion[1] = finalPosition[1];
+            drawFullTrajectory();
+            updateBallPositionLabel();
+        }
+    }
+
+    private void drawBallAndTrajectory(int currentIndex) {
+        GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
+        drawTrajectory(gc, currentIndex);
+
+        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
+
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
+    }
+
+    private void drawFullTrajectory() {
+        GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
+        drawTrajectory(gc, fullTrajectory.size() - 1);
+        drawBallOnly();
+    }
+
+    private void drawBallOnly() {
+        GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+
+        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
+
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
     }
 
     private void logEvent(String message) {
@@ -339,15 +412,15 @@ public class ThirdScreenController {
             }
         });
     }
+
     private void showStats() {
         StringBuilder stats = new StringBuilder();
         stats.append("Total Shots: ").append(shotCount).append("\n");
         stats.append("Game Log:\n");
         stats.append(logTextArea.getText());
-    
+
         logEvent("Showing stats.");
-    
+
         showAlert(Alert.AlertType.INFORMATION, "Stats:", stats.toString());
     }
-    
 }
