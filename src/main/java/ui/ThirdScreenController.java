@@ -187,32 +187,36 @@ public class ThirdScreenController {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
+    
+            double ballDiameter = 0.1 * Utility.ratio;
+            double ballRadius = ballDiameter / 2.0;
 
-            double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
-            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
-
+            double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
+            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
+    
             gc.setFill(javafx.scene.paint.Color.WHITE);
-            gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
-
+            gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
+    
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
-            double arrowX = ballX + directionVector[0] * arrowLength;
-            double arrowY = ballY - directionVector[1] * arrowLength;
-
+            double arrowX = ballX + ballRadius + directionVector[0] * arrowLength;
+            double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
+    
             gc.setStroke(javafx.scene.paint.Color.RED);
-            gc.setLineWidth(0.07 * Utility.ratio);
-
+            gc.setLineWidth(0.15);
+    
             // Draw the arrow shaft
-            gc.strokeLine(ballX + 0.5, ballY + 0.5, arrowX, arrowY);
-
+            gc.strokeLine(ballX + ballRadius, ballY + ballRadius, arrowX, arrowY);
+    
             // Draw the arrowhead
             drawArrowhead(gc, arrowX, arrowY, directionVector);
-
+    
             updateBallPositionLabel();
         } else {
             System.err.println("ballCanvas is null");
         }
     }
+    
 
     private void drawArrowhead(GraphicsContext gc, double x, double y, double[] direction) {
         double arrowHeadSize = 5;
@@ -284,7 +288,6 @@ public class ThirdScreenController {
     private void animateBallMovement(ArrayList<double[]> trajectory, double power) {
         timeline = new Timeline();
         
-        // duration is inversely proportional to power???
         double duration = 5; 
         
         for (int i = 0; i < trajectory.size(); i++) {
@@ -306,9 +309,12 @@ public class ThirdScreenController {
     }
 
     private void handlePostAnimation() {
-        // message is always printed when the ball hit the water once
         try {
             String message = golfGame.getMessage();
+            if(golfGame.getTreeHit()){
+                logEvent("** The ball hit a tree and bounced off **");
+            }
+
             if (message.contains("Water")) {
                 logEvent("!!--The ball landed in water--!!");
                 showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
@@ -316,7 +322,7 @@ public class ThirdScreenController {
                 this.REACHED_THE_HOLE = true;
                 logEvent("CONGRATULATIONS! The ball reached the hole.");
                 showGoalAlert();
-            }
+            } 
         } catch (Exception e) {
             // System.out.println("Error in message");
         }
@@ -337,11 +343,14 @@ public class ThirdScreenController {
         gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
         drawTrajectory(gc, currentIndex);
 
-        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
-        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
+        double ballDiameter = 0.1 * Utility.ratio;
+        double ballRadius = ballDiameter / 2.0;
+
+        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
 
         gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
+        gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 
     private void drawFullTrajectory() {
@@ -353,12 +362,14 @@ public class ThirdScreenController {
 
     private void drawBallOnly() {
         GraphicsContext gc = ballCanvas.getGraphicsContext2D();
+        double ballDiameter = 0.1 * Utility.ratio;
+        double ballRadius = ballDiameter / 2.0;
 
-        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]);
-        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]);
+        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
+        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
 
         gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.fillOval(ballX, ballY, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
+        gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 
     private void logEvent(String message) {

@@ -21,6 +21,7 @@ public class GolfGame {
     private double r;
     private String mappath;
     private String message;
+    private boolean treeHit=false;
 
     /**
      * Construct the game engine
@@ -39,6 +40,10 @@ public class GolfGame {
         this.hole=hole;
         this.r=r;
         this.mappath=mappath;
+    }
+
+    public boolean getTreeHit(){
+        return this.treeHit;
     }
 
     /**
@@ -61,6 +66,7 @@ public class GolfGame {
         //clear previous
         this.message="";
         this.goal=false;
+        this.treeHit=false;
         
         //Read the map, store the gradient 
         map.readmap(mappath);
@@ -109,9 +115,11 @@ public class GolfGame {
                 }
                 break;
             }
+
             //ckeck hit the tree
             if (treeAry[pixelX][pixelY]) {
                         if (!bounceCheck) {
+                            this.treeHit=true;
                             double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
                             bouncingHandler(x, normVec);
                             bounceCheck=true;
