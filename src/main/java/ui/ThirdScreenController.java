@@ -68,7 +68,7 @@ public class ThirdScreenController {
     public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
-        double[] a = {0.05, 0.12};
+        double[] a = {0.08, 0.15};
         this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
     }

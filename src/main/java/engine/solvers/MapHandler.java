@@ -54,9 +54,9 @@ public class MapHandler {
 
         gradient=new double[width][height][2];
         for (int i = 0; i < width-1; i++) {
-            for (int j = 0; j < height-1; j++) {
+            for (int j = 1; j < height; j++) {
                 for(int k=0;k<2;k++){
-                    gradient[i][j][k]=Utility.colorToHeight(gAry[i+1-k][j+k])-Utility.colorToHeight(gAry[i][j]) ; //scaled down, if (0-255)/12.75 then (0-20)
+                    gradient[i][j][k]=Utility.colorToHeight(gAry[i+1-k][j-k])-Utility.colorToHeight(gAry[i][j]) ; //scaled down, if (0-255)/12.75 then (0-20)
                 }
             }
         }
