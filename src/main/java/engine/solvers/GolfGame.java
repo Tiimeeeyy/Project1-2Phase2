@@ -118,12 +118,12 @@ public class GolfGame {
 
             //ckeck hit the tree
             if (treeAry[pixelX][pixelY]) {
-                        if (!bounceCheck) {
+                if (!bounceCheck) {
                             this.treeHit=true;
-                            double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
-                            bouncingHandler(x, normVec);
-                            bounceCheck=true;
-                        }
+                    double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
+                    bouncingHandler(x, normVec);
+                    bounceCheck=true;
+                }
             }else{
                 bounceCheck=false;
             }
@@ -210,14 +210,28 @@ public class GolfGame {
     public String getMessage(){
         return this.message;
     }
-    
+
+    /**
+     * Calculate boucning. adjust x object directly.
+     * 
+     * @param x inbound ball status
+     * @param normVec   norm vector for the bouncing surface
+     */
     private void bouncingHandler(double[] x, double[] normVec){
-        double coe=0.8;
+        double coe=0.8;                                             //velocity lose from bouncing
         double[] inVec={-x[2],-x[3]};
         double[] inReflect=dotProduct(normVec, 2*dotProduct(inVec, normVec)/Math.pow(norm(normVec),2));
         x[2]=(inReflect[0]-inVec[0])*coe;
         x[3]=(inReflect[1]-inVec[1])*coe;
     }
+
+    /**
+     * Find the norm vector for hiting surface of a tree object
+     * @param x the pixel coordinate of the hitting point
+     * @param y
+     * @param treeAry
+     * @return
+     */
     private double[] findTreeNormVec(int x, int y,boolean[][] treeAry){
         double[] normVec ={Utility.pixelToCoordinate_X(x),Utility.pixelToCoordinate_Y(y)};
         Set<Integer> xSet=new HashSet<>();
@@ -240,6 +254,16 @@ public class GolfGame {
         System.out.println(xCenter + "  "+ yCenter);
         return normVec;
     }
+
+    /**
+     * Calculate the center of the currenct hitting tree
+     * 
+     * @param x the hitting point. indicate which tree is hitting. in pixel coordinate
+     * @param y
+     * @param xSet  collection of pixels' x coordinate for the hitting tree
+     * @param ySet  collection of pixels' y coordinate for the hitting tree
+     * @param treeAry
+     */
     private void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,boolean[][] treeAry){
         if (xSet.contains(x) && ySet.contains(y)) {
             return;
@@ -255,13 +279,31 @@ public class GolfGame {
             return;
         }
     }
+
+    /**
+     * Vectors dot product
+     * @param a
+     * @param b
+     * @return
+     */
     private double dotProduct(double[] a, double[] b){
         return a[0]*b[0]+a[1]*b[1];
     }
+    /**
+     * dot product between vectore and a coefficient
+     * @param a
+     * @param b
+     * @return
+     */
     private double[] dotProduct(double[] a, double b){
         double[] c={a[0]*b,a[1]*b};
         return c;
     }
+    /**
+     * Vector norm
+     * @param a
+     * @return
+     */
     private double norm(double[] a){
         return Math.sqrt(Math.pow(a[0], 2)+Math.pow(a[1], 2));
     }
