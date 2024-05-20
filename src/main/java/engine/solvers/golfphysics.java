@@ -39,12 +39,5 @@ public class golfphysics implements MyFunction {
     }
     
 
-    public double[] dhx(double x, double y){
-        double[] dh=new double[2];
-        dh[0]=0;
-        dh[1]=0;
-
-        return dh;
-    }
     
 }

@@ -54,8 +54,6 @@ public class GolfGame {
     public ArrayList<double[]> shoot(double[] x,Boolean recording){
         
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
-        xtrac.clear();
-        xtrac.add(x.clone());
         double[] x0=x.clone();
         MapHandler map=new MapHandler();
         MyFunction golfPhysics=new golfphysics();
@@ -65,8 +63,10 @@ public class GolfGame {
         this.message="";
         this.goal=false;
         this.treeHit=false;
+        xtrac.clear();
+        xtrac.add(x.clone());
         
-        //Read the map, store the gradient 
+        //Read the map 
         map.readmap(mappath);
         double[][][] mapgradient=map.getGradient();
         int[][] redElm=map.getRed();
@@ -80,10 +80,9 @@ public class GolfGame {
         int pixelY=Utility.coordinateToPixel_Y(x[1]);
         //loop untill ball stop or out of court
         while (!solver.nextstep(golfPhysics,x,fric,mapgradient[pixelX][pixelY],dt)) {
-            //check whether out of court
             pixelX=Utility.coordinateToPixel_X(x[0]);
             pixelY=Utility.coordinateToPixel_Y(x[1]);
-
+            //check whether out of court
             if (pixelX>=mapgradient.length || pixelY>=mapgradient[0].length || pixelX<0 || pixelY<0) {
                 this.message="Out of boundary!";
                 System.out.println("Out of boundary!");
@@ -94,10 +93,10 @@ public class GolfGame {
                 }
                 break;
             }
+            //check goal or not
             dis=getDistance(x, this.hole);
             if(dis<r){
                 this.message="Goal!!!";
-                System.out.println("Goal!!!");
                 this.minDis=0;
                 this.goal=true;
                 break;
@@ -105,7 +104,6 @@ public class GolfGame {
             //check whether in water.
             if (blueElm[pixelX][pixelY]>=100) {
                 this.message="In Water! Start again.";
-                System.out.println("In Water! Start again.");
                 x=x0.clone();
                 this.stopCoordinate=x0.clone();
                 if (recording) {
@@ -113,11 +111,10 @@ public class GolfGame {
                 }
                 break;
             }
-
             //ckeck hit the tree
             if (treeAry[pixelX][pixelY]) {
                 if (!bounceCheck) {
-                            this.treeHit=true;
+                    this.treeHit=true;
                     double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
                     bouncingHandler(x, normVec);
                     bounceCheck=true;
@@ -125,7 +122,8 @@ public class GolfGame {
             }else{
                 bounceCheck=false;
             }
-            if (redElm[pixelX][pixelY]>=100 && blueElm[pixelX][pixelY]==0) {    // chech the sand
+            //check if in sand
+            if (redElm[pixelX][pixelY]>=100 && blueElm[pixelX][pixelY]==0) {
                 fric[0]=3*a[0];
                 fric[1]=3*a[1];
             }else{
@@ -133,7 +131,7 @@ public class GolfGame {
                 fric[1]=a[1];
             }
             
-
+            //log closet
             if(dis<this.minDis){
                 this.minDis=dis;
                 this.minCoordinate=x;
@@ -216,7 +214,7 @@ public class GolfGame {
      * @param normVec   norm vector for the bouncing surface
      */
     private void bouncingHandler(double[] x, double[] normVec){
-        double coe=0.8;                                             //velocity lose from bouncing
+        double coe=0.8;                                             //velocity lose ratio from bouncing
         double[] inVec={-x[2],-x[3]};
         double[] inReflect=dotProduct(normVec, 2*dotProduct(inVec, normVec)/Math.pow(norm(normVec),2));
         x[2]=(inReflect[0]-inVec[0])*coe;
@@ -249,7 +247,6 @@ public class GolfGame {
         int yCenter=(int) ySum/ySet.size();
         normVec[0]=normVec[0]-Utility.pixelToCoordinate_X(xCenter);
         normVec[1]=normVec[1]-Utility.pixelToCoordinate_Y(yCenter);
-        System.out.println(xCenter + "  "+ yCenter);
         return normVec;
     }
 
