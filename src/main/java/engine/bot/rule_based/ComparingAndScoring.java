@@ -1,4 +1,4 @@
-package engine.bot;
+package engine.bot.rule_based;
 
 
 //  Notes:
@@ -7,6 +7,8 @@ package engine.bot;
 //  Then -> Go 30-40° from the point with velocity 5 m/s
 //  If collision is not avoidable -> run it and calculate the collision
 //  Maybe: If collision can be used as an advantage
+
+import java.util.Arrays;
 
 /**
  * This class is responsible for comparing and scoring different vectors for the bot to "play" the game
@@ -62,8 +64,9 @@ public class ComparingAndScoring implements BotInterface {
                 bestVector = vector;
             }
         }
-
+        System.out.println("Best Vector " + Arrays.toString(bestVector));
         return bestVector;
+
     }
 
     public boolean checkHole(double[] x, double[] hole) {

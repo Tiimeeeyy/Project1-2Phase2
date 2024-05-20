@@ -1,4 +1,4 @@
-package engine.bot;
+package engine.bot.rule_based;
 
 import engine.solvers.golfphysics;
 
@@ -11,19 +11,20 @@ import java.util.Comparator;
  */
 public class CheckCollisionAndHeight {
     // Constants that are used a lot, and don´t change are declared here for maintainability and flexibility.
-    private static final double DEFAULT_VELOCITY = 5.0;
-    private static final double DEGREES_POS = Math.toRadians(30);
-    private static final double DEGREES_NEG = Math.toRadians(-30);
-    private static final double MIN_SPEED = 0.01;
+    private final double DEGREES_POS = Math.toRadians(30);
+    private final double DEGREES_NEG = Math.toRadians(-30);
+    private final double MIN_SPEED = 0.5;
     private final RungeKutta4Void rk4;
+    private final PredictVelocity predictVelocity;
 
     /**
      * Class Constructor
      *
      * @param rk4 The RungeKutta4Void solver to be used for physics simulation.
      */
-    public CheckCollisionAndHeight(RungeKutta4Void rk4) {
+    public CheckCollisionAndHeight(RungeKutta4Void rk4, PredictVelocity predictVelocity) {
         this.rk4 = rk4;
+        this.predictVelocity = predictVelocity;
     }
 
     /**
@@ -59,15 +60,17 @@ public class CheckCollisionAndHeight {
         return filterCollisionFreeVelocities(velocities, info, x, friction);
     }
 
-    /** Filters Velocity Vectors and return those that don't have collisions.
+    /**
+     * Filters Velocity Vectors and return those that don't have collisions.
+     *
      * @param velocities The velocity Vectors.
-     * @param info Information about the golf course.
-     * @param x The current position.
-     * @param friction The frictions of the golf course.
+     * @param info       Information about the golf course.
+     * @param x          The current position.
+     * @param friction   The frictions of the golf course.
      * @return The velocity Vectors that don't have collisions.
      */
     private double[][] filterCollisionFreeVelocities(double[][] velocities, double[][] info, double[] x, double[] friction) {
-
+        double speed = predictVelocity.assumeVelocity(x);
         ArrayList<double[]> noCollisionVelocities = new ArrayList<>();
 
         for (double[] velocity : velocities) {
@@ -80,16 +83,16 @@ public class CheckCollisionAndHeight {
 
     /**
      * Checks if a Velocity Vector leads to a Collision
-     * @param info The information about the golf course
-     * @param x The current position.
+     *
+     * @param info     The information about the golf course
+     * @param x        The current position.
      * @param friction The frictions of the golf course
      * @param velocity The velocity vectors.
      * @return True if the Vector leads to a collision, false otherwise.
      */
     private boolean hasCollision(double[][] info, double[] x, double[] friction, double[] velocity) {
-
+        double speed = predictVelocity.assumeVelocity(x);
         double[] position = {x[0], x[1]};
-        double speed = DEFAULT_VELOCITY;
 
         while (speed > MIN_SPEED) {
             double[] a = {friction[1], friction[0]};
@@ -110,7 +113,8 @@ public class CheckCollisionAndHeight {
 
     /**
      * Checks if a position leads to a collision.
-     * @param info The information about the golf course.
+     *
+     * @param info     The information about the golf course.
      * @param position The position to check.
      * @return True if the position leads to a collision, false otherwise.
      */
@@ -125,6 +129,7 @@ public class CheckCollisionAndHeight {
 
     /**
      * Creates Velocity vectors based on a direction (in this case, the hole).
+     *
      * @param direction The direction the vectors are facing.
      * @return The velocity Vectors.
      */
@@ -141,13 +146,15 @@ public class CheckCollisionAndHeight {
 
     /**
      * Checks height differences for each velocity Vector.
-     * @param map The 3d (x,y,z) map of the golf course.
-     * @param x The current position.
+     *
+     * @param map      The 3d (x,y,z) map of the golf course.
+     * @param x        The current position.
      * @param friction The frictions of the golf course.
-     * @param hole The position of the hole.
+     * @param hole     The position of the hole.
      * @return The velocity Vectors sorted by the height they have to traverse.
      */
     public double[][] heightChecker(double[][][] map, double[] x, double[] friction, double[] hole) {
+        double speed = predictVelocity.assumeVelocity(x);
 
         double[] direction = calculateDirection(x, hole);
 
@@ -157,7 +164,7 @@ public class CheckCollisionAndHeight {
         for (double[] velocity : velocities) {
 
             double[] position = {x[0], x[1]};
-            double speed = DEFAULT_VELOCITY;
+
 
             while (speed > MIN_SPEED) {
 
@@ -193,7 +200,8 @@ public class CheckCollisionAndHeight {
 
     /**
      * Checks if there is a significant height difference at a position.
-     * @param map The 3d (x,y,z) map of the golf course.
+     *
+     * @param map      The 3d (x,y,z) map of the golf course.
      * @param position The position to check.
      * @return True if there is a significant height difference.
      */
