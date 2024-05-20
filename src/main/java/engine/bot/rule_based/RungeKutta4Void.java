@@ -1,4 +1,4 @@
-package engine.bot;
+package engine.bot.rule_based;
 
 import engine.solvers.MyFunction;
 
