@@ -67,6 +67,8 @@ public class GolfGame {
         double[][][] mapgradient=map.getGradient();
         int[][] redElm=map.getRed();
         int[][] blueElm=map.getBlue();
+        boolean[][] treeAry=map.getTree();
+        boolean bounceCheck=false;
         this.minDis=getDistance(x, hole);
         double dis=100;
 
@@ -107,19 +109,26 @@ public class GolfGame {
                 }
                 break;
             }
-            //Check whether in sand
-            if (redElm[pixelX][pixelY]>=100) {
+            //ckeck hit the tree
+            if (treeAry[pixelX][pixelY]) {
+                        if (!bounceCheck) {
+                            System.out.println("before"+x[2]+"  "+x[3]);
+                            double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
+                            bouncingHandler(x, normVec);
+                            System.out.println("after"+x[2]+"  "+x[3]);
+                            bounceCheck=true;
+                        }
+            }else{
+                bounceCheck=false;
+            }
+            if (redElm[pixelX][pixelY]>=100 && blueElm[pixelX][pixelY]==0) {    // chech the sand
                 fric[0]=3*a[0];
                 fric[1]=3*a[1];
             }else{
                 fric[0]=a[0];
                 fric[1]=a[1];
             }
-            //ckeck hit the tree
-            if (blueElm[pixelX][pixelY]>=30 
-                    && redElm[pixelX][pixelY]>=30) {
-                
-            }
+            
 
             if(dis<this.minDis){
                 this.minDis=dis;
@@ -196,10 +205,20 @@ public class GolfGame {
         return this.message;
     }
     
-    public void findTreeCenter(int x, int y,int[][] matrix ){
+    private void bouncingHandler(double[] x, double[] normVec){
+        double coe=0.8;
+        double[] inVec={-x[2],-x[3]};
+        double[] inReflect=dotProduct(normVec, 2*dotProduct(inVec, normVec)/Math.pow(norm(normVec),2));
+        x[2]=(inReflect[0]-inVec[0])*coe;
+        x[3]=(inReflect[1]-inVec[1])*coe;
+    }
+    private double[] findTreeNormVec(int x, int y,boolean[][] treeAry){
+        double[] normVec ={Utility.pixelToCoordinate_X(x),Utility.pixelToCoordinate_Y(y)};
         Set<Integer> xSet=new HashSet<>();
         Set<Integer> ySet=new HashSet<>();
-        findTree(x, y, xSet, ySet, matrix);
+        // int pixelX=Utility.coordinateToPixel_X(x);
+        // int pixelY=Utility.coordinateToPixel_Y(y);
+        findTree(x, y, xSet, ySet, treeAry);
         int xSum=0;
         for (Integer i : xSet) {
             xSum=xSum+i;
@@ -210,21 +229,35 @@ public class GolfGame {
         }
         int xCenter=(int) xSum/xSet.size();
         int yCenter=(int) ySum/ySet.size();
+        normVec[0]=normVec[0]-Utility.pixelToCoordinate_X(xCenter);
+        normVec[1]=normVec[1]-Utility.pixelToCoordinate_Y(yCenter);
         System.out.println(xCenter + "  "+ yCenter);
+        return normVec;
     }
-    public void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,int[][] matrix){
+    private void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,boolean[][] treeAry){
         if (xSet.contains(x) && ySet.contains(y)) {
             return;
         }
-        if (matrix[x][y]>20) {
+        if (treeAry[x][y]) {
             xSet.add(x);
             ySet.add(y);
-            findTree(x-1, y, xSet, ySet, matrix);
-            findTree(x, y-1, xSet, ySet, matrix);
-            findTree(x+1, y, xSet, ySet, matrix);
-            findTree(x, y+1, xSet, ySet, matrix);
+            findTree(x-1, y, xSet, ySet, treeAry);
+            findTree(x, y-1, xSet, ySet, treeAry);
+            findTree(x+1, y, xSet, ySet, treeAry);
+            findTree(x, y+1, xSet, ySet, treeAry);
         }else{
             return;
         }
     }
+    private double dotProduct(double[] a, double[] b){
+        return a[0]*b[0]+a[1]*b[1];
+    }
+    private double[] dotProduct(double[] a, double b){
+        double[] c={a[0]*b,a[1]*b};
+        return c;
+    }
+    private double norm(double[] a){
+        return Math.sqrt(Math.pow(a[0], 2)+Math.pow(a[1], 2));
+    }
+
 }

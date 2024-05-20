@@ -285,7 +285,7 @@ public class ThirdScreenController {
         timeline = new Timeline();
         
         // duration is inversely proportional to power???
-        double duration = 20 / power; 
+        double duration = 5; 
         
         for (int i = 0; i < trajectory.size(); i++) {
             final int index = i;

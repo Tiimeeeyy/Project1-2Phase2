@@ -375,4 +375,6 @@ public class MapPageController {
     private void clearBallAndHole(GraphicsContext gc2) {
         gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
     }
+
+   
 }

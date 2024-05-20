@@ -19,6 +19,7 @@ public class MapHandler {
     private int[][] redAry;
     private int[][] blueAry;
     private double[][][] gradient;
+    private boolean[][] treeAry;
     /**
      * Read the map and store the gradient.
      *
@@ -43,12 +44,18 @@ public class MapHandler {
         int[][] gAry=new int[width][height];
         redAry=new int[width][height];
         blueAry=new int[width][height];
+        treeAry=new boolean[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
                 redAry[i][j] = (rgb >> 16) & 0xFF;   // Red component, Red is the friction, 0-255
                 gAry[i][j] = (rgb >> 8) & 0xFF;    // Green component, Green is the height, 0-255. 
                 blueAry[i][j] = rgb & 0xFF; 
+                if (rgb==-8897501) {
+                    treeAry[i][j]=true;
+                }else{
+                    treeAry[i][j]=false;
+                }
             }
         }
 
@@ -56,7 +63,14 @@ public class MapHandler {
         for (int i = 0; i < width-1; i++) {
             for (int j = 1; j < height; j++) {
                 for(int k=0;k<2;k++){
-                    gradient[i][j][k]=Utility.colorToHeight(gAry[i+1-k][j-k])-Utility.colorToHeight(gAry[i][j]) ; //scaled down, if (0-255)/12.75 then (0-20)
+                    if(treeAry[i+1-k][j-k]){
+                        gradient[i][j][k]=0;
+                    }else if(treeAry[i][j]){
+                        gradient[i][j][k]=0;
+                    }
+                    else{
+                        gradient[i][j][k]=Utility.colorToHeight(gAry[i+1-k][j-k])-Utility.colorToHeight(gAry[i][j]) ;
+                    }
                 }
             }
         }
@@ -70,6 +84,9 @@ public class MapHandler {
     }
     public double[][][] getGradient(){
         return this.gradient;
+    }
+    public boolean[][] getTree(){
+        return this.treeAry;
     }
 
     /**
@@ -150,7 +167,7 @@ public class MapHandler {
                     int g= (int) initialGreen[i][j]; // get the green
                     Color colortemp=new Color(0,g,0);
                     if (r>30 && b>30) {
-                        colortemp=new Color(100,67,33);
+                        colortemp=new Color(120,60,35);
                     }else if (r>100) {
                         colortemp=new Color(160,g,0);
                     }else if (b>100) {
@@ -187,6 +204,11 @@ public class MapHandler {
         ExpressionParser parser = new ExpressionParser(func, initVars);
         
         return (int) parser.evaluate();
+    }
+
+    public static void main(String[] args) {
+        Color c= new Color(120, 60, 35);
+        System.out.println(c.getRGB());
     }
 
 }
