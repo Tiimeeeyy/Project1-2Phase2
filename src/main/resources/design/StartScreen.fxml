@@ -9,13 +9,13 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="404.0" maxWidth="613.0" prefHeight="404.0" prefWidth="613.0" styleClass="anchor" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.StartScreenController">
+<AnchorPane maxHeight="720.0" maxWidth="1280.0" prefHeight="720.0" prefWidth="1280.0" styleClass="anchor" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.StartScreenController">
    <children>
-      <Button fx:id="startButton" layoutX="241.0" layoutY="200.0" minHeight="33.0" minWidth="119.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="119.0" text="Start Game" onAction="#startGame"/>
-      <Button fx:id="exitButton" layoutX="241.0" layoutY="277.0" minHeight="33.0" minWidth="119.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="119.0" text="Exit" onAction="#exitGame"/>
-      <Text fx:id="putting" layoutX="144.0" layoutY="111.0" text="CRAZY PUTTING">
+      <Button fx:id="startButton" layoutX="500.0" layoutY="327.0" minHeight="33.0" minWidth="119.0" mnemonicParsing="false" onAction="#startGame" prefHeight="66.0" prefWidth="280.0" text="Start Game" />
+      <Button fx:id="exitButton" layoutX="500.0" layoutY="418.0" minHeight="33.0" minWidth="119.0" mnemonicParsing="false" onAction="#exitGame" prefHeight="66.0" prefWidth="280.0" text="Exit" />
+      <Text fx:id="putting" layoutX="381.0" layoutY="205.0" text="CRAZY PUTTING" wrappingWidth="517.3408203125">
          <font>
-            <Font name="Consolas" size="43.0" />
+            <Font name="Consolas" size="72.0" />
          </font>
       </Text>
    </children>
