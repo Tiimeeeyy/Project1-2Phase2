@@ -2,9 +2,7 @@ package engine.bot.rule_based;
 
 import engine.solvers.GolfGame;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class DistanceMeasure {
     private CheckCollisionAndHeight checkCollisionAndHeight;
