@@ -1,4 +1,6 @@
-package engine.solvers;
+package engine.solvers.odeSolvers;
+
+import engine.solvers.odeFunctions.MyFunction;
 
 /**
  * The type Rk 4.

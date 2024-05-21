@@ -1,4 +1,5 @@
-package engine.solvers;
+package engine.solvers.odeFunctions;
+
 /**
  * golfphysics
  */

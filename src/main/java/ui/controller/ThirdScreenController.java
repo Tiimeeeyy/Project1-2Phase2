@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import engine.solvers.GolfGame;
-import engine.solvers.RK4;
 import engine.solvers.Utility;
+import engine.solvers.odeSolvers.RK4;
 
 public class ThirdScreenController implements ScreenInterface{
 

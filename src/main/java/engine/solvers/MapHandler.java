@@ -203,9 +203,4 @@ public class MapHandler {
         return (int) parser.evaluate();
     }
 
-    public static void main(String[] args) {
-        Color c= new Color(120, 60, 35);
-        System.out.println(c.getRGB());
-    }
-
 }
