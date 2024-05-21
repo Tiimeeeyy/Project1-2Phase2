@@ -9,7 +9,7 @@
     -fx-background-image: url("images/img.png");
     -fx-background-size: cover;
     -fx-background-repeat: no-repeat;
-    -fx-background-color: rgba(0, 0, 0, 0.5); 
+    /* -fx-background-color: rgba(173, 216, 230, 0.5);  */
 }
 
 .putting {
@@ -25,11 +25,11 @@
     -fx-text-fill: #ffffff;
     -fx-font-family: Consolas;
     -fx-padding: 10px;
-    -fx-transition: background-color 0.3s ease; 
+    -fx-transition: background-color 0.3s ease;
 }
 
 .button:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.4); 
+    -fx-background-color: rgba(255, 255, 255, 0.4);
     -fx-text-fill: #000000;
 }
 
@@ -42,7 +42,7 @@
 
 .text-area {
     -fx-background-color: rgba(0, 0, 0, 0.4);
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #000000;
     -fx-font-family: Consolas;
     -fx-padding: 10px;
 }
