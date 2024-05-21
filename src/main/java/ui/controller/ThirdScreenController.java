@@ -1,8 +1,10 @@
-package ui;
+package ui.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import ui.CircularSlider;
+import ui.Main;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;

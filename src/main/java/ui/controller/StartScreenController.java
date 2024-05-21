@@ -1,11 +1,12 @@
-package ui;
+package ui.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.stage.Stage;
+import ui.Main;
 
-public class StartScreen {
+public class StartScreenController {
 
     @FXML
     private void startGame(ActionEvent event) {

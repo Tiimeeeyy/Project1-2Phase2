@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import ui.controller.ThirdScreenController;
+
 import java.io.IOException;
 
 public class Main extends Application {
@@ -13,14 +15,14 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/appIcon.jpg"))); // Установка иконки
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/design/images/appIcon.jpg"))); 
 
         startScreen();
     }
 
     public static void startScreen() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/StartScreen.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/design/StartScreen.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 613, 404);
             primaryStage.setTitle("Golf Game!");
             primaryStage.setScene(scene);
@@ -33,7 +35,7 @@ public class Main extends Application {
 
     public static void openGUI() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/design/FirstScreen.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
             primaryStage.setTitle("GolfGame!");
             primaryStage.setScene(scene);
@@ -46,7 +48,7 @@ public class Main extends Application {
 
     public static void openThirdScreen(double[] startBallPosition, double[] holePosition, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/ThirdScreen.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/design/ThirdScreen.fxml"));
             ThirdScreenController controller = new ThirdScreenController(startBallPosition, holePosition, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);

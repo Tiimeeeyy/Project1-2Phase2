@@ -1,5 +1,6 @@
-package ui;
+package ui.controller;
 
+import javafx.scene.control.Alert;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
@@ -17,6 +18,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import ui.HeightMap3DChart;
+import ui.Main;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;

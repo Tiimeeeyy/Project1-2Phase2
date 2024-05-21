@@ -13,6 +13,8 @@ module ui {
     requires gluegen.rt;
 
     opens ui to javafx.fxml;
+    opens ui.controller to javafx.fxml;
     exports ui;
+    exports ui.controller to javafx.fxml;
     exports engine.bot.rule_based;
 }

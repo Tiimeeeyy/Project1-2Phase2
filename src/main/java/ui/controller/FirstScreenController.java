@@ -1,4 +1,4 @@
-package ui;
+package ui.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import ui.Main;
 
 public class FirstScreenController {
     @FXML
@@ -60,7 +61,37 @@ public class FirstScreenController {
         System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
         System.out.println("Grass Friction STATIC: " + grassFrictionKINETIC);
 
+        if (function.isEmpty()) {
+            showAlert("Error!", "Invalid input for function", "Please enter a valid function.");
+            return;
+        }
+        if(grassFrictionKINETIC>=0.05 && grassFrictionKINETIC<=0.1){
+            System.out.println("Grass Friction KINETIC is valid");
+        }else{
+            showAlert("Error!", "Invalid input for Grass Friction KINETIC", "Please enter a value between 0.05 and 0.1.");
+            return;
+        }
 
+        if (grassFrictionSTATIC>=0.1 && grassFrictionSTATIC<=0.2){
+            System.out.println("Grass Friction STATIC is valid");
+        }else{
+            showAlert("Error!", "Invalid input for Grass Friction STATIC", "Please enter a value between 0.1 and 0.2.");
+            return;
+        }
+
+        if (treeRadius>=0.05 && treeRadius<=0.15){
+            System.out.println("Tree Radius is valid");
+        }else{  
+            showAlert("Error!", "Invalid input for Tree Radius", "Please enter a value between 0.05 and 0.15.");
+            return;
+        }
+
+        if (radiusHole>=0.05 && radiusHole<=0.15){
+            System.out.println("Hole Radius is valid");
+        }else{  
+            showAlert("Error!", "Invalid input for Hole Radius", "Please enter a value between 0.05 and 0.1.");
+            return;
+        }
 
         try {
             String userDir = System.getProperty("user.dir");
@@ -82,7 +113,7 @@ public class FirstScreenController {
         }
 
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/MapPage.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/design/MapPage.fxml"));
             MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
@@ -112,34 +143,3 @@ public class FirstScreenController {
 
 
 //         
-// if (function.isEmpty()) {
-//     showAlert("Error!", "Invalid input for function", "Please enter a valid function.");
-//     return;
-// }
-// if(grassFrictionKINETIC>=0.05 && grassFrictionKINETIC<=0.1){
-//     System.out.println("Grass Friction KINETIC is valid");
-// }else{
-//     showAlert("Error!", "Invalid input for Grass Friction KINETIC", "Please enter a value between 0.05 and 0.1.");
-//     return;
-// }
-
-// if (grassFrictionSTATIC>=0.1 && grassFrictionSTATIC<=0.2){
-//     System.out.println("Grass Friction STATIC is valid");
-// }else{
-//     showAlert("Error!", "Invalid input for Grass Friction STATIC", "Please enter a value between 0.1 and 0.2.");
-//     return;
-// }
-
-// if (treeRadius>=0.05 && treeRadius<=0.15){
-//     System.out.println("Tree Radius is valid");
-// }else{  
-//     showAlert("Error!", "Invalid input for Tree Radius", "Please enter a value between 0.05 and 0.15.");
-//     return;
-// }
-
-// if (radiusHole>=0.05 && radiusHole<=0.15){
-//     System.out.println("Hole Radius is valid");
-// }else{  
-//     showAlert("Error!", "Invalid input for Hole Radius", "Please enter a value between 0.05 and 0.1.");
-//     return;
-// }

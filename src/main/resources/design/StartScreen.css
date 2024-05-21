@@ -1,5 +1,5 @@
 .anchor {
-    -fx-background-image: url("img.png");
+    -fx-background-image: url("images/img.png");
     -fx-background-size: cover;
     -fx-background-repeat: no-repeat;
 }
