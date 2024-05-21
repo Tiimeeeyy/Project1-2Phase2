@@ -3,6 +3,7 @@ package ui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.IOException;
 
@@ -12,6 +13,8 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/appIcon.jpg"))); // Установка иконки
+
         startScreen();
     }
 
@@ -19,7 +22,7 @@ public class Main extends Application {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/StartScreen.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 613, 404);
-            primaryStage.setTitle("Title Screen");
+            primaryStage.setTitle("Golf Game!");
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
@@ -32,7 +35,7 @@ public class Main extends Application {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/FirstScreen.fxml"));
             Scene scene = new Scene(fxmlLoader.load(), 900, 600);
-            primaryStage.setTitle("First Screen");
+            primaryStage.setTitle("GolfGame!");
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
@@ -47,7 +50,7 @@ public class Main extends Application {
             ThirdScreenController controller = new ThirdScreenController(startBallPosition, holePosition, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
             fxmlLoader.setController(controller);
             Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
-            primaryStage.setTitle("Third Screen");
+            primaryStage.setTitle("Golf Game!");
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();

@@ -203,7 +203,7 @@ public class ThirdScreenController {
             double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
     
             gc.setStroke(javafx.scene.paint.Color.RED);
-            gc.setLineWidth(0.15);
+            gc.setLineWidth(1);
     
             // Draw the arrow shaft
             gc.strokeLine(ballX + ballRadius, ballY + ballRadius, arrowX, arrowY);

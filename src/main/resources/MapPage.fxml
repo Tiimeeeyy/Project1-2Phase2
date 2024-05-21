@@ -48,5 +48,16 @@
             <Font size="16.0"/>
          </font>
       </Text>
+      <Text fx:id="minHeightText" layoutX="583.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Min height: -10.0" wrappingWidth="200.0">
+         <font>
+            <Font size="16.0"/>
+         </font>
+      </Text>
+      <Text fx:id="maxHeightText" layoutX="883.0" layoutY="70.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Max height: 10.0" wrappingWidth="200.0">
+         <font>
+            <Font size="16.0"/>
+         </font>
+      </Text>
+      <ChoiceBox fx:id="disableWaterChoiceBox" layoutX="1090.0" layoutY="200.0" prefHeight="34.0" prefWidth="150.0"/>
    </children>
 </AnchorPane>

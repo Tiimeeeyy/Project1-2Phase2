@@ -6,6 +6,8 @@ import engine.solvers.MapHandler;
 import engine.solvers.Utility;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -50,6 +52,15 @@ public class MapPageController {
     @FXML
     private Text mapSizeText;
 
+    @FXML
+    private Text minHeightText;
+
+    @FXML
+    private Text maxHeightText;
+
+    @FXML
+    private ChoiceBox<String> disableWaterChoiceBox;
+
     private double[][] heightStorage;
     private int[][] initialGreen = new int[500][500];
     private double[] startBallPostion = new double[2];
@@ -60,6 +71,7 @@ public class MapPageController {
     private double treeRadius;
     private double grassFrictionKINETIC;
     private double grassFrictionSTATIC;
+    private boolean disableWater = false;
 
     GraphicsContext gc;
 
@@ -87,7 +99,6 @@ public class MapPageController {
         System.out.println("Tree Radius: " + treeRadius);
         System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
         System.out.println("Grass Friction STATIC: " + grassFrictionSTATIC);
-
     }
 
     public class ColorItem {
@@ -118,6 +129,17 @@ public class MapPageController {
         mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
         mapSizeChoiceBox.setValue(mapSize);
         mapSizeText.setText("Map size in meters: " + mapSize);
+
+        disableWaterChoiceBox.getItems().addAll("Enable water", "Disable water");
+        disableWaterChoiceBox.setValue("Enable water");
+        disableWaterChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                disableWater = newValue.equals("Disable water");
+                renderInitialMap();
+                drawBallAndHole();
+            }
+        });
 
         mapSizeChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSize, newSize) -> {
             if (newSize != null) {
@@ -186,10 +208,8 @@ public class MapPageController {
                 }
             }
     
-            // if (mapSize == 50) {
             GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
             gc.setFill( Color.rgb(0, 0, 150));
-            // 12???
             gc.setLineWidth(12);
 
             gc.fillRect(0, 0, 500, 2);
@@ -205,7 +225,6 @@ public class MapPageController {
                     bufferedImage.setRGB(x, y, argb);
                 }
             }
-            // }
     
             String userDir = System.getProperty("user.dir");
             File resourcesDir = new File(userDir, "src/main/resources");
@@ -279,6 +298,24 @@ public class MapPageController {
         return heightStorage;
     }
 
+    private double[] getMinMaxHeight() {
+        double minHeight = Double.MAX_VALUE;
+        double maxHeight = Double.MIN_VALUE;
+
+        for (int i = 0; i < heightStorage.length; i++) {
+            for (int j = 0; j < heightStorage[i].length; j++) {
+                if (heightStorage[i][j] < minHeight) {
+                    minHeight = heightStorage[i][j];
+                }
+                if (heightStorage[i][j] > maxHeight) {
+                    maxHeight = heightStorage[i][j];
+                }
+            }
+        }
+
+        return new double[]{minHeight, maxHeight};
+    }
+
     private Color getModifiedColor(double height) {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
@@ -287,11 +324,13 @@ public class MapPageController {
             gr = Math.max(0, Math.min(255, gr));
 
             if (height < 0) {
-                Color color = Color.rgb(0, gr, 150);
-                return color;
+                if (disableWater) {
+                    return Color.rgb(0, gr, 0); // Green color for negative height when water is disabled
+                } else {
+                    return Color.rgb(0, gr, 150); // Blue color for negative height when water is enabled
+                }
             } else {
-                Color color = Color.rgb(0, gr, 0);
-                return color;
+                return Color.rgb(0, gr, 0);
             }
         }
     }
@@ -308,6 +347,11 @@ public class MapPageController {
         }
         System.out.println("Initial map rendered with green color.");
     
+        // Update min and max height texts
+        double[] minMaxHeight = getMinMaxHeight();
+        minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
+        maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
+    
         // borders
         gc.setFill(Color.BLUE);
         gc.setLineWidth(2);
@@ -315,7 +359,6 @@ public class MapPageController {
         gc.fillRect(0, 498, 500, 2);
         gc.fillRect(0, 0, 2, 500);
         gc.fillRect(498, 0, 2, 500);
-        
     }
 
     private void updateHeightMap(int x, int y, double heightStep) {
@@ -330,13 +373,6 @@ public class MapPageController {
             if (colorChoiceBox.getValue().name.equals("Tree")) {
                 baseColor = Color.rgb(120, 60, 35);
             } 
-            // else {
-            //     baseColor = Color.rgb(
-            //         (int) (colorChoiceBox.getValue().color.getRed() * 255),
-            //         Math.min(255, initialGreen[x][y]),
-            //         (int) (colorChoiceBox.getValue().color.getBlue() * 255)
-            //     );
-            // }
             if (colorChoiceBox.getValue().name.equals("Sand")) {
                 baseColor=Color.rgb(160, Math.max(100, Math.min(255, initialGreen[x][y])),0);
             }
@@ -350,6 +386,10 @@ public class MapPageController {
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
+            // Update min and max height texts
+            double[] minMaxHeight = getMinMaxHeight();
+            minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
+            maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
@@ -375,6 +415,4 @@ public class MapPageController {
     private void clearBallAndHole(GraphicsContext gc2) {
         gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
     }
-
-   
 }
