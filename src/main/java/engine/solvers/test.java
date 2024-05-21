@@ -11,7 +11,7 @@ public class test {
 
 
    public static void hh(){
-    Utility.ratio=20;
+    
    }
 
 }
