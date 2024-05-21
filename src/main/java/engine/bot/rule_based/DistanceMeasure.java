@@ -1,16 +1,25 @@
 package engine.bot.rule_based;
 
 import engine.solvers.GolfGame;
+import javafx.css.Rule;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class DistanceMeasure {
+    private RungeKutta4Void rk4;
+    private PredictVelocity predictVelocity;
     private CheckCollisionAndHeight checkCollisionAndHeight;
     private GolfGame golfGame;
     private ComparingAndScoring comparingAndScoring;
+    private RuleBasedPlayer ruleBasedPlayer;
+    public DistanceMeasure() {
+        this.golfGame = new GolfGame();
+        this.rk4 = new RungeKutta4Void();
+        this.predictVelocity = new PredictVelocity(golfGame);
 
+        this.checkCollisionAndHeight = new CheckCollisionAndHeight(rk4, predictVelocity);
+
+    }
 
     public ArrayList<double[]> bestDistance(double[] x, double[] hole) {
         double direction[] = checkCollisionAndHeight.calculateDirection(x, hole);
@@ -47,6 +56,10 @@ public class DistanceMeasure {
 
         if (!comparingAndScoring.checkHole(finalPosition, hole)) {
             allTrajectories.addAll(recursiveDistances(finalPosition, hole));
+        } else {
+            double[] lastVelocity = ruleBasedPlayer.lastShot(x, hole);
+            ArrayList<double[]> finalTrajectory = golfGame.shoot(new double[] {finalPosition[0], finalPosition[1], lastVelocity[0], lastVelocity[1]}, true);
+            allTrajectories.add(finalTrajectory);
         }
         return allTrajectories;
     }

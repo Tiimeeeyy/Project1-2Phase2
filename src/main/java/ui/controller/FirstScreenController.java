@@ -6,13 +6,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import ui.Main;
+import ui.screenFactory.ScreenInterface;
 
-public class FirstScreenController {
+public class FirstScreenController extends Parent implements ScreenInterface{
     @FXML
     private TextField FunctionTextfield;
     @FXML
@@ -35,9 +37,15 @@ public class FirstScreenController {
 
     private String function;
 
-    @FXML
-    public void initialize() {
+    private Parent root;
 
+    public void setRoot(Parent root) {
+        this.root = root;
+    }
+
+    @Override
+    public Parent getRoot() {
+        return root;
     }
 
     public void nextScreen(ActionEvent event) {
@@ -112,16 +120,11 @@ public class FirstScreenController {
             return;
         }
 
+        // next screen
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/design/MapPage.fxml"));
-            MapPageController controller = new MapPageController(function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC);
-            fxmlLoader.setController(controller);
-            Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("Map Creating Screen");
-            stage.show();
-        } catch (IOException ex) {
+            Main mainInst = new Main();
+            mainInst.setScreen("MAP", function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC, null, null);
+        } catch (Exception ex) {
             showAlert("Error!", "Failed to proceed to the next screen", ex.getMessage());
             ex.printStackTrace();
         }
@@ -129,7 +132,8 @@ public class FirstScreenController {
 
     @FXML
     private void goBack(ActionEvent event) {
-        Main.startScreen();
+        Main mainInst = new Main();
+        mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
     }
 
     private void showAlert(String title, String header, String content) {

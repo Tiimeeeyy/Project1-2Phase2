@@ -3,10 +3,12 @@ package ui.controller;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
-import ui.CircularSlider;
 import ui.Main;
+import ui.helpers.CircularSlider;
+import ui.screenFactory.ScreenInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -30,7 +32,7 @@ import engine.solvers.GolfGame;
 import engine.solvers.RK4;
 import engine.solvers.Utility;
 
-public class ThirdScreenController {
+public class ThirdScreenController implements ScreenInterface{
 
     @FXML
     private ImageView mapImageView;
@@ -76,20 +78,40 @@ public class ThirdScreenController {
     private boolean REACHED_THE_HOLE;
     private Timeline timeline;
 
-    public ThirdScreenController(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
+    private Parent root;
+
+    public void setRoot(Parent root) {
+        this.root = root;
+    }
+
+    @Override
+    public Parent getRoot() {
+        return root;
+    }
+
+    public ThirdScreenController() {
+    }
+
+
+    public void initializeParameters(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.startBallPostion = startBallPostion;
         this.HolePostion = HolePostion;
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.REACHED_THE_HOLE = false;
-        // grass friction?
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
+
+        initialize();
     }
 
     @FXML
     public void initialize() {
+        if (startBallPostion == null || HolePostion == null) {
+            return; 
+        }
+
         loadNewImage();
 
         circularSlider = new CircularSlider();
@@ -116,6 +138,7 @@ public class ThirdScreenController {
         updateBallPositionLabel();
         updateShotCountLabel();
     }
+    
 
     private void updateDirection(Number newVal) {
         double[] directionVector = circularSlider.getDirectionVector();
@@ -382,7 +405,8 @@ public class ThirdScreenController {
 
     @FXML
     private void goBack() {
-        Main.openGUI();
+        Main mainInst = new Main();
+        mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
     }
 
     private void updateBallPositionLabel() {

@@ -18,8 +18,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import ui.HeightMap3DChart;
 import ui.Main;
+import ui.helpers.HeightMap3DChart;
+import ui.screenFactory.ScreenInterface;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
@@ -30,7 +32,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
-public class MapPageController {
+public class MapPageController implements ScreenInterface{
     private static final double MAX_HEIGHT = 10.0;
     private static final double MIN_HEIGHT = -10.0;
 
@@ -78,7 +80,21 @@ public class MapPageController {
 
     GraphicsContext gc;
 
-    public MapPageController(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC) {
+    private Parent root;
+
+    public void setRoot(Parent root) {
+        this.root = root;
+    }
+
+    @Override
+    public Parent getRoot() {
+        return root;
+    }
+
+    public MapPageController() {
+    }
+
+    public void initializeParameters(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.heightStorage = getHeightCoordinates(function);
         this.function = function;
         startBallPostion[0] = xBall;
@@ -87,21 +103,25 @@ public class MapPageController {
         HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = 50;
-
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.treeRadius = treeRadius;
-
+    
         System.out.println("Function: " + function);
         System.out.println("Ball position: " + xBall + ", " + yBall);
         System.out.println("Hole position: " + xHole + ", " + yHole);
         System.out.println("Hole Radius: " + radiusHole);
         System.out.println("Map Size: " + mapSize);
         System.out.println("Map ratio: " + Utility.ratio);
-
         System.out.println("Tree Radius: " + treeRadius);
         System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
         System.out.println("Grass Friction STATIC: " + grassFrictionSTATIC);
+    
+        renderInitialMap();
+        drawBallAndHole();
+    
+        HeightMap3DChart chart = new HeightMap3DChart(heightStorage, chartPane);
+        chart.display3DChart();
     }
 
     public class ColorItem {
@@ -124,44 +144,39 @@ public class MapPageController {
             new ColorItem("Sand", Color.rgb(160, 125, 0)),
             new ColorItem("Grass", Color.rgb(0, 125, 0)),
             new ColorItem("Water", Color.rgb(0, 125, 180)),
-            new ColorItem("Tree", Color.rgb(120, 60, 35)),
-            new ColorItem("Lift ground", Color.rgb(0, 125, 0)),
-            new ColorItem("Lower ground", Color.rgb(0, 125, 0))
+            new ColorItem("Tree", Color.rgb(120, 60, 35))
+            // new ColorItem("Lift ground", Color.rgb(0, 125, 0)),
+            // new ColorItem("Lower ground", Color.rgb(0, 125, 0))
         );
-
+    
         mapSizeChoiceBox.getItems().addAll(5, 10, 25, 50);
         mapSizeChoiceBox.setValue(mapSize);
         mapSizeText.setText("Map size in meters: " + mapSize);
-
+    
         disableWaterChoiceBox.getItems().addAll("Enable water", "Disable water");
         disableWaterChoiceBox.setValue("Enable water");
-        disableWaterChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                disableWater = newValue.equals("Disable water");
-                renderInitialMap();
-                drawBallAndHole();
-            }
+        disableWaterChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            disableWater = newValue.equals("Disable water");
+            renderInitialMap();
+            drawBallAndHole();
         });
-
+    
         mapSizeChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSize, newSize) -> {
             if (newSize != null) {
                 mapSize = newSize;
                 mapSizeText.setText("Map size in meters: " + mapSize);
             }
         });
-
+    
         if (drawingCanvas != null) {
             this.gc = drawingCanvas.getGraphicsContext2D();
             gc.setLineWidth(30);
-
-            renderInitialMap();
-
+        
             EventHandler<MouseEvent> handler = event -> {
                 double x = event.getX();
                 double y = event.getY();
                 System.out.println("Mouse event at: " + x + ", " + y);
-
+    
                 int ix = (int) x;
                 int iy = (int) y;
                 if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
@@ -169,7 +184,7 @@ public class MapPageController {
                     updateHeightMap(ix, iy, heightStep);
                 }
             };
-
+    
             colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
                 if (newColor != null) {
                     if (newColor.color.equals(Color.rgb(120, 60, 35))) {
@@ -181,19 +196,14 @@ public class MapPageController {
                     }
                 }
             });
-
+    
             // Make overlayCanvas transparent and disable mouse events
             overlayCanvas.setMouseTransparent(true);
         } else {
             System.err.println("drawingCanvas is null");
         }
-        
-        double[][] height = heightStorage;
-        HeightMap3DChart chart3d = new HeightMap3DChart(height, chartPane);
-        chart3d.display3DChart();
-
-        drawBallAndHole();
     }
+    
 
     @FXML
     private void saveCanvasAsPNG() {
@@ -269,7 +279,9 @@ public class MapPageController {
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path, HolePostion, radiusHole);
-        Main.openThirdScreen(startBallPostion, HolePostion, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
+
+        Main mainInst = new Main();
+        mainInst.setScreen("GAME", "", 0, 0, 0, 0, radiusHole, 0, grassFrictionKINETIC, grassFrictionSTATIC, startBallPostion, HolePostion);
     }
 
     @FXML
@@ -284,7 +296,8 @@ public class MapPageController {
     }
 
     public void goBack() {
-        Main.openGUI();
+        Main mainInst = new Main();
+        mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
     }
 
     public static double[][] getHeightCoordinates(String func) {

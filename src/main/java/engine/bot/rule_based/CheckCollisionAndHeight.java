@@ -10,7 +10,7 @@ import java.util.Comparator;
  * It uses the RungeKutta4Void solver to simulate the physics of the golf ball.
  */
 public class CheckCollisionAndHeight {
-    // Constants that are used a lot, and don´t change are declared here for maintainability and flexibility.
+    // Constants that are used a lot, and don't change are declared here for maintainability and flexibility.
     private final double DEGREES_POS = Math.toRadians(30);
     private final double DEGREES_NEG = Math.toRadians(-30);
     private final double MIN_SPEED = 0.5;
@@ -26,6 +26,8 @@ public class CheckCollisionAndHeight {
         this.rk4 = rk4;
         this.predictVelocity = predictVelocity;
     }
+
+
 
     /**
      * Calculate the direction vector from the current position to the hole.
