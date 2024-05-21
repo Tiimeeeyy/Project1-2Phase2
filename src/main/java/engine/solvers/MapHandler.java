@@ -60,9 +60,9 @@ public class MapHandler {
         for (int i = 0; i < width-1; i++) {
             for (int j = 1; j < height; j++) {
                 for(int k=0;k<2;k++){
-                    if(treeAry[i+1-k][j-k]){
+                    if(treeAry[i+1-k][j-k] || gAry[i+1-k][j-k]==0){
                         gradient[i][j][k]=0;
-                    }else if(treeAry[i][j]){
+                    }else if(treeAry[i][j] || gAry[i][j]==0){
                         gradient[i][j][k]=0;
                     }
                     else{
