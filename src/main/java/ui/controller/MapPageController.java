@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import ui.Main;
+import ui.helpers.CanvasToPng;
 import ui.helpers.HeightMap3DChart;
 import ui.screenFactory.ScreenInterface;
 import javafx.scene.Parent;
@@ -82,6 +83,10 @@ public class MapPageController implements ScreenInterface{
 
     private Parent root;
 
+    
+    public MapPageController() {
+    }
+
     public void setRoot(Parent root) {
         this.root = root;
     }
@@ -91,55 +96,74 @@ public class MapPageController implements ScreenInterface{
         return root;
     }
 
-    public MapPageController() {
-    }
-
     public void initializeParameters(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.heightStorage = getHeightCoordinates(function);
         this.function = function;
-        startBallPostion[0] = xBall;
-        startBallPostion[1] = yBall;
-        HolePostion[0] = xHole;
-        HolePostion[1] = yHole;
+        this.startBallPostion[0] = xBall;
+        this.startBallPostion[1] = yBall;
+        this.HolePostion[0] = xHole;
+        this.HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = 50;
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.treeRadius = treeRadius;
-    
-        System.out.println("Function: " + function);
-        System.out.println("Ball position: " + xBall + ", " + yBall);
-        System.out.println("Hole position: " + xHole + ", " + yHole);
-        System.out.println("Hole Radius: " + radiusHole);
-        System.out.println("Map Size: " + mapSize);
-        System.out.println("Map ratio: " + Utility.ratio);
-        System.out.println("Tree Radius: " + treeRadius);
-        System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
-        System.out.println("Grass Friction STATIC: " + grassFrictionSTATIC);
-    
-        renderInitialMap();
-        drawBallAndHole();
-    
+
+        createScreen();
+    }
+
+    private void createScreen(){
         HeightMap3DChart chart = new HeightMap3DChart(heightStorage, chartPane);
         chart.display3DChart();
+       
+        renderInitialMap();
+        drawBallAndHole();
     }
 
-    public class ColorItem {
-        private String name;
-        private Color color;
-
-        public ColorItem(String name, Color color) {
-            this.name = name;
-            this.color = color;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 
     public void initialize() {
+        setUpChoiceBoxes();
+        setUpCanvas();
+    }
+
+    private void setUpCanvas() {
+        if (drawingCanvas != null) {
+            this.gc = drawingCanvas.getGraphicsContext2D();
+            gc.setLineWidth(30);
+
+            EventHandler<MouseEvent> handler = event -> {
+                double x = event.getX();
+                double y = event.getY();
+                System.out.println("Mouse event at: " + x + ", " + y);
+
+                int ix = (int) x;
+                int iy = (int) y;
+                if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
+                    double heightStep = 0.1;
+                    updateHeightMap(ix, iy, heightStep);
+                }
+            };
+
+            colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
+                if (newColor != null) {
+                    if (newColor.color.equals(Color.rgb(120, 60, 35))) {
+                        drawingCanvas.setOnMouseClicked(handler);
+                        drawingCanvas.setOnMouseDragged(null); // Disable dragging for dark brown
+                    } else {
+                        drawingCanvas.setOnMouseClicked(handler); // Enable clicking for other colors
+                        drawingCanvas.setOnMouseDragged(handler); // Enable dragging for other colors
+                    }
+                }
+            });
+
+            // Make overlayCanvas transparent and disable mouse events
+            overlayCanvas.setMouseTransparent(true);
+        } else {
+            System.err.println("drawingCanvas is null");
+        }
+    }
+
+    private void setUpChoiceBoxes(){
         colorChoiceBox.getItems().addAll(
             new ColorItem("Sand", Color.rgb(160, 125, 0)),
             new ColorItem("Grass", Color.rgb(0, 125, 0)),
@@ -167,115 +191,14 @@ public class MapPageController implements ScreenInterface{
                 mapSizeText.setText("Map size in meters: " + mapSize);
             }
         });
-    
-        if (drawingCanvas != null) {
-            this.gc = drawingCanvas.getGraphicsContext2D();
-            gc.setLineWidth(30);
-        
-            EventHandler<MouseEvent> handler = event -> {
-                double x = event.getX();
-                double y = event.getY();
-                System.out.println("Mouse event at: " + x + ", " + y);
-    
-                int ix = (int) x;
-                int iy = (int) y;
-                if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
-                    double heightStep = 0.1;
-                    updateHeightMap(ix, iy, heightStep);
-                }
-            };
-    
-            colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
-                if (newColor != null) {
-                    if (newColor.color.equals(Color.rgb(120, 60, 35))) {
-                        drawingCanvas.setOnMouseClicked(handler);
-                        drawingCanvas.setOnMouseDragged(null); // Disable dragging for dark brown
-                    } else {
-                        drawingCanvas.setOnMouseClicked(handler); // Disable clicking for other colors
-                        drawingCanvas.setOnMouseDragged(handler);
-                    }
-                }
-            });
-    
-            // Make overlayCanvas transparent and disable mouse events
-            overlayCanvas.setMouseTransparent(true);
-        } else {
-            System.err.println("drawingCanvas is null");
-        }
     }
     
-
-    @FXML
-    private void saveCanvasAsPNG() {
-        try {
-            WritableImage writableImage = new WritableImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight());
-            drawingCanvas.snapshot(null, writableImage);
-    
-            BufferedImage bufferedImage = new BufferedImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            PixelReader pixelReader = writableImage.getPixelReader();
-    
-            for (int y = 0; y < writableImage.getHeight(); y++) {
-                for (int x = 0; x < writableImage.getWidth(); x++) {
-                    int argb = pixelReader.getArgb(x, y);
-                    bufferedImage.setRGB(x, y, argb);
-                }
-            }
-    
-            GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
-            gc.setFill( Color.rgb(0, 0, 150));
-            gc.setLineWidth(12);
-
-            gc.fillRect(0, 0, 500, 2);
-            gc.fillRect(0, 498, 500, 2);
-            gc.fillRect(0, 0, 2, 500);
-            gc.fillRect(498, 0, 2, 500);
-
-            drawingCanvas.snapshot(null, writableImage);
-            pixelReader = writableImage.getPixelReader();
-            for (int y = 0; y < writableImage.getHeight(); y++) {
-                for (int x = 0; x < writableImage.getWidth(); x++) {
-                    int argb = pixelReader.getArgb(x, y);
-                    bufferedImage.setRGB(x, y, argb);
-                }
-            }
-    
-            String userDir = System.getProperty("user.dir");
-            File resourcesDir = new File(userDir, "src/main/resources");
-            if (!resourcesDir.exists()) {
-                showAlert(Alert.AlertType.ERROR, "Save Failed", "The directory you are trying to save to does not exist.");
-                return;
-            }
-    
-            File file = new File(resourcesDir, "userInputMap.png");
-    
-            if (file.exists()) {
-                if (!file.delete()) {
-                    throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
-                }
-            }
-            boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
-            if (!imageWritten) {
-                throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
-            }
-    
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
-        }
-    }
-    
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 
     @FXML
     private void saveCanvasAndContinue() {
-        saveCanvasAsPNG();
+        CanvasToPng canvasToPng = new CanvasToPng(drawingCanvas);
+        canvasToPng.saveCanvasAsPNG();
+
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path, HolePostion, radiusHole);
@@ -289,10 +212,9 @@ public class MapPageController implements ScreenInterface{
         int selectedMapSize = mapSizeChoiceBox.getValue();
         Utility.ratio = 500.0 / selectedMapSize;
         this.heightStorage = getHeightCoordinates(function);
+        
         renderInitialMap();
         drawBallAndHole();
-
-        System.out.println("Selected map size: " + selectedMapSize + " meters");
     }
 
     public void goBack() {
@@ -430,5 +352,20 @@ public class MapPageController implements ScreenInterface{
 
     private void clearBallAndHole(GraphicsContext gc2) {
         gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
+    }
+
+    public class ColorItem {
+        private String name;
+        private Color color;
+
+        public ColorItem(String name, Color color) {
+            this.name = name;
+            this.color = color;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }
