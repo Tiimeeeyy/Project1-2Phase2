@@ -1,7 +1,6 @@
 package engine.parser;
 
 import java.util.Map;
-import engine.parser.interfaces.IParser;
 
 public class ExpressionParser implements IParser {
 

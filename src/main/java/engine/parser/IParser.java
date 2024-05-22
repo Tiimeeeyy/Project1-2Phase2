@@ -1,4 +1,4 @@
-package engine.parser.interfaces;
+package engine.parser;
 
 /**
  * Interface for parsing and evaluating mathematical expressions.
