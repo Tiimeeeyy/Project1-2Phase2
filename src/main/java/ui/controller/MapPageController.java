@@ -11,7 +11,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
@@ -36,6 +35,8 @@ import java.io.IOException;
 public class MapPageController implements ScreenInterface{
     private static final double MAX_HEIGHT = 10.0;
     private static final double MIN_HEIGHT = -10.0;
+    private static double minCurrentHeight;
+    private static double maxCurrentHeight;
 
     @FXML
     private Canvas drawingCanvas;
@@ -78,11 +79,13 @@ public class MapPageController implements ScreenInterface{
     private double grassFrictionKINETIC;
     private double grassFrictionSTATIC;
     private boolean disableWater = false;
+ 
 
     GraphicsContext gc;
 
     private Parent root;
 
+    
     
     public MapPageController() {
     }
@@ -212,7 +215,7 @@ public class MapPageController implements ScreenInterface{
         int selectedMapSize = mapSizeChoiceBox.getValue();
         Utility.ratio = 500.0 / selectedMapSize;
         this.heightStorage = getHeightCoordinates(function);
-        
+
         renderInitialMap();
         drawBallAndHole();
     }
@@ -222,36 +225,31 @@ public class MapPageController implements ScreenInterface{
         mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
     }
 
+
     public static double[][] getHeightCoordinates(String func) {
         double[][] heightStorage = new double[500][500];
+        
+
         for (int i = 0; i < 500; i++) {
             for (int j = 0; j < 500; j++) {
                 HashMap<String, Double> currentCoordinates = new HashMap<>();
                 currentCoordinates.put("x", Utility.pixelToCoordinate_X(i));
                 currentCoordinates.put("y", Utility.pixelToCoordinate_Y(j));
                 ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
-                heightStorage[i][j] = parser.evaluate();
+                double height = parser.evaluate();
+                heightStorage[i][j] = height;
+
+                // Update min and max height
+                if (height < minCurrentHeight) {
+                    minCurrentHeight = height;
+                }
+                if (height > maxCurrentHeight) {
+                    maxCurrentHeight = height;
+                }
             }
         }
+
         return heightStorage;
-    }
-
-    private double[] getMinMaxHeight() {
-        double minHeight = Double.MAX_VALUE;
-        double maxHeight = Double.MIN_VALUE;
-
-        for (int i = 0; i < heightStorage.length; i++) {
-            for (int j = 0; j < heightStorage[i].length; j++) {
-                if (heightStorage[i][j] < minHeight) {
-                    minHeight = heightStorage[i][j];
-                }
-                if (heightStorage[i][j] > maxHeight) {
-                    maxHeight = heightStorage[i][j];
-                }
-            }
-        }
-
-        return new double[]{minHeight, maxHeight};
     }
 
     private Color getModifiedColor(double height) {
@@ -286,9 +284,8 @@ public class MapPageController implements ScreenInterface{
         System.out.println("Initial map rendered with green color.");
     
         // Update min and max height texts
-        double[] minMaxHeight = getMinMaxHeight();
-        minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
-        maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
+        minHeightText.setText(String.format("Min height: %.2f", minCurrentHeight));
+        maxHeightText.setText(String.format("Max height: %.2f",maxCurrentHeight));
     
         // borders
         gc.setFill(Color.BLUE);
@@ -325,9 +322,8 @@ public class MapPageController implements ScreenInterface{
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
             // Update min and max height texts
-            double[] minMaxHeight = getMinMaxHeight();
-            minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
-            maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
+            minHeightText.setText(String.format("Min height: %.2f",minCurrentHeight));
+            maxHeightText.setText(String.format("Max height: %.2f", maxCurrentHeight));
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }

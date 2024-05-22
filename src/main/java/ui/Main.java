@@ -27,7 +27,6 @@ public class Main extends Application {
         try{
             ScreenFactory factory = new ScreenFactory();
             ScreenInterface screen = factory.createScreen(screenType, function, xBall, yBall, xHole, yHole, radiusHole, treeRadius, grassFrictionKINETIC, grassFrictionSTATIC, startBallPosition, holePosition);
-            System.out.println(screen.getRoot());
             Scene scene = new Scene(screen.getRoot(), 1280, 720);
             primaryStage.setTitle("Golf Game!");
             primaryStage.setScene(scene);
