@@ -1,145 +1,198 @@
 package ui.controller;
 
-import javafx.scene.control.Alert;
 import java.util.HashMap;
 import engine.parser.ExpressionParser;
 import engine.solvers.MapHandler;
 import engine.solvers.Utility;
-import javafx.animation.PauseTransition;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 import ui.Main;
+import ui.helpers.CanvasToPng;
 import ui.helpers.HeightMap3DChart;
 import ui.screenFactory.ScreenInterface;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.image.WritableImage;
-import javafx.scene.image.PixelReader;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 
-public class MapPageController implements ScreenInterface{
-    private static final double MAX_HEIGHT = 10.0;
-    private static final double MIN_HEIGHT = -10.0;
 
-    @FXML
-    private Canvas drawingCanvas;
+/**
+ * Controller class for the map page.
+ */
+public class MapPageController implements ScreenInterface {
+    private static final double MAX_HEIGHT = 10.0; // Maximum height for the height map
+    private static final double MIN_HEIGHT = -10.0; // Minimum height for the height map
+    private static double minCurrentHeight;
+    private static double maxCurrentHeight;
 
     @FXML
-    private Canvas overlayCanvas;
+    private Canvas drawingCanvas; // Canvas for drawing
 
     @FXML
-    private ChoiceBox<ColorItem> colorChoiceBox;
+    private Canvas overlayCanvas; // Canvas for overlay elements
 
     @FXML
-    private ChoiceBox<Integer> mapSizeChoiceBox;
+    private ChoiceBox<ColorItem> colorChoiceBox; // Choice box for selecting colors
 
     @FXML
-    private Slider widthSlider;
+    private ChoiceBox<Integer> mapSizeChoiceBox; // Choice box for selecting map size
 
     @FXML
-    private Pane chartPane;
+    private Slider widthSlider; // Slider for setting brush width
 
     @FXML
-    private Text mapSizeText;
+    private Pane chartPane; // Pane for displaying 3D chart
 
     @FXML
-    private Text minHeightText;
+    private Text mapSizeText; // Text for displaying map size
 
     @FXML
-    private Text maxHeightText;
+    private Text minHeightText; // Text for displaying minimum height
 
     @FXML
-    private ChoiceBox<String> disableWaterChoiceBox;
+    private Text maxHeightText; // Text for displaying maximum height
 
-    private double[][] heightStorage;
-    private int[][] initialGreen = new int[500][500];
-    private double[] startBallPostion = new double[2];
-    private double[] HolePostion = new double[2];
-    private double radiusHole;
-    private int mapSize;
-    private String function;
-    private double treeRadius;
-    private double grassFrictionKINETIC;
-    private double grassFrictionSTATIC;
-    private boolean disableWater = false;
+    @FXML
+    private ChoiceBox<String> disableWaterChoiceBox; // Choice box for enabling/disabling water
 
-    GraphicsContext gc;
+    private double[][] heightStorage; // Storage for height values
+    private int[][] initialGreen = new int[500][500]; // Initial green values
+    private double[] startBallPostion = new double[2]; // Starting position of the ball
+    private double[] HolePostion = new double[2]; // Position of the hole
+    private double radiusHole; // Radius of the hole
+    private int mapSize; // Size of the map
+    private String function; // Function for generating the height map
+    private double treeRadius; // Radius of trees
+    private double grassFrictionKINETIC; // Kinetic friction for grass
+    private double grassFrictionSTATIC; // Static friction for grass
+    private boolean disableWater = false; // Flag for disabling water
 
-    private Parent root;
+    GraphicsContext gc; // Graphics context for drawing
 
+    private Parent root; // Root node
+
+    /**
+     * Constructor for the MapPageController.
+     */
+    public MapPageController() {
+    }
+
+    /**
+     * Sets the root node.
+     *
+     * @param root the root node
+     */
     public void setRoot(Parent root) {
         this.root = root;
     }
 
+    /**
+     * Gets the root node.
+     *
+     * @return the root node
+     */
     @Override
     public Parent getRoot() {
         return root;
     }
 
-    public MapPageController() {
-    }
-
+    /**
+     * Initializes parameters for the map.
+     *
+     * @param function              the function for generating the height map
+     * @param xBall                 the x-coordinate of the ball's starting position
+     * @param yBall                 the y-coordinate of the ball's starting position
+     * @param xHole                 the x-coordinate of the hole's position
+     * @param yHole                 the y-coordinate of the hole's position
+     * @param radiusHole            the radius of the hole
+     * @param treeRadius            the radius of trees
+     * @param grassFrictionKINETIC  the kinetic friction for grass
+     * @param grassFrictionSTATIC   the static friction for grass
+     */
     public void initializeParameters(String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.heightStorage = getHeightCoordinates(function);
         this.function = function;
-        startBallPostion[0] = xBall;
-        startBallPostion[1] = yBall;
-        HolePostion[0] = xHole;
-        HolePostion[1] = yHole;
+        this.startBallPostion[0] = xBall;
+        this.startBallPostion[1] = yBall;
+        this.HolePostion[0] = xHole;
+        this.HolePostion[1] = yHole;
         this.radiusHole = radiusHole;
         this.mapSize = 50;
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.treeRadius = treeRadius;
-    
-        System.out.println("Function: " + function);
-        System.out.println("Ball position: " + xBall + ", " + yBall);
-        System.out.println("Hole position: " + xHole + ", " + yHole);
-        System.out.println("Hole Radius: " + radiusHole);
-        System.out.println("Map Size: " + mapSize);
-        System.out.println("Map ratio: " + Utility.ratio);
-        System.out.println("Tree Radius: " + treeRadius);
-        System.out.println("Grass Friction KINETIC: " + grassFrictionKINETIC);
-        System.out.println("Grass Friction STATIC: " + grassFrictionSTATIC);
-    
-        renderInitialMap();
-        drawBallAndHole();
-    
+
+        createScreen();
+    }
+
+    /**
+     * Creates and initializes the screen.
+     */
+    private void createScreen(){
         HeightMap3DChart chart = new HeightMap3DChart(heightStorage, chartPane);
         chart.display3DChart();
+       
+        renderInitialMap();
+        drawBallAndHole();
     }
 
-    public class ColorItem {
-        private String name;
-        private Color color;
-
-        public ColorItem(String name, Color color) {
-            this.name = name;
-            this.color = color;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
+    /**
+     * Initializes the controller.
+     */
     public void initialize() {
+        setUpChoiceBoxes();
+        setUpCanvas();
+    }
+
+    /**
+     * Sets up the drawing canvas.
+     */
+    private void setUpCanvas() {
+        if (drawingCanvas != null) {
+            this.gc = drawingCanvas.getGraphicsContext2D();
+            gc.setLineWidth(30);
+
+            EventHandler<MouseEvent> handler = event -> {
+                double x = event.getX();
+                double y = event.getY();
+                System.out.println("Mouse event at: " + x + ", " + y);
+
+                int ix = (int) x;
+                int iy = (int) y;
+                if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
+                    double heightStep = 0.1;
+                    updateHeightMap(ix, iy, heightStep);
+                }
+            };
+
+            colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
+                if (newColor != null) {
+                    if (newColor.color.equals(Color.rgb(120, 60, 35))) {
+                        drawingCanvas.setOnMouseClicked(handler);
+                        drawingCanvas.setOnMouseDragged(null); // Disable dragging for dark brown
+                    } else {
+                        drawingCanvas.setOnMouseClicked(handler); // Enable clicking for other colors
+                        drawingCanvas.setOnMouseDragged(handler); // Enable dragging for other colors
+                    }
+                }
+            });
+
+            // Make overlayCanvas transparent and disable mouse events
+            overlayCanvas.setMouseTransparent(true);
+        } else {
+            System.err.println("drawingCanvas is null");
+        }
+    }
+
+    /**
+     * Sets up choice boxes for the UI.
+     */
+    private void setUpChoiceBoxes(){
         colorChoiceBox.getItems().addAll(
             new ColorItem("Sand", Color.rgb(160, 125, 0)),
             new ColorItem("Grass", Color.rgb(0, 125, 0)),
@@ -167,115 +220,16 @@ public class MapPageController implements ScreenInterface{
                 mapSizeText.setText("Map size in meters: " + mapSize);
             }
         });
-    
-        if (drawingCanvas != null) {
-            this.gc = drawingCanvas.getGraphicsContext2D();
-            gc.setLineWidth(30);
-        
-            EventHandler<MouseEvent> handler = event -> {
-                double x = event.getX();
-                double y = event.getY();
-                System.out.println("Mouse event at: " + x + ", " + y);
-    
-                int ix = (int) x;
-                int iy = (int) y;
-                if (ix >= 0 && ix < 500 && iy >= 0 && iy < 500) {
-                    double heightStep = 0.1;
-                    updateHeightMap(ix, iy, heightStep);
-                }
-            };
-    
-            colorChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldColor, newColor) -> {
-                if (newColor != null) {
-                    if (newColor.color.equals(Color.rgb(120, 60, 35))) {
-                        drawingCanvas.setOnMouseClicked(handler);
-                        drawingCanvas.setOnMouseDragged(null); // Disable dragging for dark brown
-                    } else {
-                        drawingCanvas.setOnMouseClicked(handler); // Disable clicking for other colors
-                        drawingCanvas.setOnMouseDragged(handler);
-                    }
-                }
-            });
-    
-            // Make overlayCanvas transparent and disable mouse events
-            overlayCanvas.setMouseTransparent(true);
-        } else {
-            System.err.println("drawingCanvas is null");
-        }
-    }
-    
-
-    @FXML
-    private void saveCanvasAsPNG() {
-        try {
-            WritableImage writableImage = new WritableImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight());
-            drawingCanvas.snapshot(null, writableImage);
-    
-            BufferedImage bufferedImage = new BufferedImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            PixelReader pixelReader = writableImage.getPixelReader();
-    
-            for (int y = 0; y < writableImage.getHeight(); y++) {
-                for (int x = 0; x < writableImage.getWidth(); x++) {
-                    int argb = pixelReader.getArgb(x, y);
-                    bufferedImage.setRGB(x, y, argb);
-                }
-            }
-    
-            GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
-            gc.setFill( Color.rgb(0, 0, 150));
-            gc.setLineWidth(12);
-
-            gc.fillRect(0, 0, 500, 2);
-            gc.fillRect(0, 498, 500, 2);
-            gc.fillRect(0, 0, 2, 500);
-            gc.fillRect(498, 0, 2, 500);
-
-            drawingCanvas.snapshot(null, writableImage);
-            pixelReader = writableImage.getPixelReader();
-            for (int y = 0; y < writableImage.getHeight(); y++) {
-                for (int x = 0; x < writableImage.getWidth(); x++) {
-                    int argb = pixelReader.getArgb(x, y);
-                    bufferedImage.setRGB(x, y, argb);
-                }
-            }
-    
-            String userDir = System.getProperty("user.dir");
-            File resourcesDir = new File(userDir, "src/main/resources");
-            if (!resourcesDir.exists()) {
-                showAlert(Alert.AlertType.ERROR, "Save Failed", "The directory you are trying to save to does not exist.");
-                return;
-            }
-    
-            File file = new File(resourcesDir, "userInputMap.png");
-    
-            if (file.exists()) {
-                if (!file.delete()) {
-                    throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
-                }
-            }
-            boolean imageWritten = ImageIO.write(bufferedImage, "png", file);
-            if (!imageWritten) {
-                throw new IOException("Failed to write image to file: " + file.getAbsolutePath());
-            }
-    
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Save Failed", "An error occurred while saving the canvas: " + e.getMessage());
-        }
-    }
-    
-
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
+    /**
+     * Saves the canvas as PNG and proceeds to the game screen.
+     */
     @FXML
     private void saveCanvasAndContinue() {
-        saveCanvasAsPNG();
+        CanvasToPng canvasToPng = new CanvasToPng(drawingCanvas);
+        canvasToPng.saveCanvasAsPNG();
+
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
         map.renderMap(this.initialGreen, path, HolePostion, radiusHole);
@@ -284,54 +238,64 @@ public class MapPageController implements ScreenInterface{
         mainInst.setScreen("GAME", "", 0, 0, 0, 0, radiusHole, 0, grassFrictionKINETIC, grassFrictionSTATIC, startBallPostion, HolePostion);
     }
 
+    /**
+     * Changes the size of the map.
+     */
     @FXML
     private void changeMapSize() {
         int selectedMapSize = mapSizeChoiceBox.getValue();
         Utility.ratio = 500.0 / selectedMapSize;
         this.heightStorage = getHeightCoordinates(function);
+
         renderInitialMap();
         drawBallAndHole();
-
-        System.out.println("Selected map size: " + selectedMapSize + " meters");
     }
 
+    /**
+     * Navigates back to the input.
+     */
     public void goBack() {
         Main mainInst = new Main();
-        mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+        mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
     }
 
+    /**
+     * Generates height coordinates from the given function.
+     *
+     * @param func the function for generating the height map
+     * @return a 2D array of height values
+     */
     public static double[][] getHeightCoordinates(String func) {
         double[][] heightStorage = new double[500][500];
+
         for (int i = 0; i < 500; i++) {
             for (int j = 0; j < 500; j++) {
                 HashMap<String, Double> currentCoordinates = new HashMap<>();
                 currentCoordinates.put("x", Utility.pixelToCoordinate_X(i));
                 currentCoordinates.put("y", Utility.pixelToCoordinate_Y(j));
                 ExpressionParser parser = new ExpressionParser(func, currentCoordinates);
-                heightStorage[i][j] = parser.evaluate();
+                double height = parser.evaluate();
+                heightStorage[i][j] = height;
+
+                // Update min and max height
+                if (height < minCurrentHeight) {
+                    minCurrentHeight = height;
+                }
+                if (height > maxCurrentHeight) {
+                    maxCurrentHeight = height;
+                }
             }
         }
+
         return heightStorage;
     }
 
-    private double[] getMinMaxHeight() {
-        double minHeight = Double.MAX_VALUE;
-        double maxHeight = Double.MIN_VALUE;
-
-        for (int i = 0; i < heightStorage.length; i++) {
-            for (int j = 0; j < heightStorage[i].length; j++) {
-                if (heightStorage[i][j] < minHeight) {
-                    minHeight = heightStorage[i][j];
-                }
-                if (heightStorage[i][j] > maxHeight) {
-                    maxHeight = heightStorage[i][j];
-                }
-            }
-        }
-
-        return new double[]{minHeight, maxHeight};
-    }
-
+    /**
+     * Gets the modified color based on height.
+     *
+     * @param height the height value
+     * @return the color corresponding to the height
+     */
     private Color getModifiedColor(double height) {
         if (height < MIN_HEIGHT || height > MAX_HEIGHT) {
             throw new Error("Out of range functions");
@@ -351,6 +315,9 @@ public class MapPageController implements ScreenInterface{
         }
     }
 
+    /**
+     * Renders the initial map with height values.
+     */
     private void renderInitialMap() {
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
@@ -364,11 +331,10 @@ public class MapPageController implements ScreenInterface{
         System.out.println("Initial map rendered with green color.");
     
         // Update min and max height texts
-        double[] minMaxHeight = getMinMaxHeight();
-        minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
-        maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
+        minHeightText.setText(String.format("Min height: %.2f", minCurrentHeight));
+        maxHeightText.setText(String.format("Max height: %.2f", maxCurrentHeight));
     
-        // borders
+        // Draw borders
         gc.setFill(Color.BLUE);
         gc.setLineWidth(2);
         gc.fillRect(0, 0, 500, 2);
@@ -377,6 +343,13 @@ public class MapPageController implements ScreenInterface{
         gc.fillRect(498, 0, 2, 500);
     }
 
+    /**
+     * Updates the height map based on mouse interactions.
+     *
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     * @param heightStep the step value for height adjustment
+     */
     private void updateHeightMap(int x, int y, double heightStep) {
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
             heightStorage[x][y] += heightStep;
@@ -390,27 +363,29 @@ public class MapPageController implements ScreenInterface{
                 baseColor = Color.rgb(120, 60, 35);
             } 
             if (colorChoiceBox.getValue().name.equals("Sand")) {
-                baseColor=Color.rgb(160, Math.max(100, Math.min(255, initialGreen[x][y])),0);
+                baseColor = Color.rgb(160, Math.max(100, Math.min(255, initialGreen[x][y])), 0);
             }
             if (colorChoiceBox.getValue().name.equals("Water")) {
-                baseColor=Color.rgb(0, Math.min(255, initialGreen[x][y]),180);
+                baseColor = Color.rgb(0, Math.min(255, initialGreen[x][y]), 180);
             }
             gc.setFill(baseColor);
             double brushWidth = widthSlider.getValue();
             if (colorChoiceBox.getValue().color.equals(Color.rgb(120, 60, 35))) {
-                gc.fillOval(x - 5, y - 5, 2*treeRadius*Utility.ratio, 2*treeRadius*Utility.ratio);
+                gc.fillOval(x - 5, y - 5, 2 * treeRadius * Utility.ratio, 2 * treeRadius * Utility.ratio);
             } else {
                 gc.fillOval(x - brushWidth / 2, y - brushWidth / 2, brushWidth, brushWidth);
             }
             // Update min and max height texts
-            double[] minMaxHeight = getMinMaxHeight();
-            minHeightText.setText(String.format("Min height: %.2f", minMaxHeight[0]));
-            maxHeightText.setText(String.format("Max height: %.2f", minMaxHeight[1]));
+            minHeightText.setText(String.format("Min height: %.2f", minCurrentHeight));
+            maxHeightText.setText(String.format("Max height: %.2f", maxCurrentHeight));
         } else {
             System.err.println("Mouse coordinates out of bounds: " + x + ", " + y);
         }
     }
 
+    /**
+     * Draws the ball and the hole on the overlay canvas.
+     */
     private void drawBallAndHole() {
         GraphicsContext gc2 = overlayCanvas.getGraphicsContext2D();
 
@@ -422,13 +397,47 @@ public class MapPageController implements ScreenInterface{
         double holeY = Utility.coordinateToPixel_Y(HolePostion[1]);
 
         gc2.setFill(Color.WHITE);
-        gc2.fillOval(ballX - 0.5, ballY - 0.5, 0.1* Utility.ratio, 0.1* Utility.ratio);
+        gc2.fillOval(ballX - 0.5, ballY - 0.5, 0.1 * Utility.ratio, 0.1 * Utility.ratio);
 
         gc2.setFill(Color.BLACK);
-        gc2.fillOval(holeX - radiusHole * Utility.ratio, holeY - radiusHole * Utility.ratio, 2*radiusHole * Utility.ratio, 2*radiusHole * Utility.ratio);
+        gc2.fillOval(holeX - radiusHole * Utility.ratio, holeY - radiusHole * Utility.ratio, 2 * radiusHole * Utility.ratio, 2 * radiusHole * Utility.ratio);
     }
 
+    /**
+     * Clears the ball and hole from the overlay canvas.
+     *
+     * @param gc2 the graphics context of the overlay canvas
+     */
     private void clearBallAndHole(GraphicsContext gc2) {
         gc2.clearRect(0, 0, overlayCanvas.getWidth(), overlayCanvas.getHeight());
+    }
+
+    /**
+     * Class representing a color item for the choice box.
+     */
+    public class ColorItem {
+        private String name; // Name of the color item
+        private Color color; // Color value
+
+        /**
+         * Constructor for ColorItem.
+         *
+         * @param name  the name of the color item
+         * @param color the color value
+         */
+        public ColorItem(String name, Color color) {
+            this.name = name;
+            this.color = color;
+        }
+
+        /**
+         * Returns the name of the color item.
+         *
+         * @return the name of the color item
+         */
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }
