@@ -1,8 +1,8 @@
 package engine.bot.rule_based;
 
-import engine.solvers.MyFunction;
-
 import java.util.logging.Logger;
+
+import engine.solvers.odeFunctions.MyFunction;
 
 /**
  * The type Rk 4.

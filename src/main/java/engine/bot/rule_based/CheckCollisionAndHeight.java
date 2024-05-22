@@ -1,9 +1,9 @@
 package engine.bot.rule_based;
 
-import engine.solvers.golfphysics;
-
 import java.util.ArrayList;
 import java.util.Comparator;
+
+import engine.solvers.odeFunctions.golfphysics;
 
 /**
  * This class is responsible for checking collisions and height differences for the Bot's decision-making process.

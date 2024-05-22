@@ -3,6 +3,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.golfphysics;
+import engine.solvers.odeSolvers.MySolver;
+
 /** 
  * The main engine
 */
@@ -11,6 +15,8 @@ public class GolfGame {
     private boolean goal=false;
     private double[] minCoordinate=new double[4];
     private double[] stopCoordinate=new double[4];
+    private String message;
+    private boolean treeHit=false;
 
     private MySolver solver;
     private double[] a;
@@ -18,8 +24,7 @@ public class GolfGame {
     private double[] hole;
     private double r;
     private String mappath;
-    private String message;
-    private boolean treeHit=false;
+    
 
     /**
      * Construct the game engine
@@ -40,9 +45,6 @@ public class GolfGame {
         this.mappath=mappath;
     }
 
-    public boolean getTreeHit(){
-        return this.treeHit;
-    }
 
     /**
      * shoot!
@@ -143,62 +145,35 @@ public class GolfGame {
         }
         return xtrac;
     }
-    /**
-     * get the distance between two points
-     * 
-     * @param src   one of the point. Only read the src[0] and src[1] as coordination. 
-     * @param des   the other point.
-     * @return      the distance
-     */
+
     public double getDistance (double[] src, double[] des){
         return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
     }
 
-    /**
-     * 
-     * @return  the miminal distance throughout the whole trajectory
-     */
     public double getMinDistance(){
         return this.minDis;
     }
 
-    /**
-     * 
-     * @return  the nearst point
-     */
     public double[] getMinCoordinate(){
         return this.minCoordinate;
     }
+    
+    public boolean getTreeHit(){
+        return this.treeHit;
+    }
 
-    /**
-     * 
-     * @return  whether goaled in this shot
-     */
     public boolean isGoal(){
         return this.goal;
     }
 
-    /**
-     * 
-     * @param x     the coordination of the ball
-     * @return      the distance between the ball and the hole
-     */
     public double getHoleBallDistance(double[] x){
         return Math.sqrt(Math.pow(x[0]-hole[0], 2)+Math.pow(x[1]-hole[1], 2));
     }
 
-    /**
-     * 
-     * @return      the position of the ball
-     */
     public double[] getHole(){
         return this.hole;
     }
 
-    /**
-     * 
-     * @return      the ball stop position
-     */
     public double[] getStoppoint(){
         return this.stopCoordinate;
     }
@@ -275,30 +250,15 @@ public class GolfGame {
         }
     }
 
-    /**
-     * Vectors dot product
-     * @param a
-     * @param b
-     * @return
-     */
     private double dotProduct(double[] a, double[] b){
         return a[0]*b[0]+a[1]*b[1];
     }
-    /**
-     * dot product between vectore and a coefficient
-     * @param a
-     * @param b
-     * @return
-     */
+
     private double[] dotProduct(double[] a, double b){
         double[] c={a[0]*b,a[1]*b};
         return c;
     }
-    /**
-     * Vector norm
-     * @param a
-     * @return
-     */
+
     private double norm(double[] a){
         return Math.sqrt(Math.pow(a[0], 2)+Math.pow(a[1], 2));
     }

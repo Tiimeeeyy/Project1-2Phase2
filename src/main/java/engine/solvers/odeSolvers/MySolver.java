@@ -1,4 +1,7 @@
-package engine.solvers;
+package engine.solvers.odeSolvers;
+
+import engine.solvers.odeFunctions.MyFunction;
+
 /**
  * Interface for numerical solvers for ODEs.
  */
