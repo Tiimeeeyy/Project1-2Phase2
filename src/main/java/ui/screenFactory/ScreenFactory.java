@@ -7,7 +7,29 @@ import ui.controller.MapPageController;
 import ui.controller.StartScreenController;
 import ui.controller.ThirdScreenController;
 
+/**
+ * Factory class to create different screens for the application.
+ */
 public class ScreenFactory {
+
+    /**
+     * Creates a screen based on the specified type.
+     *
+     * @param screenType            the type of the screen
+     * @param function              the function for map generation (for MAP screen)
+     * @param xBall                 the x-coordinate of the ball (for MAP screen)
+     * @param yBall                 the y-coordinate of the ball (for MAP screen)
+     * @param xHole                 the x-coordinate of the hole (for MAP screen)
+     * @param yHole                 the y-coordinate of the hole (for MAP screen)
+     * @param radiusHole            the radius of the hole (for MAP and GAME screens)
+     * @param treeRadius            the radius of trees (for MAP screen)
+     * @param grassFrictionKINETIC  the kinetic friction of grass (for MAP and GAME screens)
+     * @param grassFrictionSTATIC   the static friction of grass (for MAP and GAME screens)
+     * @param startBallPosition     the starting position of the ball (for GAME screen)
+     * @param holePosition          the position of the hole (for GAME screen)
+     * @return the screen controller
+     * @throws Exception if the screen type is invalid or the screen creation fails
+     */
     public ScreenInterface createScreen(String screenType, String function, double xBall, double yBall, double xHole, double yHole, double radiusHole, double treeRadius, double grassFrictionKINETIC, double grassFrictionSTATIC, double[] startBallPosition, double[] holePosition) throws Exception {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
