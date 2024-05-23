@@ -75,6 +75,18 @@ public class NeuralNetwork {
         }
     }
 
+    public double[] predict(double[] input) {
+        double[] output = feedForward(input);
+
+        double angle = output[0] * 2 *Math.PI;
+        double directionX = Math.cos(angle);
+        double directionY = Math.sin(angle);
+
+        double velocity = output[1];
+
+        return new double[]{directionX, directionY, velocity};
+    }
+
     private double sigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
     }

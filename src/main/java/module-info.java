@@ -17,4 +17,5 @@ module ui {
     exports ui;
     exports ui.controller to javafx.fxml;
     exports engine.bot.rule_based;
+    exports engine.bot.distance;
 }
