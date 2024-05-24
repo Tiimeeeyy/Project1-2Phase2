@@ -39,4 +39,9 @@ public class Utility {
         double[] normalized={x[0]/getPowerFromVelocity(x),x[1]/getPowerFromVelocity(x)};
         return normalized;
     }
+
+    public static void main(String[] args) {
+        BallStatus s=BallStatus.Goal;
+        System.out.println(s.equals(BallStatus.Goal));
+    }
 }

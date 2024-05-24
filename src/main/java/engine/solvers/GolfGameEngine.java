@@ -17,6 +17,7 @@ public class GolfGameEngine {
     private double[] stopCoordinate=new double[4];
     private String message;
     private boolean treeHit=false;
+    private BallStatus status=BallStatus.Normal;
 
     private SolverInterface solver;
     private double[] a;
@@ -87,7 +88,7 @@ public class GolfGameEngine {
             //check whether out of court
             if (pixelX>=mapgradient.length || pixelY>=mapgradient[0].length || pixelX<0 || pixelY<0) {
                 this.message="Out of boundary!";
-                System.out.println("Out of boundary!");
+                status=BallStatus.OutOfBoundary;
                 x=x0.clone();
                 this.stopCoordinate=x0.clone();
                 if (recording) {
@@ -99,6 +100,7 @@ public class GolfGameEngine {
             dis=getDistance(x, this.hole);
             if(dis<r){
                 this.message="Goal!!!";
+                status=BallStatus.Goal;
                 this.minDis=0;
                 this.goal=true;
                 break;
@@ -106,6 +108,7 @@ public class GolfGameEngine {
             //check whether in water.
             if (blueElm[pixelX][pixelY]>=100) {
                 this.message="In Water! Start again.";
+                status=BallStatus.HitWater;
                 x=x0.clone();
                 this.stopCoordinate=x0.clone();
                 if (recording) {
@@ -142,6 +145,7 @@ public class GolfGameEngine {
                 xtrac.add(x.clone());
             }
             this.stopCoordinate=x.clone();
+            status=BallStatus.Normal;
         }
         return xtrac;
     }
@@ -180,6 +184,9 @@ public class GolfGameEngine {
 
     public String getMessage(){
         return this.message;
+    }
+    public BallStatus getStatus(){
+        return this.status;
     }
 
     /**
@@ -263,4 +270,11 @@ public class GolfGameEngine {
         return Math.sqrt(Math.pow(a[0], 2)+Math.pow(a[1], 2));
     }
 
+}
+
+enum BallStatus{
+    Goal,
+    HitWater,
+    Normal,
+    OutOfBoundary,
 }
