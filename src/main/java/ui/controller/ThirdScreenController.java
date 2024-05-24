@@ -382,11 +382,11 @@ public class ThirdScreenController implements ScreenInterface {
      * @param trajectory the trajectory of the ball
      * @param power      the power of the hit
      */
-    private void animateBallMovement(ArrayList<double[]> trajectory, double power) {
+    public void animateBallMovement(ArrayList<double[]> trajectory, double power) {
         timeline = new Timeline();
         
         double duration = 5; 
-        
+
         for (int i = 0; i < trajectory.size(); i++) {
             final int index = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(duration * i), event -> {
