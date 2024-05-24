@@ -32,5 +32,11 @@ public class Utility {
     public static double pixelToCoordinate_Y(int x){
         return (double) (-x+250)/ratio;
     }
-
+    public static double getPowerFromVelocity(double[] x){
+        return Math.sqrt(Math.pow(x[0], 2)+Math.pow(x[1], 2));
+    }
+    public static double[] getDirectionFromVelocity(double[] x){
+        double[] normalized={x[0]/getPowerFromVelocity(x),x[1]/getPowerFromVelocity(x)};
+        return normalized;
+    }
 }
