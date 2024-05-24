@@ -178,7 +178,7 @@ public class FirstScreenController extends Parent implements ScreenInterface {
         } else if (grassFrictionSTATIC < 0.1 || grassFrictionSTATIC > 0.2) {
             showAlert("Error!", "Invalid input for Grass Friction STATIC", "Please enter a value between 0.1 and 0.2.");
             return false;
-        } else if (treeRadius < 0.05 || treeRadius > 0.15) {
+        } else if (treeRadius < 0.05 || treeRadius > 0.5) {
             showAlert("Error!", "Invalid input for Tree Radius", "Please enter a value between 0.05 and 0.15.");
             return false;
         } else if (radiusHole < 0.05 || radiusHole > 0.15) {

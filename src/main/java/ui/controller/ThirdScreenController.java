@@ -85,6 +85,7 @@ public class ThirdScreenController implements ScreenInterface {
     private ArrayList<double[]> fullTrajectory = new ArrayList<>(); // Full trajectory of the ball
     private boolean REACHED_THE_HOLE; // Flag to check if the ball reached the hole
     private Timeline timeline; // Animation timeline
+    private boolean ballMoving=false;
 
     private Parent root; // Root node
 
@@ -324,6 +325,9 @@ public class ThirdScreenController implements ScreenInterface {
      */
     @FXML
     private void hit() {
+        if (this.ballMoving) {
+            return;
+        }
         if (!REACHED_THE_HOLE) {
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
@@ -386,6 +390,7 @@ public class ThirdScreenController implements ScreenInterface {
         timeline = new Timeline();
         
         double duration = 5; 
+        this.ballMoving=true;
 
         for (int i = 0; i < trajectory.size(); i++) {
             final int index = i;
@@ -395,12 +400,13 @@ public class ThirdScreenController implements ScreenInterface {
                 startBallPostion[1] = point[1];
                 drawBallAndTrajectory(index);
                 updateBallPositionLabel();
-            });
+            });  
             timeline.getKeyFrames().add(keyFrame);
         }
         timeline.setOnFinished(event -> {
             updateShotCountLabel();
             handlePostAnimation();
+            this.ballMoving=false;
         });
         timeline.play();
     }
