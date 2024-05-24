@@ -621,7 +621,7 @@ public class ThirdScreenController implements ScreenInterface {
         gaBot.golfBot(x);
         double[] solution = gaBot.getBest();
         double[] velocity = {solution[2], solution[3]};
-
+        ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
         System.out.println(Arrays.toString(velocity));
     }
 }
