@@ -31,6 +31,7 @@ import java.util.Optional;
 import engine.solvers.GolfGame;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
+import engine.bot.distance.DistanceMeasure;
 
 /**
  * Controller class for the third screen in the UI.
@@ -38,38 +39,42 @@ import engine.solvers.odeSolvers.RK4;
 public class ThirdScreenController implements ScreenInterface {
 
     @FXML
-    private ImageView mapImageView; // ImageView to display the map
+    private ImageView mapImageView;
 
     @FXML
-    private Button goBackButton; // Button to go back to the previous screen
+    private Button goBackButton;
 
     @FXML
-    private Button hitButton; // Button to hit the ball
+    private Button hitButton;
 
     @FXML
-    private Slider powerSlider; // Slider to adjust the power of the hit
+    private Slider powerSlider;
 
     @FXML
-    private Pane circularSliderPane; // Pane to hold the circular slider
+    private Pane circularSliderPane;
 
     @FXML
-    private Canvas ballCanvas; // Canvas to draw the ball and trajectory
+    private Canvas ballCanvas;
 
     @FXML
-    private Label ballPositionLabel; // Label to display the ball position
+    private Label ballPositionLabel;
 
     @FXML
-    private Label shotCountLabel; // Label to display the shot count
+    private Label shotCountLabel;
 
     @FXML
-    private Label directionLabel; // Label to display the direction of the hit
+    private Label directionLabel;
 
     @FXML
-    private Label powerLabel; // Label to display the power of the hit
+    private Label powerLabel;
 
     @FXML
-    private TextArea logTextArea; // TextArea to log events
+    private TextArea logTextArea;
 
+    @FXML
+    private Button ruleBot;
+
+    private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
     private double[] startBallPostion; // Starting position of the ball
     private double[] HolePostion; // Position of the hole
@@ -124,6 +129,7 @@ public class ThirdScreenController implements ScreenInterface {
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.REACHED_THE_HOLE = false;
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
+        this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
@@ -140,7 +146,7 @@ public class ThirdScreenController implements ScreenInterface {
         }
 
         loadNewImage();
-
+        ruleBot.setOnAction(event -> ruleBotPlay());
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
 
@@ -165,6 +171,7 @@ public class ThirdScreenController implements ScreenInterface {
         updateBallPositionLabel();
         updateShotCountLabel();
     }
+    
 
     /**
      * Updates the direction label.
@@ -260,35 +267,36 @@ public class ThirdScreenController implements ScreenInterface {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
-
+    
             double ballDiameter = 0.1 * Utility.ratio;
             double ballRadius = ballDiameter / 2.0;
 
             double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
             double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
-
+    
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
-
+    
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
             double arrowX = ballX + ballRadius + directionVector[0] * arrowLength;
             double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
-
+    
             gc.setStroke(javafx.scene.paint.Color.RED);
             gc.setLineWidth(1);
-
+    
             // Draw the arrow shaft
             gc.strokeLine(ballX + ballRadius, ballY + ballRadius, arrowX, arrowY);
-
+    
             // Draw the arrowhead
             drawArrowhead(gc, arrowX, arrowY, directionVector);
-
+    
             updateBallPositionLabel();
         } else {
             System.err.println("ballCanvas is null");
         }
     }
+    
 
     /**
      * Draws the arrowhead.
@@ -567,5 +575,9 @@ public class ThirdScreenController implements ScreenInterface {
         logEvent("Showing stats.");
 
         showAlert(Alert.AlertType.INFORMATION, "Stats:", stats.toString());
+    }
+
+    private void ruleBotPlay() {
+        distanceMeasure.playGame(HolePostion, startBallPostion, REACHED_THE_HOLE);
     }
 }
