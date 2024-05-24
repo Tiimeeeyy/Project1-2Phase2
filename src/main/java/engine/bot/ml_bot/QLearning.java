@@ -1,7 +1,7 @@
 package engine.bot.ml_bot;
 
-import engine.solvers.GolfGame;
-import engine.solvers.odeSolvers.MySolver;
+import engine.solvers.GolfGameEngine;
+import engine.solvers.odeSolvers.SolverInterface;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -13,16 +13,16 @@ import java.util.logging.Logger;
 public class QLearning {
     private final NeuralNetwork network;
     private final Random random = new Random();
-    private final GolfGame golfGame;
+    private final GolfGameEngine golfGame;
     private final double[] position;
     private final boolean isGoal;
     private final Logger logger = Logger.getLogger(QLearning.class.getName());
 
-    public QLearning(MySolver mySolver, double[] hole, double[] friction, double radius, double[] position, boolean isGoal, int... nodes) {
+    public QLearning(SolverInterface mySolver, double[] hole, double[] friction, double radius, double[] position, boolean isGoal, int... nodes) {
         this.position = position;
         this.isGoal = isGoal;
         network = new NeuralNetwork(nodes);
-        golfGame = new GolfGame(mySolver, friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
+        golfGame = new GolfGameEngine(mySolver, friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
     }
 
     public void train(int iterations) {
@@ -44,7 +44,7 @@ public class QLearning {
      * @param game The game
      * @return A list containing the trajectories.
      */
-    public ArrayList<ArrayList<double[]>> playGame(GolfGame game) {
+    public ArrayList<ArrayList<double[]>> playGame(GolfGameEngine game) {
         System.out.println("playGame called");
         ArrayList<ArrayList<double[]>> history = new ArrayList<>();
         ArrayList<double[]> currentAction = new ArrayList<>();

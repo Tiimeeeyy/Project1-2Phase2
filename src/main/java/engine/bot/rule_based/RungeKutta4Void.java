@@ -2,14 +2,15 @@ package engine.bot.rule_based;
 
 import java.util.logging.Logger;
 
-import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.FunctionInterface;
+
 
 /**
  * The type Rk 4.
  */
 // I changed this method to avoid having to assign a Variable when using it in code.
 
-public class RungeKutta4Void{
+public class RungeKutta4Void {
 
     private static final Logger LOGGER = Logger.getLogger(RungeKutta4Void.class.getName());
 
@@ -22,7 +23,7 @@ public class RungeKutta4Void{
      * @param dh
      * @param dt
      */
-    public void nextstep(MyFunction f, double[] x, double[] a, double[] dh, double dt) {
+    public void nextstep(FunctionInterface f, double[] x, double[] a, double[] dh, double dt) {
         final int length = x.length;
         double[] gx1 = new double[length];
         double[] gx2 = new double[length];

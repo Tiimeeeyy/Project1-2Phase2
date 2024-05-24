@@ -1,12 +1,12 @@
 package engine.solvers.odeSolvers;
 
-import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.FunctionInterface;
 
 /**
  * The type Rk 4.
  */
-public class RK4 implements MySolver{
-    public boolean nextstep(MyFunction f, double[] x,double[] a, double[] dh,double dt){
+public class RK4 implements SolverInterface{
+    public boolean nextstep(FunctionInterface f, double[] x,double[] a, double[] dh,double dt){
         boolean equillium = true;
         
         double[] gx1=new double[x.length];

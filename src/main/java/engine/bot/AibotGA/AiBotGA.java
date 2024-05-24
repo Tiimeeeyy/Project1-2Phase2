@@ -1,7 +1,7 @@
 package engine.bot.AibotGA;
 
 
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -14,9 +14,9 @@ public class AiBotGA {
     private double[] solution=new double[4];
     private boolean goal=false;
 
-    private GolfGame game;
+    private GolfGameEngine game;
 
-    public AiBotGA(GolfGame game){
+    public AiBotGA(GolfGameEngine game){
         this.game=game;
     }
 

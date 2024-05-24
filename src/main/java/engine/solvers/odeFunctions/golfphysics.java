@@ -3,7 +3,7 @@ package engine.solvers.odeFunctions;
 /**
  * golfphysics
  */
-public class golfphysics implements MyFunction {
+public class golfphysics implements FunctionInterface {
     public double[] ode(double[] x, double[] a, double[] dh){
         double[] dx=new double[x.length];
         double g=9.81;

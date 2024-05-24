@@ -1,18 +1,18 @@
 package engine.bot.rule_based;
 
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 
 import java.util.ArrayList;
 
 public class RuleBasedPlayer {
-    private final GolfGame golfGame;
+    private final GolfGameEngine golfGame;
     private final ComparingAndScoring comparingAndScoring;
     private double[][][] map;
     private double[][] info;
     private double[] friction;
     private double[] hole;
 
-    public RuleBasedPlayer(ComparingAndScoring comparingAndScoring, GolfGame golfGame) {
+    public RuleBasedPlayer(ComparingAndScoring comparingAndScoring, GolfGameEngine golfGame) {
         this.comparingAndScoring = comparingAndScoring;
         this.golfGame = golfGame;
         this.map = map;

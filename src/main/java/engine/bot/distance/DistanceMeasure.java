@@ -1,13 +1,13 @@
 package engine.bot.distance;
 
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
 import ui.controller.ThirdScreenController;
 
 import java.util.ArrayList;
 
 public class DistanceMeasure  {
-    private final GolfGame golfGame;
+    private final GolfGameEngine golfGame;
     private final double[] hole;
     private final double[] position;
     private final boolean reachedHole;
@@ -26,7 +26,7 @@ public class DistanceMeasure  {
         this.position = position;
         this.hole = hole;
 
-        this.golfGame = new GolfGame(new RK4(), friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
+        this.golfGame = new GolfGameEngine(new RK4(), friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
     }
 
     /**
