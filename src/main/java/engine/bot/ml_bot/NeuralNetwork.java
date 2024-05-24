@@ -5,17 +5,16 @@ import java.util.logging.Logger;
 
 public class NeuralNetwork {
     private final Random random = new Random();
-    private final double[][] output;
-    private final double[][][] weights;
-    private final double[][] bias;
-
     private final double[][] errorSignal;
     private final double[][] outputDerivative;
-
     private final Logger logger = Logger.getLogger(NeuralNetwork.class.getName());
+    private double[][] output;
+    private double[][][] weights;
+    private double[][] bias;
 
     /**
      * Class constructor
+     *
      * @param nodes amount of nodes in each layer of the network
      */
     public NeuralNetwork(int... nodes) {
@@ -44,6 +43,7 @@ public class NeuralNetwork {
 
     /**
      * Method used to initialise the weights and biases for the network with random values
+     *
      * @param size
      * @return
      */
@@ -58,6 +58,7 @@ public class NeuralNetwork {
     /**
      * Propagates the input through the network. Calculates sum of the inputs for each node
      * and applies the sigmoid activation function.
+     *
      * @param input The input values.
      * @return The output values after propagation.
      */
@@ -80,9 +81,13 @@ public class NeuralNetwork {
 
     /**
      * Adjusts weights and biases based on the error of each node based on the output
+     *
      * @param target the target values.
      */
     public void backPropagation(double[] target) {
+        if (weights == null) {
+            initialiseWeights();
+        }
         System.out.println("Backpropagation called");
         for (int i = 0; i < errorSignal[errorSignal.length - 1].length; i++) {
             errorSignal[errorSignal.length - 1][i] = (output[output.length - 1][i] - target[i]) * outputDerivative[outputDerivative.length - 1][i];
@@ -102,6 +107,7 @@ public class NeuralNetwork {
 
     /**
      * Makes a prediction based on the input and feeds the input through the network.
+     *
      * @param input The input values.
      * @return The predicted values.
      */
@@ -109,7 +115,7 @@ public class NeuralNetwork {
         System.out.println("Predict called");
         double[] output = feedForward(input);
 
-        double angle = output[0] * 2 *Math.PI;
+        double angle = output[0] * 2 * Math.PI;
         double directionX = Math.cos(angle);
         double directionY = Math.sin(angle);
 
@@ -123,13 +129,33 @@ public class NeuralNetwork {
 
     /**
      * Helper function to apply the Sigmoid activation function.
+     *
      * @param x The input value.
      * @return The output value after applying the sigmoid function.
      */
     private double sigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
     }
+
     public int getOutputLayerSize() {
         return output[output.length - 1].length;
+    }
+
+    private void initialiseWeights() {
+        if (weights == null) {
+            weights = new double[output.length][][];
+        }
+        for (int i = 0; i < output.length; i++) {
+            if (weights[i] == null && output[i - 1] != null) {
+                    weights[i] = new double[output[i].length][output[i - 1].length];
+                    for (int j = 0; j < output[i].length; j++) {
+                        weights[i][j] = createRandomArray(output[i - 1].length);
+                    }
+                }else {
+                System.out.println("Output is null!");
+            }
+
+
+        }
     }
 }
