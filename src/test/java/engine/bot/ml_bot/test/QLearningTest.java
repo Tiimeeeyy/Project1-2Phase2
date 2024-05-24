@@ -3,6 +3,7 @@ package engine.bot.ml_bot.test;
 import engine.bot.ml_bot.QLearning;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
+import engine.solvers.odeSolvers.SolverInterface;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class QLearningTest {
     private QLearning qLearning;
     private GolfGameEngine golfGame;
+    private SolverInterface solverInterface;
 
     @BeforeEach
     void setUp() {
