@@ -6,10 +6,9 @@ import ui.controller.ThirdScreenController;
 
 import java.util.ArrayList;
 
-public class DistanceMeasure implements DistanceBot {
+public class DistanceMeasure  {
     private final GolfGame golfGame;
     private final double[] hole;
-    private final ThirdScreenController thirdScreenController;
     private final double[] position;
     private final boolean reachedHole;
 
@@ -24,7 +23,6 @@ public class DistanceMeasure implements DistanceBot {
      */
     public DistanceMeasure(double[] position, double[] friction, double[] hole, double radius, boolean reachedHole) {
         this.reachedHole = reachedHole;
-        this.thirdScreenController = new ThirdScreenController();
         this.position = position;
         this.hole = hole;
 
@@ -48,10 +46,8 @@ public class DistanceMeasure implements DistanceBot {
 
         for (double[] velocityVector : velocities) {
             double[] point = position.clone();
-            point[2] = velocityVector[0];
-            point[3] = velocityVector[1];
 
-            ArrayList<double[]> trajectory = golfGame.shoot(point, true);
+            ArrayList<double[]> trajectory = golfGame.shoot(new double[]{point[0], point[1], velocityVector[0], velocityVector[1]}, true);
 
             double distance = golfGame.getDistance(position, trajectory.getLast());
 
@@ -193,21 +189,19 @@ public class DistanceMeasure implements DistanceBot {
      * @param position    The position of the Ball.
      * @param reachedHole Boolean describing if the ball already has reached the hole.
      */
-    @Override
-    public void playGame(double[] hole, double[] position, boolean reachedHole) {
+    public ArrayList<double[]> playGameGame(double[] hole, double[] position, boolean reachedHole) {
         if (reachedHole) {
-            return;
+            return null;
         }
-        double[] x = new double[]{position[0], position[1], 0, 0};
+        double[] x = new double[]{position[0], position[1]};
         ArrayList<ArrayList<double[]>> trajectories = recursiveDistances(x, hole);
         for (ArrayList<double[]> trajectory : trajectories) {
             if (reachedHole || trajectory.isEmpty()) {
                 break;
             }
-            thirdScreenController.animateBallMovement(trajectory, assumeVelocity(trajectory.getLast()));
-            return;
+            return trajectory;
         }
-
+        return null;
     }
 
 }
