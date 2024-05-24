@@ -31,7 +31,7 @@ public class QLearning {
             ArrayList<ArrayList<double[]>> history = playGame(golfGame);
 
             double performance = evaluatePerformance(history);
-            logger.info(MessageFormat.format("Performance at iteration:{0} :{1}", i, performance));
+            logger.info(MessageFormat.format("Performance at iteration: {0} : {1}", i, performance));
 
 
             adjustWeightsAndBiases(history, performance);

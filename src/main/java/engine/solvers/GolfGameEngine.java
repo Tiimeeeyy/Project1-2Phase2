@@ -272,9 +272,3 @@ public class GolfGameEngine {
 
 }
 
-enum BallStatus{
-    Goal,
-    HitWater,
-    Normal,
-    OutOfBoundary,
-}

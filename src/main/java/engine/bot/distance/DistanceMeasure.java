@@ -1,5 +1,6 @@
 package engine.bot.distance;
 
+import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
 
@@ -29,6 +30,7 @@ public class DistanceMeasure {
     }
 
 
+
     /**
      * This method chooses a velocity based on certain rules.
      *
@@ -37,35 +39,52 @@ public class DistanceMeasure {
      */
     public double assumeVelocity(double[] x) {
         double distance = golfGame.getDistance(x, hole);
-        if (distance >= 40) {
+        if (distance >= 20) {
             return 5;
-        } else if (distance >= 30) {
+        } else if (distance > 15) {
             return 4;
-        } else if (distance >= 20) {
+        } else if (distance < 10) {
             return 3;
-        } else if (distance >= 10) {
-            return 2;
-        } else if (distance >= 5) {
-            return 1;
-        } else return 0.5;
-
+        }
+        return 4;
     }
+
+    public BallStatus getBallStatus(){
+        return golfGame.getStatus();
+    }
+
 
     /**
      * Calculates the direction / angle from the ball position to the hole.
      *
-     * @param x    The position of the Ball.
-     * @param hole The position of the Hole.
+     * @param end   The position of the Ball.
+     * @param start The position of the Hole.
      * @return A vector containing the direction.
      */
-    public double[] calculateDirection(double[] x, double[] hole) {
+    public static double[] calculateDirection(double[] start, double[] end) {
+        // Calculate the direction vector
+        double dx = end[0] - start[0];
+        double dy = end[1] - start[1];
 
-        double[] direction = {hole[0] - x[0], hole[1] - x[1]};
-        double magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
-        direction[0] /= magnitude;
-        direction[1] /= magnitude;
+        // Print intermediate steps for debugging
+        System.out.println("dx: " + dx + ", dy: " + dy);
 
-        return direction;
+        // Calculate the magnitude of the direction vector
+        double magnitude = Math.sqrt(dx * dx + dy * dy);
+
+        // Print magnitude for debugging
+        System.out.println("magnitude: " + magnitude);
+
+        // Normalize the direction vector
+        if (magnitude != 0) {
+            dx /= magnitude;
+            dy /= magnitude;
+        }
+
+        // Print normalized direction for debugging
+        System.out.println("Normalized direction: (" + dx + ", " + dy + ")");
+
+        return new double[]{dx, dy};
     }
 
     /**
@@ -81,10 +100,13 @@ public class DistanceMeasure {
         double[] direction = {hole[0] - x[0], hole[1] - x[1]};
 
         double magnitude = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
-
-        direction[0] /= magnitude;
-        direction[1] /= magnitude;
-
+        if (magnitude != 0) {
+            direction[0] /= magnitude;
+            direction[1] /= magnitude;
+        }else {
+            direction[0] = 0;
+            direction[1] = 0;
+        }
         return new double[]{distance * direction[0], distance * direction[1]};
     }
 
@@ -95,14 +117,12 @@ public class DistanceMeasure {
      * @return An array containing all the Velocity vectors.
      */
     public double[][] createVelocityVectors(double[] direction) {
-        double velo = assumeVelocity(position);
-        double[] currentPos = position.clone();
         double degreesPos = Math.toRadians(30);
         double degreesNeg = Math.toRadians(-30);
         double[][] velocities = new double[3][2];
-        velocities[0] = new double[]{velo * currentPos[0], velo * currentPos[1]};
-        velocities[1] = new double[]{velo * Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1], velo * Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
-        velocities[2] = new double[]{velo * Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1], velo * Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
+        velocities[0] = new double[]{direction[0],direction[1]};
+        velocities[1] = new double[]{Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1],Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
+        velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1],Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
 
         return velocities;
 
@@ -117,7 +137,7 @@ public class DistanceMeasure {
      */
     public boolean checkHole(double[] x, double[] hole) {
         double distance = golfGame.getDistance(x, hole);
-        return distance <= 5;
+        return distance <= 1;
     }
 
     /**
@@ -131,17 +151,19 @@ public class DistanceMeasure {
         double[] direction = calculateDirection(position, hole);
         double[][] velocities = createVelocityVectors(direction);
 
-        double maxDistances = 0;
+        double maxDistances = Double.MAX_VALUE;
         double[] bestShot = null;
 
         for (double[] velocityVector : velocities) {
             double[] point = position.clone();
 
             ArrayList<double[]> trajectory = golfGame.shoot(new double[]{point[0], point[1], velocityVector[0] * assumeVelocity(point), velocityVector[1] * assumeVelocity(point)}, true);
-
+            BallStatus status = getBallStatus();
             double distance = golfGame.getDistance(position, trajectory.getLast());
-
-            if (distance > maxDistances) {
+            if (status == BallStatus.HitWater || status == BallStatus.OutOfBoundary) {
+                continue;
+            }
+            if (distance < maxDistances) {
                 maxDistances = distance;
                 bestShot = new double[]{velocityVector[0], velocityVector[1], assumeVelocity(point)};
             }
