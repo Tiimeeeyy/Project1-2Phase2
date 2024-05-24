@@ -2,11 +2,10 @@ package engine.bot.distance;
 
 import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
-import ui.controller.ThirdScreenController;
 
 import java.util.ArrayList;
 
-public class DistanceMeasure  {
+public class DistanceMeasure {
     private final GolfGameEngine golfGame;
     private final double[] hole;
     private final double[] position;
@@ -29,67 +28,6 @@ public class DistanceMeasure  {
         this.golfGame = new GolfGameEngine(new RK4(), friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
     }
 
-    /**
-     * This method calculates the "best" trajectory from shooting the ball
-     *
-     * @param position Position of the ball.
-     * @param hole     Position of the hole.
-     * @return A list containing the best trajectory.
-     */
-    public ArrayList<double[]> bestDistance(double[] position, double[] hole) {
-        double[] direction = calculateDirection(position, hole);
-        double[][] velocities = createVelocityVectors(direction);
-
-        double maxDistance = 0;
-
-        ArrayList<double[]> farthestTrajectory = null;
-
-        for (double[] velocityVector : velocities) {
-            double[] point = position.clone();
-
-            ArrayList<double[]> trajectory = golfGame.shoot(new double[]{point[0], point[1], velocityVector[0], velocityVector[1]}, true);
-
-            double distance = golfGame.getDistance(position, trajectory.getLast());
-
-            if (distance > maxDistance) {
-                maxDistance = distance;
-                farthestTrajectory = trajectory;
-            }
-        }
-        return farthestTrajectory;
-    }
-
-    /**
-     * This method recursively creates trajectories and adds them to the list to be animated later.
-     *
-     * @param x    The position of the ball
-     * @param hole The position of the Hole.
-     * @return List containing a list of all Trajectories.
-     */
-    public ArrayList<ArrayList<double[]>> recursiveDistances(double[] x, double[] hole) {
-        ArrayList<ArrayList<double[]>> allTrajectories = new ArrayList<>();
-        ArrayList<double[]> farthestTrajectory = bestDistance(x, hole);
-
-        if (farthestTrajectory != null) {
-            allTrajectories.add(farthestTrajectory);
-        }
-
-        double[] finalPosition = farthestTrajectory.getLast();
-
-        if (!checkHole(finalPosition, hole)) {
-            ArrayList<ArrayList<double[]>> recursiveTrajectories = recursiveDistances(finalPosition, hole);
-            if (recursiveTrajectories != null) {
-                allTrajectories.addAll(recursiveTrajectories);
-            }
-        } else {
-            double[] lastVelocity = lastShot(x, hole);
-            ArrayList<double[]> finalTrajectory = golfGame.shoot(new double[]{finalPosition[0], finalPosition[1], lastVelocity[0], lastVelocity[1]}, true);
-            if (finalTrajectory != null) {
-                allTrajectories.add(finalTrajectory);
-            }
-        }
-        return allTrajectories;
-    }
 
     /**
      * This method chooses a velocity based on certain rules.
@@ -99,15 +37,15 @@ public class DistanceMeasure  {
      */
     public double assumeVelocity(double[] x) {
         double distance = golfGame.getDistance(x, hole);
-        if (distance >= 400) {
+        if (distance >= 40) {
             return 5;
-        } else if (distance >= 300) {
+        } else if (distance >= 30) {
             return 4;
-        } else if (distance >= 200) {
+        } else if (distance >= 20) {
             return 3;
-        } else if (distance >= 100) {
+        } else if (distance >= 10) {
             return 2;
-        } else if (distance >= 50) {
+        } else if (distance >= 5) {
             return 1;
         } else return 0.5;
 
@@ -183,25 +121,48 @@ public class DistanceMeasure  {
     }
 
     /**
-     * This Method "plays" the game and animates the ball movement.
-     *
-     * @param hole        The position of the Hole.
-     * @param position    The position of the Ball.
-     * @param reachedHole Boolean describing if the ball already has reached the hole.
+     * Calculates one play for the Rule based bot based on the distance to the hole
+     * after the play
+     * @param position The position of the ball.
+     * @param hole The position of the hole.
+     * @return A list containing the best play from the position (velocityX, velocityY, power)
      */
-    public ArrayList<double[]> playGameGame(double[] hole, double[] position, boolean reachedHole) {
-        if (reachedHole) {
-            return null;
-        }
-        double[] x = new double[]{position[0], position[1]};
-        ArrayList<ArrayList<double[]>> trajectories = recursiveDistances(x, hole);
-        for (ArrayList<double[]> trajectory : trajectories) {
-            if (reachedHole || trajectory.isEmpty()) {
-                break;
-            }
-            return trajectory;
-        }
-        return null;
-    }
+    public double[] getOnePlay (double[] position, double[] hole) {
+        double[] direction = calculateDirection(position, hole);
+        double[][] velocities = createVelocityVectors(direction);
 
+        double maxDistances = 0;
+        double[] bestShot = null;
+
+        for (double[] velocityVector : velocities) {
+            double[] point = position.clone();
+
+            ArrayList<double[]> trajectory = golfGame.shoot(new double[]{point[0], point[1], velocityVector[0] * assumeVelocity(point), velocityVector[1] * assumeVelocity(point)}, true);
+
+            double distance = golfGame.getDistance(position, trajectory.getLast());
+
+            if (distance > maxDistances) {
+                maxDistances = distance;
+                bestShot = new double[]{velocityVector[0], velocityVector[1], assumeVelocity(point)};
+            }
+        }
+        if (bestShot != null) {
+            return bestShot;
+        }
+        return new double[0];
+    }
+    public ArrayList<double[]> playGame (double[] position, double[] hole, boolean reachedHole) {
+        ArrayList<double[]> gameplay = new ArrayList<>();
+        if (!reachedHole) {
+            System.out.println("While loop entered");
+            double[] play = getOnePlay(position,hole);
+            gameplay.add(play);
+            if (checkHole(position, hole)) {
+                System.out.println("If entered");
+                double[] lastPlay = lastShot(position, hole);
+                gameplay.add(lastPlay);
+            }
+        }
+        return gameplay;
+    }
 }

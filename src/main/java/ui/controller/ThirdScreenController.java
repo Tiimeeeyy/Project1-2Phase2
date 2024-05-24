@@ -1,25 +1,25 @@
 package ui.controller;
 
+import engine.bot.AibotGA.AiBotGA;
+import engine.bot.distance.DistanceMeasure;
+import engine.solvers.GolfGameEngine;
+import engine.solvers.Utility;
+import engine.solvers.odeSolvers.RK4;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.util.Duration;
-import ui.Main;
-import ui.helpers.CircularSlider;
-import ui.screenFactory.ScreenInterface;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.ButtonType;
+import javafx.util.Duration;
+import ui.Main;
+import ui.helpers.CircularSlider;
+import ui.screenFactory.ScreenInterface;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,12 +28,6 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-
-import engine.solvers.GolfGameEngine;
-import engine.solvers.Utility;
-import engine.solvers.odeSolvers.RK4;
-import engine.bot.AibotGA.AiBotGA;
-import engine.bot.distance.DistanceMeasure;
 
 /**
  * Controller class for the third screen in the UI.
@@ -90,17 +84,14 @@ public class ThirdScreenController implements ScreenInterface {
     private ArrayList<double[]> fullTrajectory = new ArrayList<>(); // Full trajectory of the ball
     private boolean REACHED_THE_HOLE; // Flag to check if the ball reached the hole
     private Timeline timeline; // Animation timeline
-    private boolean ballMoving=false;
+    private boolean ballMoving = false;
 
     private Parent root; // Root node
 
     /**
-     * Sets the root node.
-     *
-     * @param root the root node
+     * Constructor for ThirdScreenController.
      */
-    public void setRoot(Parent root) {
-        this.root = root;
+    public ThirdScreenController() {
     }
 
     /**
@@ -114,9 +105,12 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     /**
-     * Constructor for ThirdScreenController.
+     * Sets the root node.
+     *
+     * @param root the root node
      */
-    public ThirdScreenController() {
+    public void setRoot(Parent root) {
+        this.root = root;
     }
 
     /**
@@ -148,7 +142,7 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     public void initialize() {
         if (BallPosition == null || HolePostion == null) {
-            return; 
+            return;
         }
 
         loadNewImage();
@@ -177,7 +171,7 @@ public class ThirdScreenController implements ScreenInterface {
         updateBallPositionLabel();
         updateShotCountLabel();
     }
-    
+
 
     /**
      * Updates the direction label.
@@ -273,36 +267,36 @@ public class ThirdScreenController implements ScreenInterface {
         if (ballCanvas != null) {
             GraphicsContext gc = ballCanvas.getGraphicsContext2D();
             gc.clearRect(0, 0, ballCanvas.getWidth(), ballCanvas.getHeight());
-    
+
             double ballDiameter = 0.1 * Utility.ratio;
             double ballRadius = ballDiameter / 2.0;
 
             double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
             double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
-    
+
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
-    
+
             double[] directionVector = circularSlider.getDirectionVector();
             double arrowLength = powerSlider.getValue() * 5;
             double arrowX = ballX + ballRadius + directionVector[0] * arrowLength;
             double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
-    
+
             gc.setStroke(javafx.scene.paint.Color.RED);
             gc.setLineWidth(1);
-    
+
             // Draw the arrow shaft
             gc.strokeLine(ballX + ballRadius, ballY + ballRadius, arrowX, arrowY);
-    
+
             // Draw the arrowhead
             drawArrowhead(gc, arrowX, arrowY, directionVector);
-    
+
             updateBallPositionLabel();
         } else {
             System.err.println("ballCanvas is null");
         }
     }
-    
+
 
     /**
      * Draws the arrowhead.
@@ -361,8 +355,8 @@ public class ThirdScreenController implements ScreenInterface {
             }
 
             String shotLog = String.format(
-                "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
-                shotCount, BallPosition[0], BallPosition[1], power);
+                    "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
+                    shotCount, BallPosition[0], BallPosition[1], power);
             logEvent(shotLog);
             updateShotCountLabel();
             // Animate the ball movement along the trajectory
@@ -373,12 +367,12 @@ public class ThirdScreenController implements ScreenInterface {
             alert.setTitle("Goal!");
             alert.setHeaderText("Goal Reached, The ball has already reached the hole.");
             alert.setContentText("Would you like to go back or see the stats?");
-            
+
             ButtonType backButton = new ButtonType("Back");
             ButtonType seeStatsButton = new ButtonType("See the stat");
-            
+
             alert.getButtonTypes().setAll(backButton, seeStatsButton);
-            
+
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == backButton) {
@@ -398,9 +392,9 @@ public class ThirdScreenController implements ScreenInterface {
      */
     public void animateBallMovement(ArrayList<double[]> trajectory, double power) {
         timeline = new Timeline();
-        
-        double duration = 5; 
-        this.ballMoving=true;
+
+        double duration = 5;
+        this.ballMoving = true;
         for (int i = 0; i < trajectory.size(); i++) {
             final int index = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(duration * i), event -> {
@@ -416,7 +410,7 @@ public class ThirdScreenController implements ScreenInterface {
         timeline.setOnFinished(event -> {
             updateShotCountLabel();
             handlePostAnimation();
-            this.ballMoving=false;
+            this.ballMoving = false;
         });
         timeline.play();
     }
@@ -427,7 +421,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void handlePostAnimation() {
         try {
             String message = golfGame.getMessage();
-            if(golfGame.getTreeHit()){
+            if (golfGame.getTreeHit()) {
                 logEvent("** The ball hit a tree and bounced off **");
             }
 
@@ -438,7 +432,7 @@ public class ThirdScreenController implements ScreenInterface {
                 this.REACHED_THE_HOLE = true;
                 logEvent("CONGRATULATIONS! The ball reached the hole.");
                 showGoalAlert();
-            } 
+            }
         } catch (Exception e) {
             // System.out.println("Error in message");
         }
@@ -526,9 +520,9 @@ public class ThirdScreenController implements ScreenInterface {
         ButtonType backButton = new ButtonType("I have seen enough, take me back!");
         ButtonType stayButton = new ButtonType("Give me one more chance, captain!");
 
-        
+
         alert.getButtonTypes().setAll(backButton, stayButton);
-        
+
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent()) {
             if (result.get() == backButton) {
@@ -538,7 +532,7 @@ public class ThirdScreenController implements ScreenInterface {
                 alert.close();
             }
         }
-        
+
     }
 
     /**
@@ -581,12 +575,12 @@ public class ThirdScreenController implements ScreenInterface {
             alert.setTitle("Goal!");
             alert.setHeaderText("CONGRATULATIONS! The ball reached the hole.");
             alert.setContentText("Would you like to go back or see the stats?");
-            
+
             ButtonType backButton = new ButtonType("Back");
             ButtonType seeStatsButton = new ButtonType("See the stat");
-            
+
             alert.getButtonTypes().setAll(backButton, seeStatsButton);
-            
+
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == backButton) {
@@ -613,20 +607,21 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     private void ruleBotPlay() {
-        ArrayList<double[]> trajectory = distanceMeasure.playGameGame(HolePostion, BallPosition, REACHED_THE_HOLE);
-        animateBallMovement(trajectory, distanceMeasure.assumeVelocity(trajectory.getLast()));
-
-
+        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
+        for (double[] array : lol) {
+            System.out.println("play is: " + Arrays.toString(array));
+            ballHit(array[2], new double[]{array[0], array[1]});
+        }
     }
 
-    @FXML    
-    private void gaBotFunc(){
-        AiBotGA gaBot=new AiBotGA(golfGame);
-        double[] x={BallPosition[0],BallPosition[1],0,0};
+    @FXML
+    private void gaBotFunc() {
+        AiBotGA gaBot = new AiBotGA(golfGame);
+        double[] x = {BallPosition[0], BallPosition[1], 0, 0};
         gaBot.golfBot(x);
-        double[] solution=gaBot.getBest();
-        double[] velocity={solution[2],solution[3]};
-        
+        double[] solution = gaBot.getBest();
+        double[] velocity = {solution[2], solution[3]};
+
         System.out.println(Arrays.toString(velocity));
     }
 }
