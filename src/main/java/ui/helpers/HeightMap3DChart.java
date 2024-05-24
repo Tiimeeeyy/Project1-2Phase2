@@ -29,10 +29,26 @@ public class HeightMap3DChart {
         Function3D function = new Function3D() {
             @Override
             public double getValue(double x, double y) {
-                int xi = (int) Math.round(x);
-                int yi = (int) Math.round(y);
-                if (xi >= 0 && xi < heightStorage.length && yi >= 0 && yi < heightStorage[0].length) {
-                    return heightStorage[xi][yi];
+                int width = heightStorage.length;
+                int height = heightStorage[0].length;
+                
+                double xf = x * (width - 1); 
+                double yf = y * (height - 1);                 
+                int x1 = (int) Math.floor(xf);
+                int x2 = (int) Math.ceil(xf);
+                int y1 = (int) Math.floor(yf);
+                int y2 = (int) Math.ceil(yf);
+
+                if (x1 >= 0 && x2 < width && y1 >= 0 && y2 < height) {
+                    double q11 = heightStorage[x1][y1];
+                    double q21 = heightStorage[x2][y1];
+                    double q12 = heightStorage[x1][y2];
+                    double q22 = heightStorage[x2][y2];
+
+                    double r1 = (x2 - xf) * q11 + (xf - x1) * q21;
+                    double r2 = (x2 - xf) * q12 + (xf - x1) * q22;
+
+                    return (y2 - yf) * r1 + (yf - y1) * r2;
                 } else {
                     return Double.NaN;
                 }

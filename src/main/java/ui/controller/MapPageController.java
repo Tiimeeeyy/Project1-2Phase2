@@ -160,7 +160,7 @@ public class MapPageController implements ScreenInterface {
             EventHandler<MouseEvent> handler = event -> {
                 double x = event.getX();
                 double y = event.getY();
-                System.out.println("Mouse event at: " + x + ", " + y);
+                // System.out.println("Mouse event at: " + x + ", " + y);
 
                 int ix = (int) x;
                 int iy = (int) y;
@@ -327,9 +327,7 @@ public class MapPageController implements ScreenInterface {
     
                 this.gc.getPixelWriter().setColor(x, y, heightColor);
             }
-        }
-        System.out.println("Initial map rendered with green color.");
-    
+        }    
         // Update min and max height texts
         minHeightText.setText(String.format("Min height: %.2f", minCurrentHeight));
         maxHeightText.setText(String.format("Max height: %.2f", maxCurrentHeight));
