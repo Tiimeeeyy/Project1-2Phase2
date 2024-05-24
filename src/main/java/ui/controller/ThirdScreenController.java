@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
 import engine.bot.AibotGA.AiBotGA;
@@ -83,7 +83,7 @@ public class ThirdScreenController implements ScreenInterface {
     private CircularSlider circularSlider; // Custom circular slider for direction
     private double[] BallPosition; // Starting position of the ball
     private double[] HolePostion; // Position of the hole
-    private GolfGame golfGame; // Golf game engine
+    private GolfGameEngine golfGame; // Golf game engine
     private double grassFrictionKINETIC; // Kinetic friction on grass
     private double grassFrictionSTATIC; // Static friction on grass
     private int shotCount = 0; // Count of shots taken
@@ -136,7 +136,7 @@ public class ThirdScreenController implements ScreenInterface {
         this.REACHED_THE_HOLE = false;
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
-        this.golfGame = new GolfGame(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
+        this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
         System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         initialize();

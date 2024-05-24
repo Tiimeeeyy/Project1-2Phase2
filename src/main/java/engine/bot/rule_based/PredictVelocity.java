@@ -1,11 +1,11 @@
 package engine.bot.rule_based;
 
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 
 public class PredictVelocity {
-    private final GolfGame golfGame;
+    private final GolfGameEngine golfGame;
 
-    public PredictVelocity(GolfGame golfGame) {
+    public PredictVelocity(GolfGameEngine golfGame) {
         this.golfGame = golfGame;
     }
 

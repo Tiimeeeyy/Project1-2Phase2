@@ -1,5 +1,5 @@
 package engine.solvers.odeFunctions;
-public interface MyFunction {
+public interface FunctionInterface {
     double[] ode(double[] x, double[] a, double[] dh);
     
 } 

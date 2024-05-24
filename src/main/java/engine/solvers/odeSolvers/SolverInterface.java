@@ -1,11 +1,11 @@
 package engine.solvers.odeSolvers;
 
-import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.FunctionInterface;
 
 /**
  * Interface for numerical solvers for ODEs.
  */
-public interface MySolver {
+public interface SolverInterface {
     /**
      * Solve differential equation give x value at the next time step
      *
@@ -15,6 +15,6 @@ public interface MySolver {
      * @param dh the height gradient at current coordinate dh={slope_x,slope_y}
      * @param dt The time step
      */
-    public boolean nextstep(MyFunction f, double[] x,double[] a, double[] dh, double dt);
+    public boolean nextstep(FunctionInterface f, double[] x,double[] a, double[] dh, double dt);
     
 } 

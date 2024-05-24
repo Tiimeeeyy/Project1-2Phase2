@@ -1,11 +1,11 @@
 package engine.solvers.odeSolvers;
 
-import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.FunctionInterface;
 
 /**
  * EulerSolver
  */
-public class EulerSolver implements MySolver {
+public class EulerSolver implements SolverInterface {
     /**
      *
      * @param f indictate which dynamic function going to be solved, in this game, it is the golf pyhsics
@@ -15,7 +15,7 @@ public class EulerSolver implements MySolver {
      * @param dt The time step
      * @return
      */
-    public boolean nextstep(MyFunction f, double[] x,double[] a, double[] dh, double dt){
+    public boolean nextstep(FunctionInterface f, double[] x,double[] a, double[] dh, double dt){
         boolean equillium = true;
         //Call ODE
         double[] gx=f.ode(x,a,dh);

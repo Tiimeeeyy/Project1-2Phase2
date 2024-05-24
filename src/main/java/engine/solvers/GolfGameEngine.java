@@ -3,14 +3,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import engine.solvers.odeFunctions.MyFunction;
+import engine.solvers.odeFunctions.FunctionInterface;
 import engine.solvers.odeFunctions.golfphysics;
-import engine.solvers.odeSolvers.MySolver;
+import engine.solvers.odeSolvers.SolverInterface;
 
 /** 
  * The main engine
 */
-public class GolfGame {
+public class GolfGameEngine {
     private double minDis=100;
     private boolean goal=false;
     private double[] minCoordinate=new double[4];
@@ -18,7 +18,7 @@ public class GolfGame {
     private String message;
     private boolean treeHit=false;
 
-    private MySolver solver;
+    private SolverInterface solver;
     private double[] a;
     private double dt;
     private double[] hole;
@@ -36,7 +36,7 @@ public class GolfGame {
      * @param r         radius of the hole
      * @param mappath   the path of the map
      */
-    public GolfGame(MySolver solver, double[] a, double dt,double[] hole, double r, String mappath){
+    public GolfGameEngine(SolverInterface solver, double[] a, double dt,double[] hole, double r, String mappath){
         this.solver=solver;
         this.a=a;
         this.dt=dt;
@@ -58,7 +58,7 @@ public class GolfGame {
         ArrayList<double[]> xtrac=new ArrayList<double[]>();
         double[] x0=x.clone();
         MapHandler map=new MapHandler();
-        MyFunction golfPhysics=new golfphysics();
+        FunctionInterface golfPhysics=new golfphysics();
         double[] fric=a.clone();
         
         //clear previous
