@@ -1,7 +1,7 @@
 package engine.bot.ml_bot.test;
 
 import engine.bot.ml_bot.QLearning;
-import engine.solvers.GolfGame;
+import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class QLearningTest {
     private QLearning qLearning;
-    private GolfGame golfGame;
+    private GolfGameEngine golfGame;
 
     @BeforeEach
     void setUp() {
         // Initialize the QLearning instance with appropriate parameters
         qLearning = new QLearning(new RK4(), new double[]{0, 0}, new double[]{0.1, 0.1}, 0.1, new double[]{0, 0}, false, 10, 10);
-        golfGame = new GolfGame(new RK4(), new double[]{0, 0}, 0.1, new double[]{234, 345, 577}, 0.5, "src/main/resources/userInputMap.png");
+        golfGame = new GolfGameEngine(new RK4(), new double[]{0, 0}, 0.1, new double[]{234, 345, 577}, 0.5, "src/main/resources/userInputMap.png");
     }
 
     @Test

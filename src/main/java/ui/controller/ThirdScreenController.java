@@ -332,13 +332,18 @@ public class ThirdScreenController implements ScreenInterface {
     private void hit() {
         if (this.ballMoving) {
             return;
+        }else{
+            ballHit(powerSlider.getValue(), circularSlider.getDirectionVector());
         }
+        
+    }
+
+    private void ballHit(double power, double[] directionVector){
         if (!REACHED_THE_HOLE) {
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
 
-            double[] directionVector = circularSlider.getDirectionVector();
-            double power = powerSlider.getValue();
+            
             System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
             System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
 
