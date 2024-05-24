@@ -26,11 +26,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 import engine.solvers.GolfGame;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
+import engine.bot.AibotGA.AiBotGA;
 import engine.bot.distance.DistanceMeasure;
 
 /**
@@ -74,9 +76,12 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private Button ruleBot;
 
+    @FXML
+    private Button gaBot;
+
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
-    private double[] startBallPostion; // Starting position of the ball
+    private double[] BallPosition; // Starting position of the ball
     private double[] HolePostion; // Position of the hole
     private GolfGame golfGame; // Golf game engine
     private double grassFrictionKINETIC; // Kinetic friction on grass
@@ -85,7 +90,7 @@ public class ThirdScreenController implements ScreenInterface {
     private ArrayList<double[]> fullTrajectory = new ArrayList<>(); // Full trajectory of the ball
     private boolean REACHED_THE_HOLE; // Flag to check if the ball reached the hole
     private Timeline timeline; // Animation timeline
-    private boolean ballMoving=false; // the status of the ball whether it is moving
+    private boolean ballMoving=false;
 
     private Parent root; // Root node
 
@@ -124,7 +129,7 @@ public class ThirdScreenController implements ScreenInterface {
      * @param grassFrictionSTATIC  the static friction on grass
      */
     public void initializeParameters(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
-        this.startBallPostion = startBallPostion;
+        this.BallPosition = startBallPostion;
         this.HolePostion = HolePostion;
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
@@ -142,7 +147,7 @@ public class ThirdScreenController implements ScreenInterface {
      */
     @FXML
     public void initialize() {
-        if (startBallPostion == null || HolePostion == null) {
+        if (BallPosition == null || HolePostion == null) {
             return; 
         }
 
@@ -272,8 +277,8 @@ public class ThirdScreenController implements ScreenInterface {
             double ballDiameter = 0.1 * Utility.ratio;
             double ballRadius = ballDiameter / 2.0;
 
-            double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
-            double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
+            double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
+            double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
     
             gc.setFill(javafx.scene.paint.Color.WHITE);
             gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
@@ -335,24 +340,24 @@ public class ThirdScreenController implements ScreenInterface {
             double[] directionVector = circularSlider.getDirectionVector();
             double power = powerSlider.getValue();
             System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
-            System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
+            System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
 
             // Call the engine to calculate the trajectory
-            double[] x = {startBallPostion[0], startBallPostion[1], power * directionVector[0], power * directionVector[1]};
+            double[] x = {BallPosition[0], BallPosition[1], power * directionVector[0], power * directionVector[1]};
             ArrayList<double[]> xpath = this.golfGame.shoot(x, true);
 
             // Update ball position and shot count
             if (xpath != null && !xpath.isEmpty()) {
                 fullTrajectory.addAll(xpath);  // Add new trajectory points to the full trajectory
                 double[] finalPosition = xpath.get(xpath.size() - 1);
-                startBallPostion[0] = finalPosition[0];
-                startBallPostion[1] = finalPosition[1];
+                BallPosition[0] = finalPosition[0];
+                BallPosition[1] = finalPosition[1];
                 shotCount++;
             }
 
             String shotLog = String.format(
                 "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
-                shotCount, startBallPostion[0], startBallPostion[1], power);
+                shotCount, BallPosition[0], BallPosition[1], power);
             logEvent(shotLog);
             updateShotCountLabel();
             // Animate the ball movement along the trajectory
@@ -391,16 +396,16 @@ public class ThirdScreenController implements ScreenInterface {
         
         double duration = 5; 
         this.ballMoving=true;
-
         for (int i = 0; i < trajectory.size(); i++) {
             final int index = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(duration * i), event -> {
                 double[] point = trajectory.get(index);
-                startBallPostion[0] = point[0];
-                startBallPostion[1] = point[1];
+                System.out.println(Arrays.toString(this.BallPosition));
+                BallPosition[0] = point[0];
+                BallPosition[1] = point[1];
                 drawBallAndTrajectory(index);
                 updateBallPositionLabel();
-            });  
+            });
             timeline.getKeyFrames().add(keyFrame);
         }
         timeline.setOnFinished(event -> {
@@ -440,8 +445,8 @@ public class ThirdScreenController implements ScreenInterface {
     private void moveBallToEndOfTrajectory() {
         if (!fullTrajectory.isEmpty()) {
             double[] finalPosition = fullTrajectory.get(fullTrajectory.size() - 1);
-            startBallPostion[0] = finalPosition[0];
-            startBallPostion[1] = finalPosition[1];
+            BallPosition[0] = finalPosition[0];
+            BallPosition[1] = finalPosition[1];
             drawFullTrajectory();
             updateBallPositionLabel();
         }
@@ -460,8 +465,8 @@ public class ThirdScreenController implements ScreenInterface {
         double ballDiameter = 0.1 * Utility.ratio;
         double ballRadius = ballDiameter / 2.0;
 
-        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
-        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
+        double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
+        double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
         gc.setFill(javafx.scene.paint.Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
@@ -485,8 +490,8 @@ public class ThirdScreenController implements ScreenInterface {
         double ballDiameter = 0.1 * Utility.ratio;
         double ballRadius = ballDiameter / 2.0;
 
-        double ballX = Utility.coordinateToPixel_X(startBallPostion[0]) - ballRadius;
-        double ballY = Utility.coordinateToPixel_Y(startBallPostion[1]) - ballRadius;
+        double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
+        double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
         gc.setFill(javafx.scene.paint.Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
@@ -535,7 +540,7 @@ public class ThirdScreenController implements ScreenInterface {
      * Updates the ball position label.
      */
     private void updateBallPositionLabel() {
-        ballPositionLabel.setText(String.format("Ball Position: (%.2f, %.2f)", startBallPostion[0], startBallPostion[1]));
+        ballPositionLabel.setText(String.format("Ball Position: (%.2f, %.2f)", BallPosition[0], BallPosition[1]));
     }
 
     /**
@@ -603,7 +608,20 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     private void ruleBotPlay() {
+        ArrayList<double[]> trajectory = distanceMeasure.playGameGame(HolePostion, BallPosition, REACHED_THE_HOLE);
+        animateBallMovement(trajectory, distanceMeasure.assumeVelocity(trajectory.getLast()));
+
+
+    }
+
+    @FXML    
+    private void gaBotFunc(){
+        AiBotGA gaBot=new AiBotGA(golfGame);
+        double[] x={BallPosition[0],BallPosition[1],0,0};
+        gaBot.golfBot(x);
+        double[] solution=gaBot.getBest();
+        double[] velocity={solution[2],solution[3]};
         
-        distanceMeasure.playGame(HolePostion, startBallPostion, REACHED_THE_HOLE);
+        System.out.println(Arrays.toString(velocity));
     }
 }

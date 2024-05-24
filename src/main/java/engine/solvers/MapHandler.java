@@ -34,7 +34,6 @@ public class MapHandler {
             image = ImageIO.read(input_file);
             width=image.getWidth();
             height=image.getHeight();
-            System.out.println("map readed");
         } catch (IOException e) {
             System.out.println("Error: " + e);
         }
@@ -137,7 +136,6 @@ public class MapHandler {
                     image.setRGB(i, j, color.getRGB());
                 }
             }
-            System.out.println("map created");
             File outputfile=new File(desPath);
             ImageIO.write(image, "png", outputfile);
 

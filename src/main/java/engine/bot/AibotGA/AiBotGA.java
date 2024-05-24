@@ -20,7 +20,7 @@ public class AiBotGA {
         this.game=game;
     }
 
-    public void golfbot(double[] x){
+    public void golfBot(double[] x){
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
 

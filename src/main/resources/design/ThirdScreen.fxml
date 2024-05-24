@@ -82,6 +82,8 @@
             </content>
         </ScrollPane>
       <Button layoutX="909.0" layoutY="555.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" text="Rule Bot" fx:id="ruleBot" />
-      <Button layoutX="1105.0" layoutY="555.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" text="Neural Bot" fx:id="neuralBot"/>
+      <Button layoutX="1105.0" layoutY="555.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" onAction="#gaBotFunc" text="GA Bot" fx:id="gaBot"/>
+        <!-- <Button layoutX="1105.0" layoutY="555.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" text="Neural Bot" fx:id="neuralBot"/> -->
+
     </children>
 </AnchorPane>
