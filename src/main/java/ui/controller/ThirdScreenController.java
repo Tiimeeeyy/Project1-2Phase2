@@ -24,6 +24,7 @@ import ui.screenFactory.ScreenInterface;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -607,15 +608,19 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     private void ruleBotPlay() {
+        logEvent("!!--Rule-based bot entered the party--!!");
+
         ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
         for (double[] array : lol) {
-            System.out.println("play is: " + Arrays.toString(array));
+            // System.out.println(Arrays.toString(array));
+            // System.out.println("play is: " + Arrays.toString(array));
             ballHit(array[2], new double[]{array[0], array[1]});
         }
     }
 
     @FXML
     private void gaBotFunc() {
+        logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
         AiBotGA gaBot = new AiBotGA(golfGame);
         double[] x = {BallPosition[0], BallPosition[1], 0, 0};
         gaBot.golfBot(x);

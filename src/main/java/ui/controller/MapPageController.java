@@ -134,8 +134,7 @@ public class MapPageController implements ScreenInterface {
      * Creates and initializes the screen.
      */
     private void createScreen(){
-        HeightMap3DChart chart = new HeightMap3DChart(heightStorage, chartPane);
-        chart.display3DChart();
+
        
         renderInitialMap();
         drawBallAndHole();
@@ -315,10 +314,16 @@ public class MapPageController implements ScreenInterface {
         }
     }
 
+    private void create3DChart() {
+        HeightMap3DChart heightMap3DChart = new HeightMap3DChart(heightStorage, chartPane);
+        heightMap3DChart.display3DChart();
+    }
+
     /**
      * Renders the initial map with height values.
      */
     private void renderInitialMap() {
+        create3DChart();
         for (int x = 0; x < 500; x++) {
             for (int y = 0; y < 500; y++) {
                 double height = heightStorage[x][y];
