@@ -377,7 +377,8 @@ public class ThirdScreenController implements ScreenInterface {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == backButton) {
-                    goBack();
+                    Main mainInst = new Main();
+                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -513,27 +514,32 @@ public class ThirdScreenController implements ScreenInterface {
      */
     @FXML
     private void goBack() {
-
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Retreat");
-        alert.setHeaderText("Are you sure you want to go back?");
-        alert.setContentText("All progress will be lost! \n\"Opportunities multiply as they are seized.\" – Sun Tzu, The Art of War");
-        ButtonType backButton = new ButtonType("I have seen enough, take me back!");
-        ButtonType stayButton = new ButtonType("Give me one more chance, captain!");
-
-
-        alert.getButtonTypes().setAll(backButton, stayButton);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent()) {
-            if (result.get() == backButton) {
-                Main mainInst = new Main();
-                mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
-            } else if (result.get() == stayButton) {
-                alert.close();
-            }
+        if(REACHED_THE_HOLE){
+            Main mainInst = new Main();
+            mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+        } else{
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Retreat");
+            alert.setHeaderText("Are you sure you want to go back?");
+            alert.setContentText("All progress will be lost! \n\"Opportunities multiply as they are seized.\" – Sun Tzu, The Art of War");
+            ButtonType backButton = new ButtonType("I have seen enough, take me back!");
+            ButtonType stayButton = new ButtonType("Give me one more chance, captain!");
+    
+    
+            alert.getButtonTypes().setAll(backButton, stayButton);
+    
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == backButton) {
+                    Main mainInst = new Main();
+                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                } else if (result.get() == stayButton) {
+                    alert.close();
+                }
+            }    
         }
 
+        
     }
 
     /**
@@ -585,7 +591,8 @@ public class ThirdScreenController implements ScreenInterface {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == backButton) {
-                    goBack();
+                    Main mainInst = new Main();
+                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
