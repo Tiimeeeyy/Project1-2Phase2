@@ -10,7 +10,7 @@ public class DistanceMeasure {
     private final GolfGameEngine golfGame;
     private final double[] hole;
     private final double[] position;
-    private final boolean reachedHole;
+    private  boolean reachedHole = false;
 
     /**
      * Constructor for the class of the Rule-Based bot.
@@ -22,7 +22,7 @@ public class DistanceMeasure {
      * @param reachedHole True if the ball has reached the hole, false otherwise.
      */
     public DistanceMeasure(double[] position, double[] friction, double[] hole, double radius, boolean reachedHole) {
-        this.reachedHole = reachedHole;
+        this.reachedHole = false;
         this.position = position;
         this.hole = hole;
 
@@ -67,13 +67,13 @@ public class DistanceMeasure {
         double dy = end[1] - start[1];
 
         // Print intermediate steps for debugging
-        System.out.println("dx: " + dx + ", dy: " + dy);
+        // System.out.println("dx: " + dx + ", dy: " + dy);
 
         // Calculate the magnitude of the direction vector
         double magnitude = Math.sqrt(dx * dx + dy * dy);
 
         // Print magnitude for debugging
-        System.out.println("magnitude: " + magnitude);
+        // System.out.println("magnitude: " + magnitude);
 
         // Normalize the direction vector
         if (magnitude != 0) {
@@ -82,7 +82,7 @@ public class DistanceMeasure {
         }
 
         // Print normalized direction for debugging
-        System.out.println("Normalized direction: (" + dx + ", " + dy + ")");
+        // System.out.println("Normalized direction: (" + dx + ", " + dy + ")");
 
         return new double[]{dx, dy};
     }
@@ -173,18 +173,27 @@ public class DistanceMeasure {
         }
         return new double[0];
     }
-    public ArrayList<double[]> playGame (double[] position, double[] hole, boolean reachedHole) {
+    public ArrayList<double[]> playGame (double[] position, double[] hole) {
         ArrayList<double[]> gameplay = new ArrayList<>();
-        if (!reachedHole) {
-            System.out.println("While loop entered");
-            double[] play = getOnePlay(position,hole);
-            gameplay.add(play);
+        this.reachedHole=false;
+
+        while (this.reachedHole==false) {
             if (checkHole(position, hole)) {
+                this.reachedHole = true;
                 System.out.println("If entered");
                 double[] lastPlay = lastShot(position, hole);
                 gameplay.add(lastPlay);
+                return gameplay;
+            } else{
+                System.out.println("else entered");
+
+                // System.out.println("While loop entered");
+                double[] play = getOnePlay(position,hole);
+                gameplay.add(play);
             }
+
         }
-        return gameplay;
+        return null;
+
     }
 }

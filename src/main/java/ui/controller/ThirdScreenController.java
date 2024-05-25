@@ -610,7 +610,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void ruleBotPlay() {
         logEvent("!!--Rule-based bot entered the party--!!");
 
-        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
+        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion);
         for (double[] array : lol) {
             // System.out.println(Arrays.toString(array));
             // System.out.println("play is: " + Arrays.toString(array));
