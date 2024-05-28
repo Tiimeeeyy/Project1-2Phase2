@@ -4,10 +4,10 @@ public class Utility {
     public static double ratio=10.0;
 
     public static int heightToColor(double x){
-        return (int) (x*50.0+125); 
+        return (int) (x*40.0+125); 
     }
     public static double colorToHeight(int x){
-        return (double) ((x-125)/50.0); 
+        return (double) ((x-125)/40.0); 
     }
     public static int[] coordinateToPixel(double[] x){
         int[] y=new int[2];
