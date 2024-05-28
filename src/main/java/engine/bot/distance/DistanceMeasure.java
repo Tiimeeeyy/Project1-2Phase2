@@ -125,6 +125,7 @@ public class DistanceMeasure {
         velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1],Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
 
         return velocities;
+        // hello
 
     }
 
