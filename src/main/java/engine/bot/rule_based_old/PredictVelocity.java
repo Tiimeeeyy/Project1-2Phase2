@@ -2,6 +2,9 @@ package engine.bot.rule_based_old;
 
 import engine.solvers.GolfGameEngine;
 
+/**
+ * This class predicts velocity based on a
+ */
 public class PredictVelocity {
     private final GolfGameEngine golfGame;
 

@@ -25,6 +25,10 @@ public class QLearning {
         golfGame = new GolfGameEngine(mySolver, friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
     }
 
+    /**
+     * This method trains the Neural Network.
+     * @param iterations The number of iterations to be run.
+     */
     public void train(int iterations) {
         for (int i = 0; i < iterations; i++) {
 
@@ -87,6 +91,12 @@ public class QLearning {
         return performance;
     }
 
+    /**
+     * This method adjusts the weights and biases to increase precision in future iterations
+     * TODO: FIND OUT WHY WEIGHTS[i] IS NULL
+     * @param history The current history of trajectories.
+     * @param performance The performance for those trajectories.
+     */
     public void adjustWeightsAndBiases(ArrayList<ArrayList<double[]>> history, double performance) {
         System.out.println("Adjust weights and biases called");
         for (ArrayList<double[]> trajectory : history) {

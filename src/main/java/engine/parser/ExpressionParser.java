@@ -2,17 +2,31 @@ package engine.parser;
 
 import java.util.Map;
 
+/**
+ * The expression parser class Implements the IParser Interface and is used to parse and evaluate Mathematical expressions.
+ * The expressions can contain numbers, variables and the operators: +, -, *, /, ^.
+ * The Variables are stored in a map and their values can be set when creating a new ExpressionParser object.
+ */
 public class ExpressionParser implements IParser {
 
     private String funcExpression;
     private int position = 0;
     private Variables variables;
 
+    /**
+     * Class constructor
+     * @param expression The mathematical expression to be parsed and evaluated.
+     * @param initVarsHM The initial values of the Variables.
+     */
     public ExpressionParser(String expression, Map<String, Double> initVarsHM) {
         this.funcExpression = expression.replaceAll("\\s+", "");
         this.variables = new Variables(initVarsHM);
     }
 
+    /**
+     * This method evaluates the mathematical expression and returns the result.
+     * @return The result of the mathematical expression.
+     */
     public double evaluate() {
         double finalResult = processExpression();
         if (position < funcExpression.length()) {
@@ -21,7 +35,7 @@ public class ExpressionParser implements IParser {
         }
         return finalResult;
     }
-
+    // The following methods are helper functions used to parse and evaluate the mathematical expression.
     private double processExpression() {
         return processAdditionSubtraction();
     }
@@ -149,13 +163,25 @@ public class ExpressionParser implements IParser {
         return Double.parseDouble(funcExpression.substring(start, position));
     }
 
+    /**
+     * The Variables class is a private static inner class used to store the Variables and their values.
+     */
     private static class Variables {
         private Map<String, Double> variableMap;
 
+        /**
+         * Class constructor.
+         * @param variableMap The map of Variables and their values.
+         */
         public Variables(Map<String, Double> variableMap) {
             this.variableMap = variableMap;
         }
 
+        /**
+         * This method returns the value of a Variable.
+         * @param varName The name of the Variable.
+         * @return The value of the Variable.
+         */
         public double getVariable(String varName) {
             if (variableMap.containsKey(varName)) {
                 return variableMap.get(varName);

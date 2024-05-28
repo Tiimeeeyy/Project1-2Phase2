@@ -8,7 +8,10 @@ import engine.solvers.odeFunctions.golfphysics;
 import engine.solvers.odeSolvers.SolverInterface;
 
 /** 
- * The main engine
+ * The GolfGameEngine class is the main engine for the golf game simulation.
+ * It utilises the SolverInterface to solve the ordinary differential equations (ODEs) that model the physics of the game.
+ * The engine keeps track of the state of the game including the position and velocity of the ball,
+ * the position of the hole and whether the ball has hit the hole.
 */
 public class GolfGameEngine {
     private double minDis=100;
@@ -30,12 +33,12 @@ public class GolfGameEngine {
     /**
      * Construct the game engine
      * 
-     * @param solver    ODE sovler
-     * @param a         friction coefficients, [knetic fraction, static friction]
-     * @param dt        time step
-     * @param hole      position of the hole
-     * @param r         radius of the hole
-     * @param mappath   the path of the map
+     * @param solver    The ODE solver to be used.
+     * @param a         The friction coefficients, [kinetic fraction, static friction]
+     * @param dt        The time step
+     * @param hole      The position of the hole
+     * @param r         The radius of the hole
+     * @param mappath   The path of the map
      */
     public GolfGameEngine(SolverInterface solver, double[] a, double dt,double[] hole, double r, String mappath){
         this.solver=solver;
@@ -48,10 +51,11 @@ public class GolfGameEngine {
 
 
     /**
-     * shoot!
+     * The shoot method simulates a shot in the golf game.
+     * It calculates the trajectory of the ball and checks if the ball has hit a tree, landed in water, or reached the hole.
      * 
-     * @param x             the starting position and velocity of the ball
-     * @param recording     whether save the trajectory. Disable recording in AI bot calculation to save memory. 
+     * @param x             The starting position and velocity of the ball
+     * @param recording     Whether save the trajectory. Disable recording in AI bot calculation to save memory.
      * @return              The trajectory of the ball. It is null if recording is false.
      */
     public ArrayList<double[]> shoot(double[] x,Boolean recording){
@@ -190,7 +194,7 @@ public class GolfGameEngine {
     }
 
     /**
-     * Calculate boucning. adjust x object directly.
+     * Calculate bouncing. adjust x object directly.
      * 
      * @param x inbound ball status
      * @param normVec   norm vector for the bouncing surface
@@ -204,11 +208,11 @@ public class GolfGameEngine {
     }
 
     /**
-     * Find the norm vector for hiting surface of a tree object
-     * @param x the pixel coordinate of the hitting point
-     * @param y
-     * @param treeAry
-     * @return
+     * Find the norm vector for hitting surface of a tree object
+     * @param x The pixel coordinate (x) of the hitting point.
+     * @param y The pixel coordinate (y) of the hitting point.
+     * @param treeAry The locations of the trees.
+     * @return The norm-vector of the collision surface.
      */
     private double[] findTreeNormVec(int x, int y,boolean[][] treeAry){
         double[] normVec ={Utility.pixelToCoordinate_X(x),Utility.pixelToCoordinate_Y(y)};
@@ -236,10 +240,10 @@ public class GolfGameEngine {
      * Calculate the center of the currenct hitting tree
      * 
      * @param x the hitting point. indicate which tree is hitting. in pixel coordinate
-     * @param y
-     * @param xSet  collection of pixels' x coordinate for the hitting tree
-     * @param ySet  collection of pixels' y coordinate for the hitting tree
-     * @param treeAry
+     * @param y "-"
+     * @param xSet  The collection of pixels' x coordinate for the hitting tree
+     * @param ySet  The collection of pixels' y coordinate for the hitting tree
+     * @param treeAry The location information of the trees in the map.
      */
     private void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,boolean[][] treeAry){
         if (xSet.contains(x) && ySet.contains(y)) {

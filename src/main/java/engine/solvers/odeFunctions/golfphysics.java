@@ -1,9 +1,17 @@
 package engine.solvers.odeFunctions;
 
 /**
- * golfphysics
+ * The golfphysics class implements the function interface.
+ * It is used to calculate the ODEs for a Golf physics simulation.
  */
 public class golfphysics implements FunctionInterface {
+    /**
+     * This method calculates the ODEs for the simulation.
+     * @param x The current state of the system.
+     * @param a The friction of the surfaces.
+     * @param dh The chang in height.
+     * @return The rate of change of the System.
+     */
     public double[] ode(double[] x, double[] a, double[] dh){
         double[] dx=new double[x.length];
         double g=9.81;

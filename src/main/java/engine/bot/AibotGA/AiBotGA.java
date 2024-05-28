@@ -6,7 +6,9 @@ import engine.solvers.GolfGameEngine;
 import java.util.Arrays;
 import java.util.Random;
 
-
+/**
+ * AI Bot to play the Golf game, using a genetic algorithm to find the best shot.
+ */
 public class AiBotGA {
     private int popSize=50;
     private char[] vocab={'0','1'};
@@ -16,10 +18,18 @@ public class AiBotGA {
 
     private GolfGameEngine game;
 
+    /**
+     * Class constructor
+     * @param game The engine to simulate the game.
+     */
     public AiBotGA(GolfGameEngine game){
         this.game=game;
     }
 
+    /**
+     * this method "plays" the golf game
+     * @param x Initial state / initial position of the ball.
+     */
     public void golfBot(double[] x){
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
@@ -27,7 +37,7 @@ public class AiBotGA {
         // initiate population
         initialPopulation(population, x0);
  
-
+        // Run the algorithm for 700 generations
         for (int i = 0; i < 700; i++) {
             int[] slcIndex=selection(population);
             crossover(population[slcIndex[0]], population[slcIndex[1]], population);
@@ -39,7 +49,7 @@ public class AiBotGA {
             HeapSort.sort(population);
             // System.out.println(population[0].getFitness()+"  "+i);
         }
-
+        // If the goal is not reached, set the solution to the best solution found
         if (!this.goal) {
             double[] best=x0;
             best[2]=population[0].genoToPhenotype()[0];
@@ -48,7 +58,12 @@ public class AiBotGA {
         }
         
     }
-    
+
+    /**
+     * THis method initialises the population for the genetic algorithm
+     * @param pop The population size to be initialised.
+     * @param x The initial state / position of the ball.
+     */
     void initialPopulation(Individual[] pop, double[] x){
        
         Random rand=new Random();
@@ -97,6 +112,12 @@ public class AiBotGA {
 
     }
 
+    /**
+     * This method calculates the fitness of an Individual
+     * @param indi The individual whose fitness is to be calculated.
+     * @param x The current position of the ball.
+     * @return The fitness of the individual.
+     */
     double calculateFitness(Individual indi, double[] x){
         
         double ball_hole_distance=game.getHoleBallDistance(x);
@@ -115,6 +136,11 @@ public class AiBotGA {
         return fit;
     }
 
+    /**
+     * This method performs selection in the genetic algorithm
+     * @param pop The current population.
+     * @return The indices of the two selected individuals.
+     */
     int[] selection(Individual[] pop){
         double sum=0;
         int[] selected={0,0};
@@ -146,6 +172,12 @@ public class AiBotGA {
         return selected;
     }
 
+    /**
+     * This method performs crossover in the genetic algorithm.
+     * @param slc1 The first selected individual.
+     * @param slc2 The second selected individual.
+     * @param pop The current population.
+     */
     void crossover(Individual slc1, Individual slc2, Individual[] pop){
         Random rnd=new Random();
         int pivot=rnd.nextInt(7)+1;
@@ -168,6 +200,10 @@ public class AiBotGA {
         pop[popSize-2]=child2.clone();
     }
 
+    /**
+     * This method performs mutations in the genetic algorithm.
+     * @param indi The individual to be mutated.
+     */
     void mutation(Individual indi){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {

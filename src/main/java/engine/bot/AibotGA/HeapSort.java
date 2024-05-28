@@ -39,14 +39,17 @@ package engine.bot.AibotGA;
  */
 public class HeapSort 
 {
-    
+    /**
+     * The sort method sorts an array of individuals in-place using the heap sort algorithm.
+     * @param i The array of individuals to be sorted.
+     */
     public static void sort(Individual i[])
     {
         int N = i.length;
-        
+        // Build the heap
         for (int k = N/2; k > 0; k--) 
         downheap(i, k, N);
-
+        // Sort the array
         do 
         {
             Individual T = i[0];
@@ -58,7 +61,13 @@ public class HeapSort
         } 
         while (N > 1);
     }
-    
+
+    /**
+     * The downheap method is a helper function that ensures the heap property is maintained for the element at index k.
+     * @param i The array of individuals.
+     * @param k The index of the element to downheap.
+     * @param N The size of the heap.
+     */
     private static void downheap(Individual i[], int k, int N)
     {
         Individual T = i[k - 1];
