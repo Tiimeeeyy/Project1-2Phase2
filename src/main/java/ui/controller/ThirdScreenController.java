@@ -24,6 +24,7 @@ import ui.screenFactory.ScreenInterface;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -618,8 +619,9 @@ public class ThirdScreenController implements ScreenInterface {
      */
     private void ruleBotPlay() {
         logEvent("!!--Rule-based bot entered the party--!!");
-        ArrayList<double[]> plays = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
-    
+        double[] ballP = BallPosition.clone();
+        ArrayList<double[]> plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
+
         if (!plays.isEmpty()) {
             playBotShot(plays, 0);
         }
@@ -635,7 +637,10 @@ public class ThirdScreenController implements ScreenInterface {
             ballHit(play[2], new double[]{play[0], play[1]});
             
             timeline.setOnFinished(event -> {
-                Platform.runLater(() -> playBotShot(plays, index + 1));
+                Platform.runLater(() -> {
+                    playBotShot(plays, index + 1);
+                    ruleBot.fire(); 
+                });
             });
         } else {
             logEvent("Rule-based bot finished playing.");

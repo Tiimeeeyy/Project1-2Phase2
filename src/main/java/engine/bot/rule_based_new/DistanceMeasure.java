@@ -201,6 +201,7 @@ public class DistanceMeasure {
             position[0] = newPos[0];
             position[1] = newPos[1];
             reachedHole = checkHole(position, hole);
+            
             if (reachedHole) {
                 break;
             }
