@@ -1,7 +1,7 @@
 package ui.controller;
 
 import engine.bot.AibotGA.AiBotGA;
-import engine.bot.distance.DistanceMeasure;
+import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
@@ -24,7 +24,6 @@ import ui.screenFactory.ScreenInterface;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -327,18 +326,18 @@ public class ThirdScreenController implements ScreenInterface {
     private void hit() {
         if (this.ballMoving) {
             return;
-        }else{
+        } else {
             ballHit(powerSlider.getValue(), circularSlider.getDirectionVector());
         }
-        
+
     }
 
-    private void ballHit(double power, double[] directionVector){
+    private void ballHit(double power, double[] directionVector) {
         if (!REACHED_THE_HOLE) {
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
 
-            
+
             System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
             System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
 
@@ -514,20 +513,20 @@ public class ThirdScreenController implements ScreenInterface {
      */
     @FXML
     private void goBack() {
-        if(REACHED_THE_HOLE){
+        if (REACHED_THE_HOLE) {
             Main mainInst = new Main();
             mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
-        } else{
+        } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Retreat");
             alert.setHeaderText("Are you sure you want to go back?");
             alert.setContentText("All progress will be lost! \n\"Opportunities multiply as they are seized.\" – Sun Tzu, The Art of War");
             ButtonType backButton = new ButtonType("I have seen enough, take me back!");
             ButtonType stayButton = new ButtonType("Give me one more chance, captain!");
-    
-    
+
+
             alert.getButtonTypes().setAll(backButton, stayButton);
-    
+
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
                 if (result.get() == backButton) {
@@ -536,10 +535,10 @@ public class ThirdScreenController implements ScreenInterface {
                 } else if (result.get() == stayButton) {
                     alert.close();
                 }
-            }    
+            }
         }
 
-        
+
     }
 
     /**
@@ -614,14 +613,24 @@ public class ThirdScreenController implements ScreenInterface {
         showAlert(Alert.AlertType.INFORMATION, "Stats:", stats.toString());
     }
 
+    /**
+     * Method that "plays" the game
+     */
     private void ruleBotPlay() {
         logEvent("!!--Rule-based bot entered the party--!!");
-
-        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion);
-        for (double[] array : lol) {
-            // System.out.println(Arrays.toString(array));
-            // System.out.println("play is: " + Arrays.toString(array));
-            ballHit(array[2], new double[]{array[0], array[1]});
+        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
+        while (!golfGame.isGoal()) {
+            for (double[] array : lol) {
+                // System.out.println(Arrays.toString(array));
+                // System.out.println("play is: " + Arrays.toString(array));
+                ballHit(array[2], new double[]{array[0], array[1]});
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
         }
     }
 
