@@ -14,6 +14,7 @@ public interface SolverInterface {
      * @param a The friction coefficients. a={knetic friction, static friction}
      * @param dh the height gradient at current coordinate dh={slope_x,slope_y}
      * @param dt The time step
+     * @return True if the system has reached equilibrium, false otherwise.
      */
     public boolean nextstep(FunctionInterface f, double[] x,double[] a, double[] dh, double dt);
     

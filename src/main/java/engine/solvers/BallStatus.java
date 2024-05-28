@@ -4,8 +4,20 @@ package engine.solvers;
  * This enum contains all the possible states the ball can be in.
  */
 public enum BallStatus{
-    Goal, // If the ball has reached the goal.
-    HitWater, // If the ball has hit the water.
-    Normal, // If everything works normally.
-    OutOfBoundary, // If the ball goes out of bounds.
+    /**
+     * This status indicates the goal has been reached
+     */
+    Goal,
+    /**
+     * This status indicated that the ball has hit water.
+     */
+    HitWater,
+    /**
+     * This status indicates that everything is working normally.
+     */
+    Normal,
+    /**
+     * This status indicates that the ball has gone out of bounds.
+     */
+    OutOfBoundary,
 }

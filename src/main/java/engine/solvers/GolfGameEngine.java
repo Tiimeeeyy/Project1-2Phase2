@@ -158,37 +158,75 @@ public class GolfGameEngine {
         return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
     }
 
+    /**
+     * Gets the minimum distance.
+     * @return The minimum distance.
+     */
     public double getMinDistance(){
         return this.minDis;
     }
 
+    /**
+     * Gets the minimum coordinate.
+     * @return The minimum coordinate.
+     */
     public double[] getMinCoordinate(){
         return this.minCoordinate;
     }
-    
+
+    /**
+     * Checks if the ball has hit a tree.
+     * @return True if the ball hit a tree, false otherwise.
+     */
     public boolean getTreeHit(){
         return this.treeHit;
     }
 
+    /**
+     * Checks if the ball has reached the goal.
+     * @return True if it has reached the goal, false otherwise.
+     */
     public boolean isGoal(){
         return this.goal;
     }
 
+    /**
+     * Calculates the distance between the hole and the ball.
+     * @param x Current position of the ball.
+     * @return The distance between the hole and the ball.
+     */
     public double getHoleBallDistance(double[] x){
         return Math.sqrt(Math.pow(x[0]-hole[0], 2)+Math.pow(x[1]-hole[1], 2));
     }
 
+    /**
+     * Gets the location of the hole.
+     * @return The location of the hole.
+     */
     public double[] getHole(){
         return this.hole;
     }
 
+    /**
+     * Gets the point at which the ball has stopped moving
+     * @return The location at which the ball has stopped moving
+     */
     public double[] getStoppoint(){
         return this.stopCoordinate;
     }
 
+    /**
+     * Gets the message.
+     * @return The message.
+     */
     public String getMessage(){
         return this.message;
     }
+
+    /**
+     * Gets the status of the ball.
+     * @return The status of the ball.
+     */
     public BallStatus getStatus(){
         return this.status;
     }
@@ -261,15 +299,32 @@ public class GolfGameEngine {
         }
     }
 
+    /**
+     * Case specific dot product calculation.
+     * @param a The first vector.
+     * @param b The second vector.
+     * @return The dot product of a and b.
+     */
     private double dotProduct(double[] a, double[] b){
         return a[0]*b[0]+a[1]*b[1];
     }
 
+    /**
+     * Calculates the dot product of a vector with a value.
+     * @param a The vector.
+     * @param b The value.
+     * @return The dot product of a and b.
+     */
     private double[] dotProduct(double[] a, double b){
         double[] c={a[0]*b,a[1]*b};
         return c;
     }
 
+    /**
+     * Normalises the inputted vector.
+     * @param a The input vector
+     * @return The norm of that input vector.
+     */
     private double norm(double[] a){
         return Math.sqrt(Math.pow(a[0], 2)+Math.pow(a[1], 2));
     }

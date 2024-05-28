@@ -10,7 +10,6 @@ module ui {
     requires org.jfree.chart3d;
     requires org.jfree.chart3d.fx;
     requires javafx.swing;
-    requires gluegen.rt;
 
     opens ui to javafx.fxml;
     opens ui.controller to javafx.fxml;
@@ -18,4 +17,9 @@ module ui {
     exports ui.controller to javafx.fxml;
     exports engine.bot.rule_based_old;
     exports engine.bot.rule_based_new;
+    exports engine.bot.ml_bot;
+    exports engine.bot.AibotGA;
+    exports engine.solvers.odeSolvers;
+    exports engine.solvers.odeFunctions;
+    exports engine.parser;
 }

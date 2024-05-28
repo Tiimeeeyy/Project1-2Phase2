@@ -21,6 +21,7 @@ public class CheckCollisionAndHeight {
      * Class Constructor
      *
      * @param rk4 The RungeKutta4Void solver to be used for physics simulation.
+     * @param predictVelocity The predict velocity class used to predict the velocity.
      */
     public CheckCollisionAndHeight(RungeKutta4Void rk4, PredictVelocity predictVelocity) {
         this.rk4 = rk4;

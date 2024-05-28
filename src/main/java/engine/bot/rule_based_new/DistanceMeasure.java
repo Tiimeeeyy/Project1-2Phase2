@@ -74,13 +74,14 @@ public class DistanceMeasure {
         return 4;
     }
 
+    /**
+     * Gets the current status of the ball.
+     * @return The status of the ball.
+     */
     public BallStatus getBallStatus() {
         return golfGame.getStatus();
     }
 
-    public void setPosition(double[] x) {
-        position = x;
-    }
 
     /**
      * This Method calculates the last shot, which is used, when the ball is 5m away from the hole.
