@@ -1,4 +1,4 @@
-package engine.bot.rule_based;
+package engine.bot.rule_based_old;
 
 import engine.solvers.GolfGameEngine;
 

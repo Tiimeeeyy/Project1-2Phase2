@@ -1,6 +1,6 @@
 package engine.bot.ml_bot.test;
 
-import engine.bot.distance.DistanceMeasure;
+import engine.bot.rule_based_new.DistanceMeasure;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
