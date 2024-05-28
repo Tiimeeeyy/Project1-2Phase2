@@ -1,16 +1,20 @@
-package engine.bot.distance;
+package engine.bot.rule_based_new;
 
 import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.odeSolvers.RK4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+/**
+ * Class that defines the Rule Based Bot
+ */
 public class DistanceMeasure {
     private final GolfGameEngine golfGame;
     private final double[] hole;
-    private final double[] position;
-    private  boolean reachedHole = false;
+    private double[] position;
+    private boolean reachedHole;
 
     /**
      * Constructor for the class of the Rule-Based bot.
@@ -29,7 +33,28 @@ public class DistanceMeasure {
         this.golfGame = new GolfGameEngine(new RK4(), friction, 0.1, hole, radius, "src/main/resources/userInputMap.png");
     }
 
+    /**
+     * Calculates the direction / angle from the ball position to the hole.
+     *
+     * @param end   The position of the Ball.
+     * @param start The position of the Hole.
+     * @return A vector containing the direction.
+     */
+    public static double[] calculateDirection(double[] start, double[] end) {
+        // Calculate the direction vector
+        double dx = end[0] - start[0];
+        double dy = end[1] - start[1];
 
+        // Calculate the magnitude of the direction vector
+        double magnitude = Math.sqrt(dx * dx + dy * dy);
+
+        // Normalize the direction vector
+        if (magnitude != 0) {
+            dx /= magnitude;
+            dy /= magnitude;
+        }
+        return new double[]{dx, dy};
+    }
 
     /**
      * This method chooses a velocity based on certain rules.
@@ -49,42 +74,12 @@ public class DistanceMeasure {
         return 4;
     }
 
-    public BallStatus getBallStatus(){
+    public BallStatus getBallStatus() {
         return golfGame.getStatus();
     }
 
-
-    /**
-     * Calculates the direction / angle from the ball position to the hole.
-     *
-     * @param end   The position of the Ball.
-     * @param start The position of the Hole.
-     * @return A vector containing the direction.
-     */
-    public static double[] calculateDirection(double[] start, double[] end) {
-        // Calculate the direction vector
-        double dx = end[0] - start[0];
-        double dy = end[1] - start[1];
-
-        // Print intermediate steps for debugging
-        // System.out.println("dx: " + dx + ", dy: " + dy);
-
-        // Calculate the magnitude of the direction vector
-        double magnitude = Math.sqrt(dx * dx + dy * dy);
-
-        // Print magnitude for debugging
-        // System.out.println("magnitude: " + magnitude);
-
-        // Normalize the direction vector
-        if (magnitude != 0) {
-            dx /= magnitude;
-            dy /= magnitude;
-        }
-
-        // Print normalized direction for debugging
-        // System.out.println("Normalized direction: (" + dx + ", " + dy + ")");
-
-        return new double[]{dx, dy};
+    public void setPosition(double[] x) {
+        position = x;
     }
 
     /**
@@ -103,7 +98,7 @@ public class DistanceMeasure {
         if (magnitude != 0) {
             direction[0] /= magnitude;
             direction[1] /= magnitude;
-        }else {
+        } else {
             direction[0] = 0;
             direction[1] = 0;
         }
@@ -120,9 +115,9 @@ public class DistanceMeasure {
         double degreesPos = Math.toRadians(30);
         double degreesNeg = Math.toRadians(-30);
         double[][] velocities = new double[3][2];
-        velocities[0] = new double[]{direction[0],direction[1]};
-        velocities[1] = new double[]{Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1],Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
-        velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1],Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
+        velocities[0] = new double[]{direction[0], direction[1]};
+        velocities[1] = new double[]{Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1], Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
+        velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1], Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
 
         return velocities;
         // hello
@@ -144,14 +139,15 @@ public class DistanceMeasure {
     /**
      * Calculates one play for the Rule based bot based on the distance to the hole
      * after the play
+     *
      * @param position The position of the ball.
-     * @param hole The position of the hole.
+     * @param hole     The position of the hole.
      * @return A list containing the best play from the position (velocityX, velocityY, power)
      */
-    public double[] getOnePlay (double[] position, double[] hole) {
+    public double[] getOnePlay(double[] position, double[] hole) {
         double[] direction = calculateDirection(position, hole);
         double[][] velocities = createVelocityVectors(direction);
-
+        // Assign a big maximum distance and an empty array to store the best shot.
         double maxDistances = Double.MAX_VALUE;
         double[] bestShot = null;
 
@@ -174,27 +170,47 @@ public class DistanceMeasure {
         }
         return new double[0];
     }
-    public ArrayList<double[]> playGame (double[] position, double[] hole) {
-        ArrayList<double[]> gameplay = new ArrayList<>();
-        this.reachedHole=false;
 
-        while (this.reachedHole==false) {
+    /**
+     * Checks if the Ball is in the hole.
+     * @param position Position of the ball.
+     * @param hole Position of the hole.
+     * @return True if ball is in hole, false otherwise.
+     */
+    public boolean checkInHole(double[] position, double[] hole) {
+        return hole == position;
+    }
+
+    /**
+     * This method "plays" the game and creates a list of trajectories.
+     *
+     * @param position    Position of the Ball.
+     * @param hole        Position of the hole.
+     * @param reachedHole Boolean condition: True if the hole is reached, false otherwise.
+     * @return List containing the plays necessary to reach the goal.
+     */
+    public ArrayList<double[]> playGame(double[] position, double[] hole, boolean reachedHole) {
+        ArrayList<double[]> gameplay = new ArrayList<>();
+        while (!reachedHole) {
+            checkInHole(position, hole);
+            System.out.println("While loop entered");
+            double[] play = getOnePlay(position, hole);
+            gameplay.add(play);
+            reachedHole = checkInHole(position, hole);
+            ArrayList<double[]> traj = golfGame.shoot(new double[]{position[0], position[1], play[0], play[1]}, true);
+            double[] newPos = traj.getLast();
+            System.out.println(Arrays.toString(newPos));
+            position[0] = newPos[0];
+            position[1] = newPos[1];
+
             if (checkHole(position, hole)) {
-                this.reachedHole = true;
                 System.out.println("If entered");
                 double[] lastPlay = lastShot(position, hole);
                 gameplay.add(lastPlay);
-                return gameplay;
-            } else{
-                System.out.println("else entered");
-
-                // System.out.println("While loop entered");
-                double[] play = getOnePlay(position,hole);
-                gameplay.add(play);
+                break;
             }
-
         }
-        return null;
-
+        return gameplay;
     }
 }
+
