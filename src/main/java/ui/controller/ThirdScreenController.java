@@ -86,6 +86,7 @@ public class ThirdScreenController implements ScreenInterface {
     private boolean REACHED_THE_HOLE; // Flag to check if the ball reached the hole
     private Timeline timeline; // Animation timeline
     private boolean ballMoving = false;
+    private boolean ruleBasedBot = false;
 
     private Parent root; // Root node
 
@@ -132,7 +133,7 @@ public class ThirdScreenController implements ScreenInterface {
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
-        System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
+        // System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         initialize();
     }
@@ -182,7 +183,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void updateDirection(Number newVal) {
         double[] directionVector = circularSlider.getDirectionVector();
         directionLabel.setText(String.format("Direction: [%.2f, %.2f]", directionVector[0], directionVector[1]));
-        System.out.println("Direction Vector: [" + directionVector[0] + ", " + directionVector[1] + "]");
+        // System.out.println("Direction Vector: [" + directionVector[0] + ", " + directionVector[1] + "]");
     }
 
     /**
@@ -215,7 +216,7 @@ public class ThirdScreenController implements ScreenInterface {
             for (File file : files) {
                 if (file.isFile() && file.getName().equals("userInputMap.png")) {
                     String fileUrl = file.toURI().toURL().toExternalForm();
-                    System.out.println("Loading image from: " + fileUrl);
+                    // System.out.println("Loading image from: " + fileUrl);
                     Image image = new Image(new FileInputStream(file));
 
                     if (image.isError()) {
@@ -225,14 +226,14 @@ public class ThirdScreenController implements ScreenInterface {
                     }
 
                     mapImageView.setImage(image);
-                    System.out.println("Image width: " + image.getWidth() + ", height: " + image.getHeight());
-                    System.out.println("ImageView width: " + mapImageView.getFitWidth() + ", height: " + mapImageView.getFitHeight());
+                    // System.out.println("Image width: " + image.getWidth() + ", height: " + image.getHeight());
+                    // System.out.println("ImageView width: " + mapImageView.getFitWidth() + ", height: " + mapImageView.getFitHeight());
 
                     return;
                 }
             }
 
-            System.err.println("Image file userInputMap.png does not exist in the resources directory.");
+            // System.err.println("Image file userInputMap.png does not exist in the resources directory.");
             Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Load Failed", "The image file userInputMap.png does not exist in the resources directory."));
 
         } catch (MalformedURLException e) {
@@ -432,6 +433,9 @@ public class ThirdScreenController implements ScreenInterface {
                 showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
             } else if (golfGame.isGoal()) {
                 this.REACHED_THE_HOLE = true;
+                if(this.ruleBasedBot){
+                    logEvent("The rule based bot reached the hole.");
+                    }
                 logEvent("CONGRATULATIONS! The ball reached the hole.");
                 showGoalAlert();
             }
@@ -618,7 +622,10 @@ public class ThirdScreenController implements ScreenInterface {
      * Rule-based bot plays the game.
      */
     private void ruleBotPlay() {
-        logEvent("!!--Rule-based bot entered the party--!!");
+        if(!ruleBasedBot){
+            logEvent("!!--Rule-based bot entered the party--!!");
+        }
+        this.ruleBasedBot = true;
         double[] ballP = BallPosition.clone();
         ArrayList<double[]> plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
 
@@ -633,7 +640,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void playBotShot(ArrayList<double[]> plays, int index) {
         if (index < plays.size()) {
             double[] play = plays.get(index);
-            System.out.println(Arrays.toString(play));
+            // System.out.println(Arrays.toString(play));
             ballHit(play[2], new double[]{play[0], play[1]});
             
             timeline.setOnFinished(event -> {
@@ -643,7 +650,7 @@ public class ThirdScreenController implements ScreenInterface {
                 });
             });
         } else {
-            logEvent("Rule-based bot finished playing.");
+            // 
         }
     }
     

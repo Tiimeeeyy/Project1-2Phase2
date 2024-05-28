@@ -149,7 +149,7 @@ public class FirstScreenController extends Parent implements ScreenInterface {
                 if (!file.delete()) {
                     throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
                 } else {
-                    System.out.println("Existing file deleted: " + file.getAbsolutePath());
+                    // System.out.println("Existing file deleted: " + file.getAbsolutePath());
                 }
             }
         } catch (IOException ex) {
