@@ -229,6 +229,11 @@ public class AiBotGA {
 
         }
     }
+
+    /**
+     * Gets the best solution.
+     * @return The best solution.
+     */
     public double[] getBest(){
         return this.solution;
     }

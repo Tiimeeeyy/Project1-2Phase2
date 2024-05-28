@@ -21,7 +21,6 @@ public class MapHandler {
      * Read the map and store the gradient.
      *
      * @param mappath the dir path
-     * @return the gradient array double [ ] [ ] [ ]
      */
     public void readmap(String mappath){
         int width = 20;

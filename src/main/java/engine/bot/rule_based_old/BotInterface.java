@@ -1,6 +1,7 @@
 package engine.bot.rule_based_old;
 
 /**
+ * !! UNUSED CHECK DISTANCE MEASURE FOR CURRENT BOT !!
  * The interface Bot interface for the bot classes
  * These methods are the ones used by all bot classes, the "Dumb" bot and the "Smart" bot.
  */
