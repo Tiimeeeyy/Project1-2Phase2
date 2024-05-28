@@ -338,8 +338,8 @@ public class ThirdScreenController implements ScreenInterface {
             fullTrajectory.clear();
 
 
-            System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
-            System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
+            // System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
+            // System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
 
             // Call the engine to calculate the trajectory
             double[] x = {BallPosition[0], BallPosition[1], power * directionVector[0], power * directionVector[1]};
@@ -400,7 +400,7 @@ public class ThirdScreenController implements ScreenInterface {
             final int index = i;
             KeyFrame keyFrame = new KeyFrame(Duration.millis(duration * i), event -> {
                 double[] point = trajectory.get(index);
-                System.out.println(Arrays.toString(this.BallPosition));
+                // System.out.println(Arrays.toString(this.BallPosition));
                 BallPosition[0] = point[0];
                 BallPosition[1] = point[1];
                 drawBallAndTrajectory(index);
@@ -614,25 +614,34 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     /**
-     * Method that "plays" the game
+     * Rule-based bot plays the game.
      */
     private void ruleBotPlay() {
         logEvent("!!--Rule-based bot entered the party--!!");
-        ArrayList<double[]> lol = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
-        while (!golfGame.isGoal()) {
-            for (double[] array : lol) {
-                // System.out.println(Arrays.toString(array));
-                // System.out.println("play is: " + Arrays.toString(array));
-                ballHit(array[2], new double[]{array[0], array[1]});
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            break;
+        ArrayList<double[]> plays = distanceMeasure.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
+    
+        if (!plays.isEmpty()) {
+            playBotShot(plays, 0);
         }
     }
+    
+    /**
+     * Rule-based bot method to animate the shoot.
+     */
+    private void playBotShot(ArrayList<double[]> plays, int index) {
+        if (index < plays.size()) {
+            double[] play = plays.get(index);
+            System.out.println(Arrays.toString(play));
+            ballHit(play[2], new double[]{play[0], play[1]});
+            
+            timeline.setOnFinished(event -> {
+                Platform.runLater(() -> playBotShot(plays, index + 1));
+            });
+        } else {
+            logEvent("Rule-based bot finished playing.");
+        }
+    }
+    
 
     @FXML
     private void gaBotFunc() {

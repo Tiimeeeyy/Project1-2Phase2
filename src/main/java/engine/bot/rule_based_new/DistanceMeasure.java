@@ -26,7 +26,7 @@ public class DistanceMeasure {
      * @param reachedHole True if the ball has reached the hole, false otherwise.
      */
     public DistanceMeasure(double[] position, double[] friction, double[] hole, double radius, boolean reachedHole) {
-        this.reachedHole = false;
+        this.reachedHole = reachedHole;
         this.position = position;
         this.hole = hole;
 
@@ -120,8 +120,6 @@ public class DistanceMeasure {
         velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1], Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
 
         return velocities;
-        // hello
-
     }
 
     /**
@@ -129,7 +127,7 @@ public class DistanceMeasure {
      *
      * @param x    The position of the Ball.
      * @param hole The position of the Hole.
-     * @return True if the ball is closer than 5m to the hole, false otherwise.
+     * @return True if the ball is closer than 1m to the hole, false otherwise.
      */
     public boolean checkHole(double[] x, double[] hole) {
         double distance = golfGame.getDistance(x, hole);
@@ -148,20 +146,19 @@ public class DistanceMeasure {
         double[] direction = calculateDirection(position, hole);
         double[][] velocities = createVelocityVectors(direction);
         // Assign a big maximum distance and an empty array to store the best shot.
-        double maxDistances = Double.MAX_VALUE;
+        double minDistance = Double.MAX_VALUE;
         double[] bestShot = null;
 
         for (double[] velocityVector : velocities) {
             double[] point = position.clone();
-
             ArrayList<double[]> trajectory = golfGame.shoot(new double[]{point[0], point[1], velocityVector[0] * assumeVelocity(point), velocityVector[1] * assumeVelocity(point)}, true);
             BallStatus status = getBallStatus();
-            double distance = golfGame.getDistance(position, trajectory.getLast());
+            double distance = golfGame.getDistance(trajectory.get(trajectory.size() - 1), hole);
             if (status == BallStatus.HitWater || status == BallStatus.OutOfBoundary) {
                 continue;
             }
-            if (distance < maxDistances) {
-                maxDistances = distance;
+            if (distance < minDistance) {
+                minDistance = distance;
                 bestShot = new double[]{velocityVector[0], velocityVector[1], assumeVelocity(point)};
             }
         }
@@ -178,7 +175,7 @@ public class DistanceMeasure {
      * @return True if ball is in hole, false otherwise.
      */
     public boolean checkInHole(double[] position, double[] hole) {
-        return hole == position;
+        return checkHole(position, hole);
     }
 
     /**
@@ -191,26 +188,23 @@ public class DistanceMeasure {
      */
     public ArrayList<double[]> playGame(double[] position, double[] hole, boolean reachedHole) {
         ArrayList<double[]> gameplay = new ArrayList<>();
+        
         while (!reachedHole) {
-            checkInHole(position, hole);
-            System.out.println("While loop entered");
             double[] play = getOnePlay(position, hole);
+            if (play.length == 0) {
+                break;
+            }
+            
             gameplay.add(play);
-            reachedHole = checkInHole(position, hole);
-            ArrayList<double[]> traj = golfGame.shoot(new double[]{position[0], position[1], play[0], play[1]}, true);
-            double[] newPos = traj.getLast();
-            System.out.println(Arrays.toString(newPos));
+            ArrayList<double[]> traj = golfGame.shoot(new double[]{position[0], position[1], play[0] * play[2], play[1] * play[2]}, true);
+            double[] newPos = traj.get(traj.size() - 1);
             position[0] = newPos[0];
             position[1] = newPos[1];
-
-            if (checkHole(position, hole)) {
-                System.out.println("If entered");
-                double[] lastPlay = lastShot(position, hole);
-                gameplay.add(lastPlay);
+            reachedHole = checkHole(position, hole);
+            if (reachedHole) {
                 break;
             }
         }
         return gameplay;
     }
 }
-
