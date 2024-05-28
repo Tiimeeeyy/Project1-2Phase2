@@ -55,13 +55,13 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="TREE_RADIUS" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="m" text="0.15" GridPane.columnIndex="1" />
+                  <TextField fx:id="TREE_RADIUS" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="m" text="0.3" GridPane.columnIndex="1" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Grass Friction(K,S):" wrappingWidth="122.2099609375" GridPane.rowIndex="1">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="GRASS_FRICTION_KINETIC" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="K" text="0.08" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="GRASS_FRICTION_KINETIC" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="62.0" promptText="K" text="0.06" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <Button alignment="CENTER" mnemonicParsing="false" onAction="#nextScreen" prefHeight="38.0" prefWidth="167.0" text="Next" GridPane.columnIndex="3" GridPane.rowIndex="4">
                      <cursor>
                         <Cursor fx:constant="HAND" />
@@ -86,7 +86,7 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="FunctionTextfield" alignment="CENTER" prefHeight="42.0" prefWidth="702.0" promptText="Insert function" text="0.4 * (0.9 - e^(-(x^2 + y^2) / 8))" GridPane.columnIndex="1">
+                  <TextField fx:id="FunctionTextfield" alignment="CENTER" prefHeight="42.0" prefWidth="702.0" promptText="Insert function" text="2*sin(x+y)+2" GridPane.columnIndex="1">
                      <font>
                         <Font size="14.0" />
                      </font>
