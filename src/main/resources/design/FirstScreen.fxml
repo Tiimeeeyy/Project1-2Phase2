@@ -86,7 +86,7 @@
                         <Font size="14.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="FunctionTextfield" alignment="CENTER" prefHeight="42.0" prefWidth="702.0" promptText="Insert function" text="2*sin(x+y)+2" GridPane.columnIndex="1">
+                  <TextField fx:id="FunctionTextfield" alignment="CENTER" prefHeight="42.0" prefWidth="702.0" promptText="Insert function" text="sin(x+y)" GridPane.columnIndex="1">
                      <font>
                         <Font size="14.0" />
                      </font>

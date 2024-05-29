@@ -65,7 +65,7 @@ public class MapPageController implements ScreenInterface {
     private double[] startBallPostion = new double[2]; // Starting position of the ball
     private double[] HolePostion = new double[2]; // Position of the hole
     private double radiusHole; // Radius of the hole
-    private int mapSize; // Size of the map
+    private int mapSize = 50; // Size of the map
     private String function; // Function for generating the height map
     private double treeRadius; // Radius of trees
     private double grassFrictionKINETIC; // Kinetic friction for grass
