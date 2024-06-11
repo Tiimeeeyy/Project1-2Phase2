@@ -33,7 +33,13 @@ public class Utility {
         return (double) (-x+250)/ratio;
     }
     public static double getPowerFromVelocity(double[] x){
-        return Math.sqrt(Math.pow(x[0], 2)+Math.pow(x[1], 2));
+        if(x.length==2){
+            return Math.sqrt(Math.pow(x[0], 2)+Math.pow(x[1], 2));
+        }
+        if (x.length==4) {
+            return Math.sqrt(Math.pow(x[2], 2)+Math.pow(x[3], 2));
+        }
+        return -1;
     }
     public static double[] getDirectionFromVelocity(double[] x){
         double[] normalized={x[0]/getPowerFromVelocity(x),x[1]/getPowerFromVelocity(x)};
