@@ -469,11 +469,12 @@ public class ThirdScreenController implements ScreenInterface {
             updateShotCountLabel();
             handlePostAnimation();
             this.ballMoving = false;
-            if (step<shots.size()-1) {
-                
+            if (shots!=null) {
+                if (step<shots.size()-1) {
                     ballHit(step+1);
-                
+                }
             }
+            
         });
         timeline.play();
     }
@@ -718,22 +719,22 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void gaBotFunc() {
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        AiBotGA gaBot = new AiBotGA(golfGame);
-        double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        gaBot.golfBot(x);
-        double[] solution = gaBot.getBest();
-        double[] velocity = {solution[2], solution[3]};
-        ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-        System.out.println(Arrays.toString(velocity));
+        // AiBotGA gaBot = new AiBotGA(golfGame);
+        // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+        // gaBot.golfBot(x);
+        // double[] solution = gaBot.getBest();
+        // double[] velocity = {solution[2], solution[3]};
+        // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+        // System.out.println(Arrays.toString(velocity));
 
-        // ArrayList<double[]> test=new ArrayList<>();
-        // double[] t={-3,0,0,2};
-        // test.add(t.clone());
-        // t=new double[]{-3,5,2,0};
-        // test.add(t.clone());
-        // t=new double[]{-3,5,2,2};
-        // test.add(t.clone());
-        // shots=test;
-        // ballHit(0);
+        ArrayList<double[]> test=new ArrayList<>();
+        double[] t={-3,0,0,2};
+        test.add(t.clone());
+        t=new double[]{-3,5,2,0};
+        test.add(t.clone());
+        t=new double[]{-3,5,2,2};
+        test.add(t.clone());
+        shots=test;
+        ballHit(0);
     }
 }
