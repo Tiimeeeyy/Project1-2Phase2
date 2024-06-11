@@ -135,7 +135,8 @@ public class MapPageController implements ScreenInterface {
      */
     private void createScreen(){
 
-       
+       String newStr = "hello";
+       newStr = newStr + "world";
         renderInitialMap();
         drawBallAndHole();
     }

@@ -1,6 +1,7 @@
 package ui.controller;
 
 import engine.bot.AibotGA.AiBotGA;
+import engine.bot.hillClimbingBot.HillClimbingBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
@@ -70,6 +71,12 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private Button ruleBot;
+
+    @FXML
+    private Button chBot;
+
+    @FXML
+    private Button mlBot;
 
     @FXML
     private Button gaBot;
@@ -149,6 +156,9 @@ public class ThirdScreenController implements ScreenInterface {
 
         loadNewImage();
         ruleBot.setOnAction(event -> ruleBotPlay());
+        chBot.setOnAction(event -> chBotPlay());
+        mlBot.setOnAction(event -> mlBotPlay());
+
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
 
@@ -665,5 +675,22 @@ public class ThirdScreenController implements ScreenInterface {
         double[] velocity = {solution[2], solution[3]};
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
         System.out.println(Arrays.toString(velocity));
+    }
+
+    @FXML
+    private void chBotPlay(){
+        System.out.println("hello");
+        logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
+        HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion);
+        double[] velocity = chBot.hillClimbingAlgorithm();
+        System.out.println(Arrays.toString(velocity));
+
+        ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+        return;
+    }
+
+    @FXML
+    private void mlBotPlay(){
+        return;
     }
 }
