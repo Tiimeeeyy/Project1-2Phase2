@@ -729,7 +729,7 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void gaBotFunc() {
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        AiBotGA gaBot = new AiBotGA(golfGame);
+        AiBotGA gaBot = new AiBotGA(golfGame,HolePostion);
         double[] x = {BallPosition[0], BallPosition[1], 0, 0};
         gaBot.golfBot(x);
         double[] solution = gaBot.getBest();

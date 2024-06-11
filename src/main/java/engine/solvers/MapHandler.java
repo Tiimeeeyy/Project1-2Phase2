@@ -17,6 +17,7 @@ public class MapHandler {
     private int[][] blueAry;
     private double[][][] gradient;
     private boolean[][] treeAry;
+    private boolean grass[][];
     /**
      * Read the map and store the gradient.
      *
@@ -40,12 +41,18 @@ public class MapHandler {
         redAry=new int[width][height];
         blueAry=new int[width][height];
         treeAry=new boolean[width][height];
+        grass=new boolean[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
                 redAry[i][j] = (rgb >> 16) & 0xFF;   // Red component, Red is the friction, 0-255
                 gAry[i][j] = (rgb >> 8) & 0xFF;    // Green component, Green is the height, 0-255. 
                 blueAry[i][j] = rgb & 0xFF; 
+                if(blueAry[i][j]<10){
+                    grass[i][j]=true;
+                }else{
+                    grass[i][j]=false;
+                }
                 if (rgb==-8897501) {
                     treeAry[i][j]=true;
                 }else{
@@ -82,6 +89,9 @@ public class MapHandler {
     }
     public boolean[][] getTree(){
         return this.treeAry;
+    }
+    public boolean[][] getGrass(){
+        return this.grass;
     }
 
     /**
