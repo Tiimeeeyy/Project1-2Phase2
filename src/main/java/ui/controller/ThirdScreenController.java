@@ -94,6 +94,7 @@ public class ThirdScreenController implements ScreenInterface {
     private Timeline timeline; // Animation timeline
     private boolean ballMoving = false;
     private boolean ruleBasedBot = false;
+    private ArrayList<double[]> shots;
 
     private Parent root; // Root node
 
@@ -372,7 +373,61 @@ public class ThirdScreenController implements ScreenInterface {
             logEvent(shotLog);
             updateShotCountLabel();
             // Animate the ball movement along the trajectory
-            animateBallMovement(fullTrajectory, power);
+            animateBallMovement(fullTrajectory, 0);
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Goal!");
+            alert.setHeaderText("Goal Reached, The ball has already reached the hole.");
+            alert.setContentText("Would you like to go back or see the stats?");
+
+            ButtonType backButton = new ButtonType("Back");
+            ButtonType seeStatsButton = new ButtonType("See the stat");
+
+            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent()) {
+                if (result.get() == backButton) {
+                    Main mainInst = new Main();
+                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                } else if (result.get() == seeStatsButton) {
+                    showStats();
+                }
+            }
+        }
+    }
+
+    private void ballHit(int step) {
+        if (!REACHED_THE_HOLE) {
+            double[] currentShot=shots.get(step).clone();
+            // Clear the trajectory before each new hit
+            fullTrajectory.clear();
+
+
+            // System.out.println("Hit with power: " + power + ", direction: [" + directionVector[0] + ", " + directionVector[1] + "]");
+            // System.out.println("StartBallPostion: " + BallPosition[0] + ", " + BallPosition[1]);
+
+            // Call the engine to calculate the trajectory
+            
+            ArrayList<double[]> xpath = this.golfGame.shoot(currentShot, true);
+
+            // Update ball position and shot count
+            if (xpath != null && !xpath.isEmpty()) {
+                fullTrajectory.addAll(xpath);  // Add new trajectory points to the full trajectory
+                double[] finalPosition = xpath.get(xpath.size() - 1).clone();
+                BallPosition[0] = finalPosition[0];
+                BallPosition[1] = finalPosition[1];
+                shotCount++;
+            }
+
+            String shotLog = String.format(
+                    "Shot %d: Hit to (%.2f, %.2f) with power %.2f.",
+                    shotCount, BallPosition[0], BallPosition[1], Utility.getPowerFromVelocity(shots.get(step)));
+            logEvent(shotLog);
+            updateShotCountLabel();
+            // Animate the ball movement along the trajectory
+            animateBallMovement(fullTrajectory, step);
 
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -403,7 +458,7 @@ public class ThirdScreenController implements ScreenInterface {
      * @param trajectory the trajectory of the ball
      * @param power      the power of the hit
      */
-    public void animateBallMovement(ArrayList<double[]> trajectory, double power) {
+    public void animateBallMovement(ArrayList<double[]> trajectory, int step) {
         timeline = new Timeline();
 
         double duration = 5;
@@ -424,6 +479,12 @@ public class ThirdScreenController implements ScreenInterface {
             updateShotCountLabel();
             handlePostAnimation();
             this.ballMoving = false;
+            if (shots!=null) {
+                if (step<shots.size()-1) {
+                    ballHit(step+1);
+                }
+            }
+            
         });
         timeline.play();
     }
@@ -668,13 +729,23 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void gaBotFunc() {
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        AiBotGA gaBot = new AiBotGA(golfGame);
-        double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        gaBot.golfBot(x);
-        double[] solution = gaBot.getBest();
-        double[] velocity = {solution[2], solution[3]};
-        ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-        System.out.println(Arrays.toString(velocity));
+        // AiBotGA gaBot = new AiBotGA(golfGame);
+        // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+        // gaBot.golfBot(x);
+        // double[] solution = gaBot.getBest();
+        // double[] velocity = {solution[2], solution[3]};
+        // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+        // System.out.println(Arrays.toString(velocity));
+
+        ArrayList<double[]> test=new ArrayList<>();
+        double[] t={-3,0,0,2};
+        test.add(t.clone());
+        t=new double[]{-3,5,2,0};
+        test.add(t.clone());
+        t=new double[]{-3,5,2,2};
+        test.add(t.clone());
+        shots=test;
+        ballHit(0);
     }
 
     @FXML
