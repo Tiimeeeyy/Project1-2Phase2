@@ -71,8 +71,8 @@ public class HillClimbingBot {
     private static double[] initializeVelocity() {
         Random rand = new Random();
         double[] velocity = new double[2];
-        velocity[0] = rand.nextDouble() * 10 - 5; // диапазон [-5, 5]
-        velocity[1] = rand.nextDouble() * 10 - 5; // диапазон [-5, 5]
+        velocity[0] = rand.nextDouble() * 10 - 5; 
+        velocity[1] = rand.nextDouble() * 10 - 5; 
         return velocity;
     }
 }
