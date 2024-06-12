@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane maxHeight="720.0" maxWidth="1280.0" prefHeight="720.0" prefWidth="1280.0" styleClass="background-pane" stylesheets="@StartScreen.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.LoadMapController">
+   <children>
+      <AnchorPane prefHeight="720.0" prefWidth="1280.0" stylesheets="@StartScreen.css">
+         <children>
+            <TabPane fx:id="mapTabPane" layoutX="215.0" layoutY="148.0" prefHeight="459.0" prefWidth="849.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Hills">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fx:id="mapImage1" fitHeight="426.0" fitWidth="445.0">
+                                 <image>
+                                    <Image url="@../maps/hills.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox prefHeight="426.0" prefWidth="426.0">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hills Map" textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Text>
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="The Hills map features a diverse terrain with rolling green hills, a serene water body, and a challenging sand desert area. The left side of the map is dominated by a large, blue water body, offering a serene but challenging obstacle. The map is populated with dense trees, providing a test of precision for navigating through the forested area. This map is perfect for players looking to test their skills across different terrains and obstacles." wrapText="true">
+                                       <VBox.margin>
+                                          <Insets top="40.0" />
+                                       </VBox.margin>
+                                    </TextArea>
+                                    <Button mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Play!" textAlignment="RIGHT" onAction="#goNext">
+                                       <VBox.margin>
+                                          <Insets left="100.0" top="30.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                <Tab text="Forest">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fx:id="mapImage2" fitHeight="426.0" fitWidth="445.0">
+                                 <image>
+                                    <Image url="@../maps/forest.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox prefHeight="426.0" prefWidth="426.0">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Forest Map" textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Text>
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="The Forest map features dense tree coverage providing a challenging environment for precision shots. Navigating through the thick forest requires strategic planning and skillful play. The map also features a few clearings and water bodies that add to the complexity and excitement of the gameplay." wrapText="true">
+                                       <VBox.margin>
+                                          <Insets top="40.0" />
+                                       </VBox.margin>
+                                    </TextArea>
+                                    <Button mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Play!" textAlignment="CENTER" onAction="#goNext">
+                                       <VBox.margin>
+                                          <Insets left="100.0" top="30.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Sand Desert">
+                    <content>
+                      <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fx:id="mapImage3" fitHeight="426.0" fitWidth="445.0">
+                                 <image>
+                                    <Image url="@../maps/desert.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox prefHeight="426.0" prefWidth="426.0">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sand Desert Map" textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Text>
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="The Sand Desert map presents a challenging landscape of sandy dunes and sparse vegetation. The terrain demands careful navigation and control, as the ball can easily get trapped in the sand. Players must utilize their skills to overcome the obstacles and reach the target." wrapText="true">
+                                       <VBox.margin>
+                                          <Insets top="40.0" />
+                                       </VBox.margin>
+                                    </TextArea>
+                                    <Button mnemonicParsing="false" prefHeight="48.0" prefWidth="200.0" text="Play!" textAlignment="CENTER" onAction="#goNext">
+                                       <VBox.margin>
+                                          <Insets left="100.0" top="30.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+            <Text layoutX="485.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please select a map" wrappingWidth="309.30078125">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Text>
+            <Button layoutX="215.0" layoutY="637.0" mnemonicParsing="false" onAction="#goBack" prefHeight="48.0" prefWidth="166.0" text="Back" textAlignment="CENTER" />
+         </children>
+      </AnchorPane>
+   </children>
+</Pane>

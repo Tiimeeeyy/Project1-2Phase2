@@ -55,4 +55,10 @@ public class StartScreenController implements ScreenInterface {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }
+
+    @FXML
+    private void loadMap(ActionEvent event){
+        Main mainInst = new Main();
+        mainInst.setScreen("LOAD", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+    }
 }

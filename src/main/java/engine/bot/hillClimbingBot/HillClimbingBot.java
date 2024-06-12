@@ -59,11 +59,11 @@ public class HillClimbingBot {
                     }
                 }
                 if (!foundBetter) {
-                    stepSize /= 2;  // make a step size smaller
+                    stepSize /= 2;  // make a step size smaller (adaptive)
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
-                if (Math.abs(currentFitness) <= TOLERANCE) {
+                if (Math.abs(currentFitness) <= TOLERANCE || bestFitness>-0.2) {
                     this.goal = true;
                     break;
                 }
@@ -73,6 +73,7 @@ public class HillClimbingBot {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
+
         }
         return bestVelocity;
     }

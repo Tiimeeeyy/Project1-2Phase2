@@ -152,7 +152,7 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
     }
-    public void renderMap(int[][] initialGreen, String mappath, double[] hole,double radius){
+    public void renderMap(int[][] initialGreen, String mappath, double[] hole,double radius, boolean drawHole){
         BufferedImage image = null;
         int width=500;
         int height=500;
@@ -180,14 +180,17 @@ public class MapHandler {
                     image.setRGB(i,j,colortemp.getRGB());
                 }
             }
-            int intR=(int) Math.floor(radius*Utility.ratio);
-            Color black=new Color(0,0,0);
-            for (int i = -intR; i <= intR; i++) {
-                for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
-                    image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
-                    image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
+            if(drawHole){
+                int intR=(int) Math.floor(radius*Utility.ratio);
+                Color black=new Color(0,0,0);
+                for (int i = -intR; i <= intR; i++) {
+                    for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
+                        image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
+                        image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
+                    }
                 }
             }
+
             File outputfile=new File(mappath);
             ImageIO.write(image, "png", outputfile);
 
