@@ -17,6 +17,7 @@ public class MapHandler {
     private int[][] blueAry;
     private double[][][] gradient;
     private boolean[][] treeAry;
+    private boolean grass[][];
     /**
      * Read the map and store the gradient.
      *
@@ -40,12 +41,18 @@ public class MapHandler {
         redAry=new int[width][height];
         blueAry=new int[width][height];
         treeAry=new boolean[width][height];
+        grass=new boolean[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
                 redAry[i][j] = (rgb >> 16) & 0xFF;   // Red component, Red is the friction, 0-255
                 gAry[i][j] = (rgb >> 8) & 0xFF;    // Green component, Green is the height, 0-255. 
                 blueAry[i][j] = rgb & 0xFF; 
+                if(blueAry[i][j]<10){
+                    grass[i][j]=true;
+                }else{
+                    grass[i][j]=false;
+                }
                 if (rgb==-8897501) {
                     treeAry[i][j]=true;
                 }else{
@@ -82,6 +89,9 @@ public class MapHandler {
     }
     public boolean[][] getTree(){
         return this.treeAry;
+    }
+    public boolean[][] getGrass(){
+        return this.grass;
     }
 
     /**
@@ -142,7 +152,7 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
     }
-    public void renderMap(int[][] initialGreen, String mappath, double[] hole,double radius){
+    public void renderMap(int[][] initialGreen, String mappath, double[] hole,double radius, boolean drawHole){
         BufferedImage image = null;
         int width=500;
         int height=500;
@@ -170,14 +180,17 @@ public class MapHandler {
                     image.setRGB(i,j,colortemp.getRGB());
                 }
             }
-            int intR=(int) Math.floor(radius*Utility.ratio);
-            Color black=new Color(0,0,0);
-            for (int i = -intR; i <= intR; i++) {
-                for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
-                    image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
-                    image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
+            if(drawHole){
+                int intR=(int) Math.floor(radius*Utility.ratio);
+                Color black=new Color(0,0,0);
+                for (int i = -intR; i <= intR; i++) {
+                    for (int j =0; j <= Math.round(Math.sqrt(Math.pow(intR, 2)-Math.pow(i, 2))); j++) {
+                        image.setRGB(pixelHole[0]+i, pixelHole[1]+j, black.getRGB());
+                        image.setRGB(pixelHole[0]+i, pixelHole[1]-j, black.getRGB());
+                    }
                 }
             }
+
             File outputfile=new File(mappath);
             ImageIO.write(image, "png", outputfile);
 

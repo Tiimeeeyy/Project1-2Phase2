@@ -15,6 +15,7 @@ public class AiBotGA {
     private double mutationRate=0.01;
     private double[] solution=new double[4];
     private boolean goal=false;
+    private double[] des;
 
     private GolfGameEngine game;
 
@@ -22,8 +23,9 @@ public class AiBotGA {
      * Class constructor
      * @param game The engine to simulate the game.
      */
-    public AiBotGA(GolfGameEngine game){
+    public AiBotGA(GolfGameEngine game, double[] des){
         this.game=game;
+        this.des=des;
     }
 
     /**

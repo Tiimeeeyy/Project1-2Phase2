@@ -3,6 +3,8 @@ package ui.screenFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import ui.controller.FirstScreenController;
+import ui.controller.InputSecondController;
+import ui.controller.LoadMapController;
 import ui.controller.MapPageController;
 import ui.controller.StartScreenController;
 import ui.controller.ThirdScreenController;
@@ -60,7 +62,19 @@ public class ScreenFactory {
                 controller.setRoot(root);
                 controller.initializeParameters(startBallPosition, holePosition, radiusHole, grassFrictionKINETIC, grassFrictionSTATIC);
                 return controller;
-            } else {
+            } else if (screenType.equals("LOAD")) {
+                fxmlLoader.setLocation(getClass().getResource("/design/LoadMap.fxml"));
+                root = fxmlLoader.load();
+                LoadMapController controller = fxmlLoader.getController();
+                controller.setRoot(root);
+                return controller;
+             } else if (screenType.equals("INPUT2")) {
+                fxmlLoader.setLocation(getClass().getResource("/design/InputSecondController.fxml"));
+                root = fxmlLoader.load();
+                InputSecondController controller = fxmlLoader.getController();
+                controller.setRoot(root);
+                return controller;
+             }else {
                 throw new Exception("Invalid screen type");
             }
         } catch (Exception e) {
