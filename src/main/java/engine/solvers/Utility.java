@@ -40,8 +40,5 @@ public class Utility {
         return normalized;
     }
 
-    public static void main(String[] args) {
-        BallStatus s=BallStatus.Goal;
-        System.out.println(s.equals(BallStatus.Goal));
-    }
+    
 }
