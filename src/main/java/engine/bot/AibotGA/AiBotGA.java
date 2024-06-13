@@ -3,6 +3,7 @@ package engine.bot.AibotGA;
 
 import engine.solvers.GolfGameEngine;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -12,10 +13,11 @@ import java.util.Random;
 public class AiBotGA {
     private int popSize=50;
     private char[] vocab={'0','1'};
-    private double mutationRate=0.01;
+    private double mutationRate=0.02;
     private double[] solution=new double[4];
     private boolean goal=false;
     private double[] des;
+    private ArrayList<double[]> shortestPath;
 
     private GolfGameEngine game;
 
@@ -40,7 +42,39 @@ public class AiBotGA {
         initialPopulation(population, x0);
  
         // Run the algorithm for 700 generations
-        for (int i = 0; i < 700; i++) {
+        for (int i = 0; i < 200; i++) {
+            int[] slcIndex=selection(population);
+            crossover(population[slcIndex[0]], population[slcIndex[1]], population);
+            population[popSize-1].setFitness(calculateFitness(population[popSize-1], x.clone()));
+            population[popSize-2].setFitness(calculateFitness(population[popSize-2], x.clone()));
+            if (this.goal) {
+                break;
+            }
+            HeapSort.sort(population);
+            // System.out.println(population[0].getFitness()+"  "+i);
+        }
+        // If the goal is not reached, set the solution to the best solution found
+        if (!this.goal) {
+            double[] best=x0;
+            best[2]=population[0].genoToPhenotype()[0];
+            best[3]=population[0].genoToPhenotype()[1];
+            this.solution=best.clone();
+        }
+        
+    }
+
+    public void golfBotMultiShot(double[] x){
+        Individual[] population=new Individual[popSize];
+        double[] x0=x.clone();
+
+        MapSearcher mapSearcher=new MapSearcher(game.getMapPath(), x0, game.getHole(), game.getHoleRadius());
+        shortestPath=mapSearcher.findShortestPath();
+
+        // initiate population
+        initialPopulation(population, x0);
+ 
+        // Run the algorithm for 700 generations
+        for (int i = 0; i < 500; i++) {
             int[] slcIndex=selection(population);
             crossover(population[slcIndex[0]], population[slcIndex[1]], population);
             population[popSize-1].setFitness(calculateFitness(population[popSize-1], x.clone()));
@@ -120,10 +154,27 @@ public class AiBotGA {
      * @param x The current position of the ball.
      * @return The fitness of the individual.
      */
+    // double calculateFitness(Individual indi, double[] x){
+        
+    //     double ball_hole_distance=game.getHoleBallDistance(x);
+
+    //     x[2]=indi.genoToPhenotype()[0];
+    //     x[3]=indi.genoToPhenotype()[1];
+    //     double[] x0=x.clone();
+    //     game.shoot(x,false);
+    //     if (game.isGoal() && !this.goal) {
+    //         this.solution=x0.clone();
+    //         this.goal=true;
+    //         System.out.println("Goal!!!!!!!in calcu fitness");;
+    //     }
+    //     double fit=-Math.log10((game.getMinDistance()+0.01)/(ball_hole_distance+0.01));
+        
+    //     return fit;
+    // }
+
     double calculateFitness(Individual indi, double[] x){
         
-        double ball_hole_distance=game.getHoleBallDistance(x);
-
+        double fit = 1;
         x[2]=indi.genoToPhenotype()[0];
         x[3]=indi.genoToPhenotype()[1];
         double[] x0=x.clone();
@@ -133,8 +184,13 @@ public class AiBotGA {
             this.goal=true;
             System.out.println("Goal!!!!!!!in calcu fitness");;
         }
-        double fit=-Math.log10((game.getMinDistance()+0.01)/(ball_hole_distance+0.01));
-        
+
+        for (int i =0; i<shortestPath.size();i++) {
+            if (game.getDistance(game.getStoppoint(), shortestPath.get(i))<=game.getHoleRadius()) {
+                fit = i+5;
+            }
+        }
+       
         return fit;
     }
 

@@ -731,7 +731,7 @@ public class ThirdScreenController implements ScreenInterface {
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
         AiBotGA gaBot = new AiBotGA(golfGame,HolePostion);
         double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        gaBot.golfBot(x);
+        gaBot.golfBotMultiShot(x);
         double[] solution = gaBot.getBest();
         double[] velocity = {solution[2], solution[3]};
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));

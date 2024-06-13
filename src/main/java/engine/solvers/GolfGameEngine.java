@@ -190,6 +190,14 @@ public class GolfGameEngine {
         return this.goal;
     }
 
+    public double getStoppedToHoleDistance(){
+        return getHoleBallDistance(this.stopCoordinate);
+    }
+
+    public String getMapPath(){
+        return this.mappath;
+    }
+
     /**
      * Calculates the distance between the hole and the ball.
      * @param x Current position of the ball.
@@ -229,6 +237,10 @@ public class GolfGameEngine {
      */
     public BallStatus getStatus(){
         return this.status;
+    }
+
+    public double getHoleRadius(){
+        return this.r;
     }
 
     /**
