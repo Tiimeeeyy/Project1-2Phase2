@@ -390,7 +390,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -444,7 +444,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -591,7 +591,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void goBack() {
         if (REACHED_THE_HOLE) {
             Main mainInst = new Main();
-            mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+            mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Retreat");
@@ -607,7 +607,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == stayButton) {
                     alert.close();
                 }
@@ -667,7 +667,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
