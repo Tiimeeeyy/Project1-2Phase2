@@ -141,7 +141,6 @@ public class ThirdScreenController implements ScreenInterface {
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
-        // System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         initialize();
     }
@@ -154,7 +153,6 @@ public class ThirdScreenController implements ScreenInterface {
         if (BallPosition == null || HolePostion == null) {
             return;
         }
-
         loadNewImage();
         ruleBot.setOnAction(event -> ruleBotPlay());
         chBot.setOnAction(event -> chBotPlay());
@@ -237,9 +235,6 @@ public class ThirdScreenController implements ScreenInterface {
                     }
 
                     mapImageView.setImage(image);
-                    // System.out.println("Image width: " + image.getWidth() + ", height: " + image.getHeight());
-                    // System.out.println("ImageView width: " + mapImageView.getFitWidth() + ", height: " + mapImageView.getFitHeight());
-
                     return;
                 }
             }
@@ -735,7 +730,7 @@ public class ThirdScreenController implements ScreenInterface {
         double[] solution = gaBot.getBest();
         double[] velocity = {solution[2], solution[3]};
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-        System.out.println(Arrays.toString(velocity));
+        // System.out.println(Arrays.toString(velocity));
 
         // ArrayList<double[]> test=new ArrayList<>();
         // double[] t={-3,0,0,2};
@@ -750,11 +745,11 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private void chBotPlay(){
-        System.out.println("hello");
+        // System.out.println("hello");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
         HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion);
         double[] velocity = chBot.hillClimbingAlgorithm();
-        System.out.println(Arrays.toString(velocity));
+        // System.out.println(Arrays.toString(velocity));
 
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
         return;

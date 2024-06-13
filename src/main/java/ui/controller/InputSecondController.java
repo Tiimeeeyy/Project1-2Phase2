@@ -76,7 +76,7 @@ public class InputSecondController extends Parent implements ScreenInterface {
                 GraphicsContext gc = mapCanvas.getGraphicsContext2D();
                 gc.drawImage(mapImage, 0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
             } else {
-                System.out.println("Source file does not exist.");
+                // System.out.println("Source file does not exist.");
             }
         } catch (Exception ex) {
             showAlert("Error!", "Failed to draw map", ex.getMessage());
@@ -174,10 +174,13 @@ public class InputSecondController extends Parent implements ScreenInterface {
     private void openNextScreen(double xBall, double yBall, double xHole, double yHole, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         try {
             Main mainInst = new Main();
-            System.out.println("grassFrictionKINETIC: " + grassFrictionKINETIC);
-            System.out.println("grassFrictionSTATIC: " + grassFrictionSTATIC);
-            System.out.println(relativePath);
-            mainInst.setScreen("MAP", "", xBall, yBall, xHole, yHole, radiusHole, 0.3, grassFrictionKINETIC, grassFrictionSTATIC, null, null);
+            // System.out.println("grassFrictionKINETIC: " + grassFrictionKINETIC);
+            // System.out.println("grassFrictionSTATIC: " + grassFrictionSTATIC);
+            // System.out.println(relativePath);
+            double[] startBallPostion = {xBall, yBall};
+            double[] HolePostion = {xHole, yHole};
+            mainInst.setScreen("GAME", "", 0, 0, 0, 0, radiusHole, 0, grassFrictionKINETIC, grassFrictionSTATIC, startBallPostion, HolePostion);
+
         } catch (Exception ex) {
             showAlert("Error!", "Failed to proceed to the next screen", ex.getMessage());
             ex.printStackTrace();
@@ -199,9 +202,9 @@ public class InputSecondController extends Parent implements ScreenInterface {
                 double[] hole = {xHole, yHole};
                 drawHole(image, hole, radius);
                 ImageIO.write(image, "png", newFile);
-                System.out.println("File created: " + newFile.getAbsolutePath());
+                // System.out.println("File created: " + newFile.getAbsolutePath());
             } else {
-                System.out.println("Source file does not exist.");
+                // System.out.println("Source file does not exist.");
             }
         } catch (IOException ex) {
             showAlert("Error!", "Failed to create file", ex.getMessage());
@@ -223,7 +226,7 @@ public class InputSecondController extends Parent implements ScreenInterface {
                 if (!file.delete()) {
                     throw new IOException("Failed to delete existing file: " + file.getAbsolutePath());
                 } else {
-                    System.out.println("Existing file deleted: " + file.getAbsolutePath());
+                    // System.out.println("Existing file deleted: " + file.getAbsolutePath());
                 }
             }
         } catch (IOException ex) {
