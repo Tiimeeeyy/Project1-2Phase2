@@ -1,6 +1,7 @@
 package ui.controller;
 
 import engine.bot.AibotGA.AiBotGA;
+import engine.bot.AibotGA.AiBotMultiShots;
 import engine.bot.hillClimbingBot.HillClimbingBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
@@ -740,9 +741,9 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void gaBotFunc() {
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        AiBotGA gaBot = new AiBotGA(golfGame,HolePostion);
+        AiBotMultiShots gaBot = new AiBotMultiShots(golfGame,HolePostion);
         double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        gaBot.golfBotMultiShot(x);
+        gaBot.golfBot(x);
         double[] solution = gaBot.getBest();
         double[] velocity = {solution[2], solution[3]};
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));

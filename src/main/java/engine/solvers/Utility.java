@@ -1,4 +1,8 @@
-package engine.solvers;;
+package engine.solvers;
+
+import java.util.Arrays;
+
+;
 
 public class Utility {
     public static double ratio=10.0;
@@ -49,6 +53,8 @@ public class Utility {
     public static double getDistance (double[] src, double[] des){
         return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
     }
+
+    
 
     
 }
