@@ -103,6 +103,7 @@ public class ThirdScreenController implements ScreenInterface {
     private boolean ballMoving = false;
     private boolean ruleBasedBot = false;
     private ArrayList<double[]> shots;
+    private boolean botActivated = false;
 
     private Parent root; // Root node
 
@@ -404,7 +405,7 @@ public class ThirdScreenController implements ScreenInterface {
         }
     }
 
-    private void ballHit(int step) {
+    private void ballHitMultiple(int step) {
         if (!REACHED_THE_HOLE) {
             double[] currentShot=shots.get(step).clone();
             // Clear the trajectory before each new hit
@@ -487,7 +488,7 @@ public class ThirdScreenController implements ScreenInterface {
             this.ballMoving = false;
             if (shots!=null) {
                 if (step<shots.size()-1) {
-                    ballHit(step+1);
+                    ballHitMultiple(step+1);
                 }
             }
             
@@ -505,7 +506,7 @@ public class ThirdScreenController implements ScreenInterface {
                 logEvent("** The ball hit a tree and bounced off **");
             }
 
-            if (message.contains("Water")) {
+            if (message.contains("Water") && !this.botActivated) {
                 logEvent("!!--The ball landed in water--!!");
                 showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
             } else if (golfGame.isGoal()) {
@@ -760,6 +761,7 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void playBot() {
         String selectedBot = botSelect.getValue();
+        this.botActivated=true;
         if (selectedBot != null) {
             switch (selectedBot) {
                 case "Rule Bot":
@@ -789,10 +791,12 @@ public class ThirdScreenController implements ScreenInterface {
         // System.out.println("hello");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
         HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion);
-        double[] velocity = chBot.hillClimbingAlgorithm();
+        ArrayList<double[]> velocities = chBot.hillClimbingAlgorithm();
+        // double[] velocity = velocities.get(0);
         // System.out.println(Arrays.toString(velocity));
-
-        ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+        // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+        shots = velocities;
+        ballHitMultiple(0);
         return;
     }
 

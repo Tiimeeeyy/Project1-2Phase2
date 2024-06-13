@@ -1,5 +1,6 @@
 package engine.bot.hillClimbingBot;
 
+import java.util.ArrayList;
 import java.util.Random;
 import engine.solvers.GolfGameEngine;
 
@@ -28,7 +29,7 @@ public class HillClimbingBot {
      */
     public HillClimbingBot(GolfGameEngine game, double[] startBallPosition, double[] holePosition) {
         this.game = game;
-        this.startBallPosition = startBallPosition;
+        this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
         this.velocity = initializeVelocity();
     }
@@ -38,7 +39,21 @@ public class HillClimbingBot {
      *
      * @return the best velocity found
      */
-    public double[] hillClimbingAlgorithm() {
+    public ArrayList<double[]> hillClimbingAlgorithm() {
+        ArrayList<double[]> shots = new ArrayList<>();
+        this.goal = false;
+
+        while (!this.goal) {
+            double[] shot = hillClimbing();
+            double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
+            shots.add(currentShot.clone());
+            startBallPosition = getTrajectory(startBallPosition, shot).clone();
+            System.out.println(shots.get(0)[0]);
+        }
+        return shots;
+    }
+
+    private double[] hillClimbing() {
         double bestFitness = Double.NEGATIVE_INFINITY;
         double[] bestVelocity = new double[2];
 
@@ -63,7 +78,7 @@ public class HillClimbingBot {
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
-                if (Math.abs(currentFitness) <= TOLERANCE || bestFitness>-0.2) {
+                if (Math.abs(currentFitness) <= TOLERANCE || bestFitness > -0.2) {
                     this.goal = true;
                     break;
                 }
@@ -73,7 +88,6 @@ public class HillClimbingBot {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
-
         }
         return bestVelocity;
     }
@@ -108,11 +122,15 @@ public class HillClimbingBot {
      * @return the fitness value, which is the negative distance to the hole
      */
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
-        double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
-        game.shoot(inputEngine, false);
-        double[] finalPosition = game.getStoppoint();
+        double[] finalPosition = getTrajectory(ballPosition, velocity);
         double distanceToTarget = calculateDistance(finalPosition, holePosition);
         return -distanceToTarget;
+    }
+
+    private double[] getTrajectory(double[] ballPosition, double[] velocity) {
+        double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
+        game.shoot(inputEngine, false);
+        return game.getStoppoint();
     }
 
     /**
