@@ -65,7 +65,7 @@ public class InputSecondController extends Parent implements ScreenInterface {
 
     public void initialize(String relativePath) {
         this.relativePath = relativePath;
-        drawMap();
+        updateMapF();
     }
 
     private void drawMap() {

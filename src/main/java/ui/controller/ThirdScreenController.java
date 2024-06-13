@@ -104,6 +104,7 @@ public class ThirdScreenController implements ScreenInterface {
     private boolean ruleBasedBot = false;
     private ArrayList<double[]> shots;
     private boolean botActivated = false;
+    private double radiusHole; // Radius of the hole
 
     private Parent root; // Root node
 
@@ -144,6 +145,7 @@ public class ThirdScreenController implements ScreenInterface {
     public void initializeParameters(double[] startBallPostion, double[] HolePostion, double radiusHole, double grassFrictionKINETIC, double grassFrictionSTATIC) {
         this.BallPosition = startBallPostion;
         this.HolePostion = HolePostion;
+        this.radiusHole = radiusHole;
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.REACHED_THE_HOLE = false;
@@ -507,8 +509,10 @@ public class ThirdScreenController implements ScreenInterface {
             }
 
             if (message.contains("Water") && !this.botActivated) {
+                if(!this.botActivated){
+                    showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
+                }
                 logEvent("!!--The ball landed in water--!!");
-                showAlert(Alert.AlertType.INFORMATION, "Ball in Water", "The ball landed in water.");
             } else if (golfGame.isGoal()) {
                 this.REACHED_THE_HOLE = true;
                 if(this.ruleBasedBot){

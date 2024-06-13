@@ -18,7 +18,7 @@ public class MapSearcher {
     private int[] holePostion;
     private double r;
 
-    MapSearcher(String mappath, double[] startBallPostion,double[] holePostion, double r){
+    public MapSearcher(String mappath, double[] startBallPostion,double[] holePostion, double r){
         MapHandler map=new MapHandler();
         
         map.readmap(mappath);
