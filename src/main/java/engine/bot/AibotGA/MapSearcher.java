@@ -16,7 +16,9 @@ public class MapSearcher {
     private boolean[][] grass;
     private int[] startBallPostion;
     private int[] holePostion;
+    private int[] lastPoint;
     private double r;
+    private int resolution=10;
 
     public MapSearcher(String mappath, double[] startBallPostion,double[] holePostion, double r){
         MapHandler map=new MapHandler();
@@ -25,7 +27,7 @@ public class MapSearcher {
         this.grass=map.getGrass();
         this.startBallPostion=Utility.coordinateToPixel(startBallPostion);
         this.holePostion=Utility.coordinateToPixel(holePostion);
-        this.r=Utility.ratio*r;
+        this.r=r;
     }
 
     public ArrayList<double[]> findShortestPath(){
@@ -36,46 +38,47 @@ public class MapSearcher {
         Map<int[],int[]> previous=new HashMap<>();
 
         Queue<int[]> queue=new LinkedList<>();
-        queue.add(startBallPostion);
+        queue.add(startBallPostion.clone());
         while (!queue.isEmpty()) {
             int[] current=queue.poll();
             int i=current[0];
             int j=current[1];
-            if (equals(current,holePostion)) {
+            if (Utility.getDistance(Utility.pixelToCoordinate(current),Utility.pixelToCoordinate(holePostion))<=resolution/Utility.ratio) {
+                lastPoint=current.clone();
                 System.out.println("holereached");
                 break;
             }
             
-            if (i==1 || j==1 || i==499 || j==499) {
+            if (i<=resolution || j<=resolution || i>=500-resolution || j>=500-resolution) {
                 continue;
             }
             
             
-            if (grass[i+1][j] && (!contains(visited, new int[]{i+1,j}))) {
-                int[] temp=new int[]{i+1,j};
+            if (grass[i+resolution][j] && (!contains(visited, new int[]{i+resolution,j}))) {
+                int[] temp=new int[]{i+resolution,j};
                 visited.add(temp.clone());
                 queue.add(temp.clone());
                 previous.put(temp.clone(),current.clone());
             }
-            if (grass[i][j+1] && (!contains(visited, new int[]{i,j+1}))) {
-                int[] temp=new int[]{i,j+1};
+            if (grass[i][j+resolution] && (!contains(visited, new int[]{i,j+resolution}))) {
+                int[] temp=new int[]{i,j+resolution};
                 visited.add(temp.clone());
                 queue.add(temp.clone());
                 previous.put(temp.clone(),current.clone());
             }
-            if (grass[i-1][j] && (!contains(visited, new int[]{i-1,j}))) {
-                int[] temp=new int[]{i-1,j};
+            if (grass[i-resolution][j] && (!contains(visited, new int[]{i-resolution,j}))) {
+                int[] temp=new int[]{i-resolution,j};
                 visited.add(temp.clone());
                 queue.add(temp.clone());
                 previous.put(temp.clone(),current.clone());
             }
-            if (grass[i][j-1] && (!contains(visited, new int[]{i,j-1}))) {
-                int[] temp=new int[]{i,j-1};
+            if (grass[i][j-resolution] && (!contains(visited, new int[]{i,j-resolution}))) {
+                int[] temp=new int[]{i,j-resolution};
                 visited.add(temp.clone());
                 queue.add(temp.clone());
                 previous.put(temp.clone(),current.clone());
             }
-           
+            
         }
 
         System.out.println(Arrays.toString(holePostion));
@@ -84,7 +87,7 @@ public class MapSearcher {
     }
     private  ArrayList<double[]> reConstruct(Map<int[],int[]> previous){
         ArrayList<double[]> shortestPath=new ArrayList<>();
-        int[] cur=holePostion.clone();
+        int[] cur=lastPoint.clone();
         
         shortestPath.add(Utility.pixelToCoordinate(cur));
         while (!equals(getValueOf(previous, cur),startBallPostion)) {
