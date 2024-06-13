@@ -20,7 +20,7 @@ public class MapSearcher {
 
     MapSearcher(String mappath, double[] startBallPostion,double[] holePostion, double r){
         MapHandler map=new MapHandler();
-        // map.readmap(mappath);
+        
         map.readmap(mappath);
         this.grass=map.getGrass();
         this.startBallPostion=Utility.coordinateToPixel(startBallPostion);
@@ -28,7 +28,7 @@ public class MapSearcher {
         this.r=Utility.ratio*r;
     }
 
-    private ArrayList<double[]> findShortestPath(){
+    public ArrayList<double[]> findShortestPath(){
         
         Set<int[]> visited=new HashSet<>();
         visited.add(startBallPostion.clone());
@@ -122,7 +122,7 @@ public class MapSearcher {
     
 
     public static void main(String[] args) {
-       MapSearcher mapSearcher=new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3,0}, new double[]{5,5}, 0.1);
+       MapSearcher mapSearcher=new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3,0}, new double[]{4,1}, 0.1);
        ArrayList<double[]> test=mapSearcher.findShortestPath();
        for (double[] entry:test) {
             System.out.println(Arrays.toString(entry));
