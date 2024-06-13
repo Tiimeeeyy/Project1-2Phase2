@@ -13,7 +13,7 @@ import java.util.Random;
 public class AiBotGA {
     private int popSize=50;
     private char[] vocab={'0','1'};
-    private double mutationRate=0.02;
+    private double mutationRate=0.10;
     private double[] solution=new double[4];
     private boolean goal=false;
     private double[] des;
@@ -175,10 +175,9 @@ public class AiBotGA {
     double calculateFitness(Individual indi, double[] x){
         
         double fit = 1;
-        x[2]=indi.genoToPhenotype()[0];
-        x[3]=indi.genoToPhenotype()[1];
-        double[] x0=x.clone();
-        game.shoot(x,false);
+        double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
+        double[] x0=xin.clone();
+        game.shoot(xin,false);
         if (game.isGoal() && !this.goal) {
             this.solution=x0.clone();
             this.goal=true;
@@ -186,11 +185,12 @@ public class AiBotGA {
         }
 
         for (int i =0; i<shortestPath.size();i++) {
-            if (game.getDistance(game.getStoppoint(), shortestPath.get(i))<=game.getHoleRadius()) {
-                fit = i+5;
+            if (game.getDistance(game.getStoppoint(), shortestPath.get(i))<=0.5) {
+                fit = i*5+5;
             }
         }
        
+        System.out.println(fit);
         return fit;
     }
 

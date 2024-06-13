@@ -46,5 +46,9 @@ public class Utility {
         return normalized;
     }
 
+    public static double getDistance (double[] src, double[] des){
+        return Math.sqrt(Math.pow(des[0]-src[0], 2)+Math.pow(des[1]-src[1], 2));
+    }
+
     
 }
