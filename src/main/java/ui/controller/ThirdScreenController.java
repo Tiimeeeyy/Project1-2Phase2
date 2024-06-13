@@ -794,7 +794,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void chBotPlay(){
         // System.out.println("hello");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-        HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion);
+        HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
         ArrayList<double[]> velocities = chBot.hillClimbingAlgorithm();
         // double[] velocity = velocities.get(0);
         // System.out.println(Arrays.toString(velocity));

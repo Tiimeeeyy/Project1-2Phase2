@@ -3,11 +3,8 @@ package engine.bot.hillClimbingBot;
 import java.util.ArrayList;
 import java.util.Random;
 import engine.solvers.GolfGameEngine;
+import engine.bot.AibotGA.MapSearcher; 
 
-/**
- * HillClimbingBot implements a simple hill climbing algorithm to find
- * the best velocity to shoot a golf ball to a hole in a golf game simulation.
- */
 public class HillClimbingBot {
     private boolean goal = false;
     private GolfGameEngine game;
@@ -21,36 +18,41 @@ public class HillClimbingBot {
     private static final double TOLERANCE = 0.01;
     private static final int RANDOM_RESTARTS = 3;
 
-    /**
-     * Constructs a HillClimbingBot with the given game engine, start ball position, and hole position.
-     *
-     * @param game the GolfGameEngine instance
-     * @param startBallPosition the initial position of the golf ball
-     * @param holePosition the position of the hole
-     */
-    public HillClimbingBot(GolfGameEngine game, double[] startBallPosition, double[] holePosition) {
+    private MapSearcher mapSearcher;
+    private ArrayList<double[]> turningPoints;
+    private int currentTargetIndex = 0;
+
+    public HillClimbingBot(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
         this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
         this.velocity = initializeVelocity();
+
+        this.mapSearcher = new MapSearcher(mapPath, startBallPosition, holePosition, radius);
+        this.turningPoints = mapSearcher.getTurningPoints(mapSearcher.findShortestPath());
+        this.turningPoints.add(holePosition);  
     }
 
-    /**
-     * Executes the hill climbing algorithm to find the best velocity.
-     *
-     * @return the best velocity found
-     */
     public ArrayList<double[]> hillClimbingAlgorithm() {
         ArrayList<double[]> shots = new ArrayList<>();
         this.goal = false;
 
-        while (!this.goal) {
+        while (!this.goal && currentTargetIndex < turningPoints.size()) {
             double[] shot = hillClimbing();
-            if (message == null || !message.contains("water")) {
+            if (!message.contains("water")) {
                 double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
                 shots.add(currentShot.clone());
-
+                
                 startBallPosition = getTrajectory(startBallPosition, shot).clone();
+                System.out.println(turningPoints.get(currentTargetIndex)[0] + " " + turningPoints.get(currentTargetIndex)[1]);
+                if (calculateDistance(startBallPosition, turningPoints.get(currentTargetIndex)) <= TOLERANCE) {
+                    currentTargetIndex++;
+                    if (currentTargetIndex < turningPoints.size()) {
+                        holePosition = turningPoints.get(currentTargetIndex); 
+                    } else {
+                        this.goal = true;
+                    }
+                }
             }
         }
         return shots;
@@ -61,7 +63,7 @@ public class HillClimbingBot {
         double[] bestVelocity = new double[2];
 
         for (int restart = 0; restart < RANDOM_RESTARTS; restart++) {
-            this.velocity = initializeVelocity();
+            this.velocity = initializeVelocityTowardsNextTarget();  
             double currentFitness = evaluateFitness(startBallPosition, velocity);
             double stepSize = INITIAL_STEP_SIZE;
 
@@ -77,7 +79,7 @@ public class HillClimbingBot {
                     }
                 }
                 if (!foundBetter) {
-                    stepSize /= 2; // make a step size smaller (adaptive)
+                    stepSize /= 2;
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
@@ -87,8 +89,8 @@ public class HillClimbingBot {
                 }
 
                 if (message != null && message.contains("water")) {
-                    this.velocity = initializeVelocity();
-                    stepSize=INITIAL_STEP_SIZE;
+                    this.velocity = initializeVelocityTowardsNextTarget();
+                    stepSize = INITIAL_STEP_SIZE;
                     break;
                 }
 
@@ -97,30 +99,32 @@ public class HillClimbingBot {
             if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
-                message = game.getMessage();
-                System.out.println(message);
             }
         }
         return bestVelocity;
     }
 
-    /**
-     * Generates neighbor velocities around the current velocity.
-     *
-     * @param currentVelocity the current velocity
-     * @param stepSize the step size to generate neighbors
-     * @return an array of neighboring velocities
-     */
+    private double[] initializeVelocityTowardsNextTarget() {
+        if (currentTargetIndex < turningPoints.size()) {
+            double[] nextPoint = turningPoints.get(currentTargetIndex);
+            double dx = nextPoint[0] - startBallPosition[0];
+            double dy = nextPoint[1] - startBallPosition[1];
+            double distance = Math.sqrt(dx * dx + dy * dy);
+            return new double[]{dx / distance, dy / distance};  
+        } else {
+            return initializeVelocity();  
+        }
+    }
+
     private double[][] generateNeighbors(double[] currentVelocity, double stepSize) {
         double[][] neighbors;
-        int index = 0;
-        if (message != null && message.contains("water")){
+        if (message != null && message.contains("water")) {
             neighbors = new double[16][2];
-            // stepSize=2;
-        } else{
+        } else {
             neighbors = new double[8][2];
         }
 
+        int index = 0;
         for (double dx : new double[]{-stepSize, 0, stepSize}) {
             for (double dy : new double[]{-stepSize, 0, stepSize}) {
                 if (dx != 0 || dy != 0) {
@@ -143,13 +147,6 @@ public class HillClimbingBot {
         return neighbors;
     }
 
-    /**
-     * Evaluates the fitness of a given velocity.
-     *
-     * @param ballPosition the position of the ball
-     * @param velocity the velocity to evaluate
-     * @return the fitness value, which is the negative distance to the hole
-     */
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
         double distanceToTarget = calculateDistance(finalPosition, holePosition);
@@ -166,22 +163,10 @@ public class HillClimbingBot {
         return game.getStoppoint();
     }
 
-    /**
-     * Calculates the Euclidean distance between two points.
-     *
-     * @param finalPosition the final position of the ball
-     * @param targetPosition the target position (hole position)
-     * @return the Euclidean distance between the points
-     */
     private static double calculateDistance(double[] finalPosition, double[] targetPosition) {
         return Math.sqrt(Math.pow(finalPosition[0] - targetPosition[0], 2) + Math.pow(finalPosition[1] - targetPosition[1], 2));
     }
 
-    /**
-     * Initializes a random velocity within the range [-5, 5].
-     *
-     * @return a randomly initialized velocity
-     */
     private static double[] initializeVelocity() {
         Random rand = new Random();
         double[] velocity = new double[2];
@@ -190,14 +175,6 @@ public class HillClimbingBot {
         return velocity;
     }
 
-    /**
-     * Clamps a value between a minimum and maximum value.
-     *
-     * @param value the value to clamp
-     * @param min the minimum value
-     * @param max the maximum value
-     * @return the clamped value
-     */
     private static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
