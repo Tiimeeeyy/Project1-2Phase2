@@ -30,6 +30,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import javafx.collections.FXCollections;
+
 
 /**
  * Controller class for the third screen in the UI.
@@ -80,6 +82,12 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private Button gaBot;
+
+    @FXML
+    private ComboBox<String> botSelect;
+
+    @FXML
+    private Button playBotButton;
 
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
@@ -154,13 +162,11 @@ public class ThirdScreenController implements ScreenInterface {
             return;
         }
         loadNewImage();
-        ruleBot.setOnAction(event -> ruleBotPlay());
-        chBot.setOnAction(event -> chBotPlay());
-        mlBot.setOnAction(event -> mlBotPlay());
-
+        initializeComboBox();
+    
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
-
+    
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (timeline != null && timeline.getStatus() == Timeline.Status.RUNNING) {
                 timeline.stop();
@@ -177,11 +183,16 @@ public class ThirdScreenController implements ScreenInterface {
             updatePower(newVal);
             drawBallAndArrow();
         });
-
+    
         drawBallAndArrow();
         updateBallPositionLabel();
         updateShotCountLabel();
     }
+    
+    private void initializeComboBox() {
+        botSelect.setItems(FXCollections.observableArrayList("Rule Bot", "GA Bot", "HC Bot", "ML Bot"));
+    }
+    
 
 
     /**
@@ -742,6 +753,36 @@ public class ThirdScreenController implements ScreenInterface {
         // shots=test;
         // ballHit(0);
     }
+
+    /**
+     * Handles the Play button action for selected bot.
+     */
+    @FXML
+    private void playBot() {
+        String selectedBot = botSelect.getValue();
+        if (selectedBot != null) {
+            switch (selectedBot) {
+                case "Rule Bot":
+                    ruleBotPlay();
+                    break;
+                case "GA Bot":
+                    gaBotFunc();
+                    break;
+                case "HC Bot":
+                    chBotPlay();
+                    break;
+                case "ML Bot":
+                    mlBotPlay();
+                    break;
+                default:
+                    showAlert(Alert.AlertType.ERROR, "Bot Selection Error", "Invalid bot selected.");
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Bot Selection Error", "Please select a bot.");
+        }
+    }
+
+
 
     @FXML
     private void chBotPlay(){
