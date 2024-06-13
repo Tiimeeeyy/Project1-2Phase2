@@ -1,22 +1,20 @@
 package engine.bot.AibotGA;
 
-
-import engine.solvers.GolfGameEngine;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-/**
- * AI Bot to play the Golf game, using a genetic algorithm to find the best shot.
- */
-public class AiBotGA {
+import engine.solvers.GolfGameEngine;
+
+public class AiBotMultiShots {
     private int popSize=50;
     private char[] vocab={'0','1'};
-    private double mutationRate=0.05;
+    private double mutationRate=0.10;
     private double[] solution=new double[4];
-    private double[] des;
     private boolean goal=false;
-
+    private double[] des;
+    private ArrayList<double[]> shortestPath;
+    private MapSearcher mapSearcher;
 
     private GolfGameEngine game;
 
@@ -24,7 +22,7 @@ public class AiBotGA {
      * Class constructor
      * @param game The engine to simulate the game.
      */
-    public AiBotGA(GolfGameEngine game, double[] des){
+    public AiBotMultiShots(GolfGameEngine game, double[] des){
         this.game=game;
         this.des=des;
     }
@@ -33,15 +31,20 @@ public class AiBotGA {
      * this method "plays" the golf game
      * @param x Initial state / initial position of the ball.
      */
+   
+
     public void golfBot(double[] x){
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
 
+        mapSearcher=new MapSearcher(game.getMapPath(), x0, game.getHole(), game.getHoleRadius());
+        shortestPath=mapSearcher.findShortestPath();
+
         // initiate population
         initialPopulation(population, x0);
  
-        // Run the algorithm for 700 generations
-        for (int i = 0; i < 500; i++) {
+        // Run the algorithm
+        for (int i = 0; i < 300; i++) {
             int[] slcIndex=selection(population);
             crossover(population[slcIndex[0]], population[slcIndex[1]], population);
             population[popSize-1].setFitness(calculateFitness(population[popSize-1], x.clone()));
@@ -61,8 +64,6 @@ public class AiBotGA {
         }
         
     }
-
-    
 
     /**
      * THis method initialises the population for the genetic algorithm
@@ -117,31 +118,29 @@ public class AiBotGA {
 
     }
 
-    /**
-     * This method calculates the fitness of an Individual
-     * @param indi The individual whose fitness is to be calculated.
-     * @param x The current position of the ball.
-     * @return The fitness of the individual.
-     */
+   
+
     double calculateFitness(Individual indi, double[] x){
         
-        double ball_hole_distance=game.getHoleBallDistance(x);
-
-        x[2]=indi.genoToPhenotype()[0];
-        x[3]=indi.genoToPhenotype()[1];
-        double[] x0=x.clone();
-        game.shoot(x,false);
+        double fit = 1;
+        double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
+        double[] x0=xin.clone();
+        game.shoot(xin,false);
         if (game.isGoal() && !this.goal) {
             this.solution=x0.clone();
             this.goal=true;
             System.out.println("Goal!!!!!!!in calcu fitness");;
         }
-        double fit=-Math.log10((game.getMinDistance()+0.01)/(ball_hole_distance+0.01));
+
+        for (int i =0; i<shortestPath.size();i++) {
+            if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
+                fit = i*5+5;
+            }
+        }
+       
         
         return fit;
     }
-
-    
 
     /**
      * This method performs selection in the genetic algorithm
@@ -178,6 +177,8 @@ public class AiBotGA {
         }
         return selected;
     }
+
+    
 
     /**
      * This method performs crossover in the genetic algorithm.
@@ -244,5 +245,4 @@ public class AiBotGA {
     public double[] getBest(){
         return this.solution;
     }
-
 }
