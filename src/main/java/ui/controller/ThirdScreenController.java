@@ -30,6 +30,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import javafx.collections.FXCollections;
+
 
 /**
  * Controller class for the third screen in the UI.
@@ -80,6 +82,12 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private Button gaBot;
+
+    @FXML
+    private ComboBox<String> botSelect;
+
+    @FXML
+    private Button playBotButton;
 
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
@@ -141,7 +149,6 @@ public class ThirdScreenController implements ScreenInterface {
         double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
-        // System.out.println("StartBallPostion: " + startBallPostion[0] + ", " + startBallPostion[1]);
 
         initialize();
     }
@@ -154,15 +161,12 @@ public class ThirdScreenController implements ScreenInterface {
         if (BallPosition == null || HolePostion == null) {
             return;
         }
-
         loadNewImage();
-        ruleBot.setOnAction(event -> ruleBotPlay());
-        chBot.setOnAction(event -> chBotPlay());
-        mlBot.setOnAction(event -> mlBotPlay());
-
+        initializeComboBox();
+    
         circularSlider = new CircularSlider();
         circularSliderPane.getChildren().add(circularSlider);
-
+    
         circularSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (timeline != null && timeline.getStatus() == Timeline.Status.RUNNING) {
                 timeline.stop();
@@ -179,11 +183,16 @@ public class ThirdScreenController implements ScreenInterface {
             updatePower(newVal);
             drawBallAndArrow();
         });
-
+    
         drawBallAndArrow();
         updateBallPositionLabel();
         updateShotCountLabel();
     }
+    
+    private void initializeComboBox() {
+        botSelect.setItems(FXCollections.observableArrayList("Rule Bot", "GA Bot", "HC Bot", "ML Bot"));
+    }
+    
 
 
     /**
@@ -237,9 +246,6 @@ public class ThirdScreenController implements ScreenInterface {
                     }
 
                     mapImageView.setImage(image);
-                    // System.out.println("Image width: " + image.getWidth() + ", height: " + image.getHeight());
-                    // System.out.println("ImageView width: " + mapImageView.getFitWidth() + ", height: " + mapImageView.getFitHeight());
-
                     return;
                 }
             }
@@ -390,7 +396,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -444,7 +450,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -591,7 +597,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void goBack() {
         if (REACHED_THE_HOLE) {
             Main mainInst = new Main();
-            mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+            mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Retreat");
@@ -607,7 +613,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == stayButton) {
                     alert.close();
                 }
@@ -667,7 +673,7 @@ public class ThirdScreenController implements ScreenInterface {
             if (result.isPresent()) {
                 if (result.get() == backButton) {
                     Main mainInst = new Main();
-                    mainInst.setScreen("INPUT", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
+                    mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
                 }
@@ -735,7 +741,7 @@ public class ThirdScreenController implements ScreenInterface {
         double[] solution = gaBot.getBest();
         double[] velocity = {solution[2], solution[3]};
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-        System.out.println(Arrays.toString(velocity));
+        // System.out.println(Arrays.toString(velocity));
 
         // ArrayList<double[]> test=new ArrayList<>();
         // double[] t={-3,0,0,2};
@@ -748,13 +754,43 @@ public class ThirdScreenController implements ScreenInterface {
         // ballHit(0);
     }
 
+    /**
+     * Handles the Play button action for selected bot.
+     */
+    @FXML
+    private void playBot() {
+        String selectedBot = botSelect.getValue();
+        if (selectedBot != null) {
+            switch (selectedBot) {
+                case "Rule Bot":
+                    ruleBotPlay();
+                    break;
+                case "GA Bot":
+                    gaBotFunc();
+                    break;
+                case "HC Bot":
+                    chBotPlay();
+                    break;
+                case "ML Bot":
+                    mlBotPlay();
+                    break;
+                default:
+                    showAlert(Alert.AlertType.ERROR, "Bot Selection Error", "Invalid bot selected.");
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Bot Selection Error", "Please select a bot.");
+        }
+    }
+
+
+
     @FXML
     private void chBotPlay(){
-        System.out.println("hello");
+        // System.out.println("hello");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
         HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion);
         double[] velocity = chBot.hillClimbingAlgorithm();
-        System.out.println(Arrays.toString(velocity));
+        // System.out.println(Arrays.toString(velocity));
 
         ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
         return;

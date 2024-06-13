@@ -72,6 +72,7 @@ public class ScreenFactory {
                 fxmlLoader.setLocation(getClass().getResource("/design/InputSecondController.fxml"));
                 root = fxmlLoader.load();
                 InputSecondController controller = fxmlLoader.getController();
+                controller.initialize(function);
                 controller.setRoot(root);
                 return controller;
              }else {
