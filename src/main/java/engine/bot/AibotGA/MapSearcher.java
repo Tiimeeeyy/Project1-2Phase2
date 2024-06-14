@@ -48,36 +48,44 @@ public class MapSearcher {
                 System.out.println("holereached");
                 break;
             }
-
-            if (i <= resolution || j <= resolution || i >= 500 - resolution || j >= 500 - resolution) {
-                continue;
+            
+            // if (i < resolution || j < resolution || i >= 500 - resolution || j >= 500 - resolution) {
+            //     continue;
+            // }
+            if (i+resolution<=499) {
+                if (grass[i + resolution][j] && (!contains(visited, new int[]{i + resolution, j}))) {
+                    int[] temp = new int[]{i + resolution, j};
+                    visited.add(temp.clone());
+                    queue.add(temp.clone());
+                    previous.put(temp.clone(), current.clone());
+                }
             }
-
-            if (grass[i + resolution][j] && (!contains(visited, new int[]{i + resolution, j}))) {
-                int[] temp = new int[]{i + resolution, j};
-                visited.add(temp.clone());
-                queue.add(temp.clone());
-                previous.put(temp.clone(), current.clone());
+            if (j+resolution<=499) {
+                if (grass[i][j + resolution] && (!contains(visited, new int[]{i, j + resolution}))) {
+                    int[] temp = new int[]{i, j + resolution};
+                    visited.add(temp.clone());
+                    queue.add(temp.clone());
+                    previous.put(temp.clone(), current.clone());
+                }
             }
-            if (grass[i][j + resolution] && (!contains(visited, new int[]{i, j + resolution}))) {
-                int[] temp = new int[]{i, j + resolution};
-                visited.add(temp.clone());
-                queue.add(temp.clone());
-                previous.put(temp.clone(), current.clone());
+            if (i-resolution>=0) {
+                if (grass[i - resolution][j] && (!contains(visited, new int[]{i - resolution, j}))) {
+                    int[] temp = new int[]{i - resolution, j};
+                    visited.add(temp.clone());
+                    queue.add(temp.clone());
+                    previous.put(temp.clone(), current.clone());
+                } 
             }
-            if (grass[i - resolution][j] && (!contains(visited, new int[]{i - resolution, j}))) {
-                int[] temp = new int[]{i - resolution, j};
-                visited.add(temp.clone());
-                queue.add(temp.clone());
-                previous.put(temp.clone(), current.clone());
+            if (j-resolution>=0) {
+                if (grass[i][j - resolution] && (!contains(visited, new int[]{i, j - resolution}))) {
+                    int[] temp = new int[]{i, j - resolution};
+                    visited.add(temp.clone());
+                    queue.add(temp.clone());
+                    previous.put(temp.clone(), current.clone());
+                } 
             }
-            if (grass[i][j - resolution] && (!contains(visited, new int[]{i, j - resolution}))) {
-                int[] temp = new int[]{i, j - resolution};
-                visited.add(temp.clone());
-                queue.add(temp.clone());
-                previous.put(temp.clone(), current.clone());
-            }
-
+            
+            
         }
         return reConstruct(previous);
 
