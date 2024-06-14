@@ -154,8 +154,6 @@ public class AiBotMultiShots {
                 fit = i*5+5;
             }
         }
-       
-        
         return fit;
     }
 

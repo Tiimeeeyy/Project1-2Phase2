@@ -177,9 +177,20 @@ public boolean isObstacled(double[] pointa, double[] pointb){
         }
     }
     return false;
-}
+    }
+
+    public double howFarItSee(ArrayList<double[]> shortestPath, double[] x){
+        double fit=1;
+        for (int i =0; i<shortestPath.size();i++) {
+            if (!isObstacled(x, shortestPath.get(i))) {
+                fit = i*5+5;
+            }
+        }
+        return fit;
+    }
+
     public static void main(String[] args) {
-        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3, 0}, new double[]{4, 1}, 0.1);
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-24, -24}, new double[]{24, 24}, 0.1);
         ArrayList<double[]> test = mapSearcher.findShortestPath();
         
 
