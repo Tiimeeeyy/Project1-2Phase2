@@ -22,9 +22,9 @@ public class AiBotMultiShots {
      * Class constructor
      * @param game The engine to simulate the game.
      */
-    public AiBotMultiShots(GolfGameEngine game, double[] des){
+    public AiBotMultiShots(GolfGameEngine game){
         this.game=game;
-        this.des=des;
+        
     }
 
     /**
@@ -32,13 +32,29 @@ public class AiBotMultiShots {
      * @param x Initial state / initial position of the ball.
      */
    
-
-    public void golfBot(double[] x){
-        Individual[] population=new Individual[popSize];
+    public ArrayList<double[]> golfBot(double x[]){
         double[] x0=x.clone();
-
         mapSearcher=new MapSearcher(game.getMapPath(), x0, game.getHole(), game.getHoleRadius());
         shortestPath=mapSearcher.findShortestPath();
+        int shotNum=0;
+        ArrayList<double[]> allSteps=new ArrayList<>();
+        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=7) {
+            oneShot(x0);
+            allSteps.add(solution.clone());
+            game.shoot(solution.clone(), false);
+            x0=game.getStoppoint();
+            System.out.println(Arrays.toString(solution));
+            shotNum++;
+        }
+        AiBotGA ai=new AiBotGA(game, x0);
+        ai.golfBot(x0);
+        allSteps.add(ai.getBest());
+        return allSteps;
+    }
+
+    public void oneShot(double[] x){
+        Individual[] population=new Individual[popSize];
+        double[] x0=x.clone();
 
         // initiate population
         initialPopulation(population, x0);
@@ -54,6 +70,7 @@ public class AiBotMultiShots {
             }
             HeapSort.sort(population);
             // System.out.println(population[0].getFitness()+"  "+i);
+            
         }
         // If the goal is not reached, set the solution to the best solution found
         if (!this.goal) {
@@ -99,7 +116,7 @@ public class AiBotMultiShots {
             }
             pop[k+2]=new Individual(indi);
             pop[k+2].setFitness(calculateFitness(pop[0], x.clone()));
-            System.out.println(Arrays.toString(pop[k+2].genoToPhenotype()));
+            
         }
         
 

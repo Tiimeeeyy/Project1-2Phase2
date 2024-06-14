@@ -70,6 +70,9 @@ public class GolfGameEngine {
         this.message="";
         this.goal=false;
         this.treeHit=false;
+        this.stopCoordinate=new double[4];
+        this.minCoordinate=new double[4];
+        this.minDis=100;
         xtrac.clear();
         xtrac.add(x.clone());
         

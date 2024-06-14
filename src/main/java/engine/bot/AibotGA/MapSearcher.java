@@ -38,6 +38,7 @@ public class MapSearcher {
 
         Queue<int[]> queue = new LinkedList<>();
         queue.add(startBallPostion.clone());
+        
         while (!queue.isEmpty()) {
             int[] current = queue.poll();
             int i = current[0];
@@ -180,9 +181,7 @@ public boolean isObstacled(double[] pointa, double[] pointb){
     public static void main(String[] args) {
         MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3, 0}, new double[]{4, 1}, 0.1);
         ArrayList<double[]> test = mapSearcher.findShortestPath();
-        for (double[] entry : test) {
-            System.out.println(Arrays.toString(entry));
-       }
+        
 
         MapHandler aa=new MapHandler();
         aa.plotTrajectory("src/main/resources/userInputMap.png", "src/main/resources/outtest.png", test);
