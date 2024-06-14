@@ -12,6 +12,7 @@ public class HillClimbingBotNEW {
     private double[] holePosition;
     private double[] velocity;
     private String message = "";
+    private boolean useAnotherAlgorithm = false;
 
     private static final int MAX_ITERATIONS = 10;
     private static final double INITIAL_STEP_SIZE = 1.0;
@@ -19,6 +20,8 @@ public class HillClimbingBotNEW {
     private static final int RANDOM_RESTARTS = 3;
 
     private MapSearcher mapSearcher;
+    private ArrayList<double[]> visitedPositions = new ArrayList<>();
+    private static final int MAX_VISITED_COUNT = 3;
 
     public HillClimbingBotNEW(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
@@ -35,23 +38,46 @@ public class HillClimbingBotNEW {
 
         while (!this.goal) {
             double[] shot;
+
             if (!mapSearcher.isObstacled(startBallPosition, holePosition)) {
                 shot = hillClimbingFinalShot();
-                // this.goal = true;
-            } else {
+                this.useAnotherAlgorithm = true;
+            } else if (!this.useAnotherAlgorithm) {
                 shot = hillClimbing();
+            } else {
+                shot = hillClimbingFinalShot();
             }
 
-            double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
-            shots.add(currentShot.clone());
+            if (!message.contains("water")) {
+                double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
+                shots.add(currentShot.clone());
 
-            startBallPosition = getTrajectory(startBallPosition, shot).clone();
-            if (calculateDistance(startBallPosition, holePosition) <= TOLERANCE) {
-                this.goal = true;
+                startBallPosition = getTrajectory(startBallPosition, shot).clone();
+                if (calculateDistance(startBallPosition, holePosition) <= TOLERANCE) {
+                    this.goal = true;
+                }
+
+                // Добавление проверки на застревание
+                if (isStuck(startBallPosition)) {
+                    System.out.println("Bot is stuck, reinitializing velocity.");
+                    this.velocity = initializeVelocity();
+                } else {
+                    visitedPositions.add(startBallPosition.clone());
+                }
             }
         }
 
         return shots;
+    }
+
+    private boolean isStuck(double[] position) {
+        int count = 0;
+        for (double[] pos : visitedPositions) {
+            if (calculateDistance(pos, position) < TOLERANCE) {
+                count++;
+            }
+        }
+        return count >= MAX_VISITED_COUNT;
     }
 
     private double[] hillClimbing() {
@@ -62,6 +88,7 @@ public class HillClimbingBotNEW {
             this.velocity = initializeVelocity();
             double currentFitness = evaluateFitness(startBallPosition, velocity);
             double stepSize = INITIAL_STEP_SIZE;
+            int iterationsWithoutImprovement = 0;
 
             for (int i = 0; i < MAX_ITERATIONS; i++) {
                 double[][] neighbors = generateNeighbors(velocity, stepSize);
@@ -72,15 +99,17 @@ public class HillClimbingBotNEW {
                         currentFitness = fitness;
                         velocity = neighbor;
                         foundBetter = true;
+                        iterationsWithoutImprovement = 0;
                     }
                 }
                 if (!foundBetter) {
                     stepSize /= 2;
+                    iterationsWithoutImprovement++;
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
-                if (Math.abs(currentFitness) <= TOLERANCE ) {
-                    this.goal = true;
+
+                if (iterationsWithoutImprovement >= 3) {
                     break;
                 }
 
@@ -120,6 +149,7 @@ public class HillClimbingBotNEW {
                     stepSize = INITIAL_STEP_SIZE;
                 }
                 if (Math.abs(currentFitness) <= TOLERANCE || bestFitness > -0.2) {
+                    this.goal = true;
                     break;
                 }
 
@@ -136,7 +166,7 @@ public class HillClimbingBotNEW {
     private double evaluateFinalShotFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
         double distanceToHole = calculateDistance(finalPosition, holePosition);
-        return -distanceToHole; 
+        return -distanceToHole;
     }
 
     private double[][] generateNeighbors(double[] currentVelocity, double stepSize) {
@@ -180,8 +210,6 @@ public class HillClimbingBotNEW {
         velocity[1] = rand.nextDouble() * 10 - 5;
         return velocity;
     }
-
-
 
     private static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
