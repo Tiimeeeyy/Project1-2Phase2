@@ -19,7 +19,7 @@ public class MapSearcher {
     private int[] holePostion;
     private int[] lastPoint;
     private double r;
-    private int resolution = 10;
+    private int resolution = 5;
 
     public MapSearcher(String mappath, double[] startBallPostion, double[] holePostion, double r) {
         MapHandler map = new MapHandler();
