@@ -2,7 +2,7 @@ package ui.controller;
 
 import engine.bot.AibotGA.AiBotGA;
 import engine.bot.AibotGA.AiBotMultiShots;
-import engine.bot.hillClimbingBot.HillClimbingBot;
+import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;

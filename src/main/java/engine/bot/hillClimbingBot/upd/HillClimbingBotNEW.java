@@ -1,4 +1,4 @@
-package engine.bot.hillClimbingBot;
+package engine.bot.hillClimbingBot.upd;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -7,7 +7,7 @@ import engine.bot.AibotGA.MapSearcher;
 import java.util.Random;
 
 
-public class HillClimbingBot {
+public class HillClimbingBotNEW {
     private boolean goal = false;
     private GolfGameEngine game;
     private double[] startBallPosition;
@@ -24,7 +24,7 @@ public class HillClimbingBot {
     private ArrayList<double[]> turningPoints;
     private int currentTargetIndex = 0;
 
-    public HillClimbingBot(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
+    public HillClimbingBotNEW(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
         this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
