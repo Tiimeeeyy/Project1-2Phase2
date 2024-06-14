@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 
 public class AiBotMultiShots {
@@ -38,17 +39,25 @@ public class AiBotMultiShots {
         shortestPath=mapSearcher.findShortestPath();
         int shotNum=0;
         ArrayList<double[]> allSteps=new ArrayList<>();
-        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=7) {
+        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=10) {
             oneShot(x0);
-            allSteps.add(solution.clone());
+
+            
             game.shoot(solution.clone(), false);
+            if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
+                allSteps.add(solution.clone());
+            }
+            
             x0=game.getStoppoint();
             System.out.println(Arrays.toString(solution));
             shotNum++;
         }
-        AiBotGA ai=new AiBotGA(game, x0);
-        ai.golfBot(x0);
-        allSteps.add(ai.getBest());
+        if (!goal) {
+            AiBotGA ai=new AiBotGA(game, x0);
+            ai.golfBot(x0);
+            allSteps.add(ai.getBest());
+        }
+        
         return allSteps;
     }
 

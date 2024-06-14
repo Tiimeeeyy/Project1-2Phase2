@@ -57,7 +57,6 @@ public class HillClimbingBotNEW {
                     this.goal = true;
                 }
 
-                // Добавление проверки на застревание
                 if (isStuck(startBallPosition)) {
                     System.out.println("Bot is stuck, reinitializing velocity.");
                     this.velocity = initializeVelocity();
