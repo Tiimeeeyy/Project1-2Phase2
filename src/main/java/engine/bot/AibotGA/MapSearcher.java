@@ -151,40 +151,40 @@ public class MapSearcher {
         return new double[]{Math.signum(point2[0] - point1[0]), Math.signum(point2[1] - point1[1])};
     }
 
-public boolean isObstacled(double[] pointa, double[] pointb){
-    double[]a=pointa.clone();
-    double[]b=pointb.clone();
+    public boolean isObstacled(double[] pointa, double[] pointb){
+        double[]a=pointa.clone();
+        double[]b=pointb.clone();
 
-    if (Math.abs(a[0]-b[0])>=Math.abs(a[1]-b[1])) {
-        double slope=(b[1]-a[1])/(b[0]-a[0]);
-        double intercept=a[1]-slope*a[0];
-        if (a[0]>b[0]) {
-            double[] c=b;
-            b=a;
-            a=c;
-        }
-        for (double i =a[0] ; i < b[0]; i=i+1.0/Utility.ratio) {
-            int[] p=Utility.coordinateToPixel(new double[]{i,i*slope+intercept});
-            if (!grass[p[0]][p[1]]) {
-                return true;
+        if (Math.abs(a[0]-b[0])>=Math.abs(a[1]-b[1])) {
+            double slope=(b[1]-a[1])/(b[0]-a[0]);
+            double intercept=a[1]-slope*a[0];
+            if (a[0]>b[0]) {
+                double[] c=b;
+                b=a;
+                a=c;
+            }
+            for (double i =a[0] ; i < b[0]; i=i+1.0/Utility.ratio) {
+                int[] p=Utility.coordinateToPixel(new double[]{i,i*slope+intercept});
+                if (!grass[p[0]][p[1]]) {
+                    return true;
+                }
+            }
+        }else{
+            double slope=(b[0]-a[0])/(b[1]-a[1]);
+            double intercept=a[0]-slope*a[1];
+            if (a[1]>b[1]) {
+                double[] c=b;
+                b=a;
+                a=c;
+            }
+            for (double i =a[1] ; i < b[1]; i=i+1.0/Utility.ratio) {
+                int[] p=Utility.coordinateToPixel(new double[]{i*slope+intercept,i});
+                if (!grass[p[0]][p[1]]) {
+                    return true;
+                }
             }
         }
-    }else{
-        double slope=(b[0]-a[0])/(b[1]-a[1]);
-        double intercept=a[0]-slope*a[1];
-        if (a[1]>b[1]) {
-            double[] c=b;
-            b=a;
-            a=c;
-        }
-        for (double i =a[1] ; i < b[1]; i=i+1.0/Utility.ratio) {
-            int[] p=Utility.coordinateToPixel(new double[]{i*slope+intercept,i});
-            if (!grass[p[0]][p[1]]) {
-                return true;
-            }
-        }
-    }
-    return false;
+        return false;
     }
 
     public double howFarItSee(ArrayList<double[]> shortestPath, double[] x){
