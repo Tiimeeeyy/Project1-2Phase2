@@ -90,6 +90,9 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private Button playBotButton;
 
+    @FXML   
+    private Button replayButton;
+
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
     private double[] BallPosition; // Starting position of the ball
@@ -106,6 +109,7 @@ public class ThirdScreenController implements ScreenInterface {
     private ArrayList<double[]> shots;
     private boolean botActivated = false;
     private double radiusHole; // Radius of the hole
+    // private ArrayList<double[]> replayShots;
 
     private Parent root; // Root node
 
@@ -393,8 +397,9 @@ public class ThirdScreenController implements ScreenInterface {
 
             ButtonType backButton = new ButtonType("Back");
             ButtonType seeStatsButton = new ButtonType("See the stat");
+            ButtonType seeReplayButton = new ButtonType("See the replay");
 
-            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            alert.getButtonTypes().setAll(backButton,seeReplayButton, seeStatsButton);
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
@@ -403,6 +408,8 @@ public class ThirdScreenController implements ScreenInterface {
                     mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
+                } else if(result.get() == seeReplayButton){
+                    replay();
                 }
             }
         }
@@ -446,9 +453,10 @@ public class ThirdScreenController implements ScreenInterface {
             alert.setContentText("Would you like to go back or see the stats?");
 
             ButtonType backButton = new ButtonType("Back");
+            ButtonType seeReplayButton = new ButtonType("See the replay");
             ButtonType seeStatsButton = new ButtonType("See the stat");
 
-            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            alert.getButtonTypes().setAll(backButton,seeReplayButton, seeStatsButton);
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
@@ -457,6 +465,8 @@ public class ThirdScreenController implements ScreenInterface {
                     mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
+                } else if (result.get() == seeReplayButton) {
+                    replay();
                 }
             }
         }
@@ -672,8 +682,8 @@ public class ThirdScreenController implements ScreenInterface {
 
             ButtonType backButton = new ButtonType("Back");
             ButtonType seeStatsButton = new ButtonType("See the stat");
-
-            alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            ButtonType seeReplayButton = new ButtonType("See the replay");
+            alert.getButtonTypes().setAll(backButton, seeReplayButton, seeStatsButton);
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
@@ -682,6 +692,8 @@ public class ThirdScreenController implements ScreenInterface {
                     mainInst.setScreen("START", "", 0, 0, 0, 0, 0, 0, 0, 0, null, null);
                 } else if (result.get() == seeStatsButton) {
                     showStats();
+                } else if(result.get() == seeReplayButton){
+                    replay();
                 }
             }
         });
@@ -806,7 +818,15 @@ public class ThirdScreenController implements ScreenInterface {
     }
 
     @FXML
+    private void replay(){
+        // shots = replayShots;
+        this.REACHED_THE_HOLE=false;
+        ballHitMultiple(0);
+    }
+
+    @FXML
     private void mlBotPlay(){
         return;
     }
+
 }

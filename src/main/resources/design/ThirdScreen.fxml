@@ -84,5 +84,7 @@
         </ScrollPane>
         <ComboBox fx:id="botSelect" layoutX="909.0" layoutY="555.0" prefHeight="58.0" prefWidth="156.0" />
         <Button layoutX="1105.0" layoutY="555.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" onAction="#playBot" text="Play" fx:id="playButton"/>
+        <Button layoutX="1105.0" layoutY="625.0" mnemonicParsing="false" prefHeight="58.0" prefWidth="156.0" onAction="#replay" text="Replay" fx:id="replayButton"/>
+
     </children>
 </AnchorPane>

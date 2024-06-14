@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 import engine.solvers.GolfGameEngine;
 import engine.bot.AibotGA.MapSearcher; 
+import java.util.Random;
+
 
 public class HillClimbingBot {
     private boolean goal = false;
@@ -11,7 +13,7 @@ public class HillClimbingBot {
     private double[] startBallPosition;
     private double[] holePosition;
     private double[] velocity;
-    private String message;
+    private String message = "";
 
     private static final int MAX_ITERATIONS = 10;
     private static final double INITIAL_STEP_SIZE = 1.0;
@@ -27,7 +29,7 @@ public class HillClimbingBot {
         this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
         this.velocity = initializeVelocity();
-
+        System.out.println(mapPath);
         this.mapSearcher = new MapSearcher(mapPath, startBallPosition, holePosition, radius);
         this.turningPoints = mapSearcher.getTurningPoints(mapSearcher.findShortestPath());
         this.turningPoints.add(holePosition);  
@@ -64,6 +66,7 @@ public class HillClimbingBot {
 
         for (int restart = 0; restart < RANDOM_RESTARTS; restart++) {
             this.velocity = initializeVelocityTowardsNextTarget();  
+            // this.velocity = initializeVelocity();
             double currentFitness = evaluateFitness(startBallPosition, velocity);
             double stepSize = INITIAL_STEP_SIZE;
 
@@ -104,17 +107,33 @@ public class HillClimbingBot {
         return bestVelocity;
     }
 
+    // make the ball go towards the next target(water radius)
+
     private double[] initializeVelocityTowardsNextTarget() {
         if (currentTargetIndex < turningPoints.size()) {
             double[] nextPoint = turningPoints.get(currentTargetIndex);
-            double dx = nextPoint[0] - startBallPosition[0];
-            double dy = nextPoint[1] - startBallPosition[1];
+            double[] randomPoint = getRandomPointNear(nextPoint, 5);
+            double dx = randomPoint[0] - startBallPosition[0];
+            double dy = randomPoint[1] - startBallPosition[1];
             double distance = Math.sqrt(dx * dx + dy * dy);
-            return new double[]{dx / distance, dy / distance};  
+            
+            System.out.println("WATER");
+            return new double[]{dx / distance, dy / distance};
         } else {
-            return initializeVelocity();  
+            return initializeVelocity();
         }
     }
+    
+    private double[] getRandomPointNear(double[] point, double radius) {
+        Random rand = new Random();
+        double angle = 2 * Math.PI * rand.nextDouble();
+        double r = radius * Math.sqrt(rand.nextDouble());
+        double x = point[0] + r * Math.cos(angle);
+        double y = point[1] + r * Math.sin(angle);
+        return new double[]{x, y};
+    }
+    
+    
 
     private double[][] generateNeighbors(double[] currentVelocity, double stepSize) {
         double[][] neighbors;
