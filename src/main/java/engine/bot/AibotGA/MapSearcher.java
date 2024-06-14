@@ -45,7 +45,7 @@ public class MapSearcher {
             int j = current[1];
             if (Utility.getDistance(Utility.pixelToCoordinate(current), Utility.pixelToCoordinate(holePostion)) <= resolution / Utility.ratio) {
                 lastPoint = current.clone();
-                System.out.println("holereached");
+                // System.out.println("holereached");
                 break;
             }
             
@@ -191,7 +191,7 @@ public boolean isObstacled(double[] pointa, double[] pointb){
         double fit=1;
         for (int i =0; i<shortestPath.size();i++) {
             if (!isObstacled(x, shortestPath.get(i))) {
-                fit = i*5+5;
+                fit = i;
             }
         }
         return fit;

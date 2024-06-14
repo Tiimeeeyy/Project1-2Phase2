@@ -2,7 +2,8 @@ package ui.controller;
 
 import engine.bot.AibotGA.AiBotGA;
 import engine.bot.AibotGA.AiBotMultiShots;
-import engine.bot.hillClimbingBot.HillClimbingBot;
+import engine.bot.hillClimbingBot.old.HillClimbingBot;
+import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
@@ -809,7 +810,9 @@ public class ThirdScreenController implements ScreenInterface {
     private void chBotPlay(){
         // System.out.println("hello");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-        HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+        // HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+        HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+
         ArrayList<double[]> velocities = chBot.hillClimbingAlgorithm();
         // double[] velocity = velocities.get(0);
         // System.out.println(Arrays.toString(velocity));
