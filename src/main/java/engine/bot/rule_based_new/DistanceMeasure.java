@@ -113,12 +113,16 @@ public class DistanceMeasure {
      * @return An array containing all the Velocity vectors.
      */
     public double[][] createVelocityVectors(double[] direction) {
-        double degreesPos = Math.toRadians(30);
-        double degreesNeg = Math.toRadians(-30);
-        double[][] velocities = new double[3][2];
-        velocities[0] = new double[]{direction[0], direction[1]};
-        velocities[1] = new double[]{Math.cos(degreesPos) * direction[0] - Math.sin(degreesPos) * direction[1], Math.sin(degreesPos) * direction[0] + Math.cos(degreesPos) * direction[1]};
-        velocities[2] = new double[]{Math.cos(degreesNeg) * direction[0] - Math.sin(degreesNeg) * direction[1], Math.sin(degreesNeg) * direction[0] + Math.cos(degreesNeg) * direction[1]};
+        double[] angles = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330};
+        double[][] velocities = new double[angles.length][2];
+
+        for (int i = 0; i < angles.length; i++) {
+            double angle = Math.toRadians(angles[i]);
+            velocities[i] = new double[]{
+                    Math.cos(angle) * direction[0] - Math.sin(angle) * direction[1],
+                    Math.sin(angle) * direction[0] + Math.cos(angle) * direction[1]
+            };
+        }
 
         return velocities;
     }
