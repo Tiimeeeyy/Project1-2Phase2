@@ -33,9 +33,7 @@ public class HillClimbingBotNEW {
         ArrayList<double[]> shots = new ArrayList<>();
         this.goal = false;
 
-        int totalIterations = 0;  // Счетчик общего количества итераций
-
-        while (!this.goal && totalIterations < MAX_ITERATIONS * RANDOM_RESTARTS) {
+        while (!this.goal) {
             double[] shot;
             if (!mapSearcher.isObstacled(startBallPosition, holePosition)) {
                 shot = hillClimbingFinalShot();
@@ -51,8 +49,6 @@ public class HillClimbingBotNEW {
             if (calculateDistance(startBallPosition, holePosition) <= TOLERANCE) {
                 this.goal = true;
             }
-
-            totalIterations++;  // Увеличиваем счетчик общего количества итераций
         }
 
         return shots;
@@ -83,7 +79,7 @@ public class HillClimbingBotNEW {
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
-                if (Math.abs(currentFitness) <= TOLERANCE) {
+                if (Math.abs(currentFitness) <= TOLERANCE ) {
                     this.goal = true;
                     break;
                 }
@@ -127,7 +123,7 @@ public class HillClimbingBotNEW {
                     break;
                 }
 
-                // System.out.println("Final Shot - Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", velocity[1] + ", "Fitness = " + currentFitness);
+                System.out.println("Final Shot - Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness);
             }
             if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
@@ -184,6 +180,8 @@ public class HillClimbingBotNEW {
         velocity[1] = rand.nextDouble() * 10 - 5;
         return velocity;
     }
+
+
 
     private static double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
