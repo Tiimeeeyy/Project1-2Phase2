@@ -51,12 +51,14 @@ public class HillClimbingBotNEW {
 
             }
 
-            if (!message.contains("water") && shot != null) {
+                
+            double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
+            // double[] testFinalPosit = getTrajectory(startBallPosition, shot).clone();
+            // checkWater(startBallPosition, shot);
+
+            if(checkNoWater(startBallPosition, shot)){
                 numOfShots++;
                 System.out.println("Shot: " + numOfShots+" " + shot[0] + ", " + shot[1]);
-                double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
-                shots.add(currentShot.clone());
-
                 startBallPosition = getTrajectory(startBallPosition, shot).clone();
                 if (calculateDistance(startBallPosition, holePosition) <= TOLERANCE) {
                     this.goal = true;
@@ -68,7 +70,9 @@ public class HillClimbingBotNEW {
                 } else {
                     visitedPositions.add(startBallPosition.clone());
                 }
-            }
+                shots.add(currentShot.clone());
+            }   
+        
         }
 
         return shots;
@@ -129,9 +133,7 @@ public class HillClimbingBotNEW {
                 bestVelocity = velocity.clone();
             }
         }
-        // if(message.contains("water")){
-        //     return null;
-        // }
+
         return bestVelocity;
     }
 
@@ -173,10 +175,6 @@ public class HillClimbingBotNEW {
                 bestVelocity = velocity.clone();
             }
         }
-
-        // if(message.contains("water")){
-        //     return null;
-        // }
         return bestVelocity;
     }
 
@@ -207,10 +205,19 @@ public class HillClimbingBotNEW {
 
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
-        // if (message.contains("water") || mapSearcher.isObstacled(ballPosition, finalPosition)) {
-        //     return -10000; 
+        // if (!checkNoWater(ballPosition, velocity)){
+        //     return -1;
         // }
         return mapSearcher.howFarItSee(shortestPath, finalPosition);
+    }
+
+    private boolean checkNoWater(double[] ballPosition, double[] velocity){
+        double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
+        game.shoot(inputEngine, false);
+        if(game.getMessage().contains(message)){
+            return false;
+        }
+        return true;
     }
     
 
