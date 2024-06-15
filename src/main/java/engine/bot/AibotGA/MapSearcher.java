@@ -31,6 +31,7 @@ public class MapSearcher {
     }
 
     public ArrayList<double[]> findShortestPath() {
+        // createImage();
         Set<int[]> visited = new HashSet<>();
         visited.add(startBallPostion.clone());
 
@@ -195,6 +196,13 @@ public class MapSearcher {
             }
         }
         return fit;
+    }
+
+    private void createImage() {
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-24, -24}, new double[]{24, 24}, 0.1);
+        ArrayList<double[]> test = mapSearcher.findShortestPath();
+        MapHandler aa=new MapHandler();
+        aa.plotTrajectory("src/main/resources/userInputMap.png", "src/main/resources/outtest.png", test);
     }
 
     public static void main(String[] args) {

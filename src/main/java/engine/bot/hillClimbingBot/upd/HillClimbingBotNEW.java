@@ -17,25 +17,26 @@ public class HillClimbingBotNEW {
     private static final int MAX_ITERATIONS = 10;
     private static final double INITIAL_STEP_SIZE = 1.0;
     private static final double TOLERANCE = 0.01;
-    private static final int RANDOM_RESTARTS = 3;
+    private static final int RANDOM_RESTARTS = 4;
 
     private MapSearcher mapSearcher;
     private ArrayList<double[]> visitedPositions = new ArrayList<>();
     private static final int MAX_VISITED_COUNT = 3;
+    private ArrayList<double[]> shortestPath;
 
     public HillClimbingBotNEW(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
         this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
         this.velocity = initializeVelocity();
-        System.out.println(mapPath);
         this.mapSearcher = new MapSearcher(mapPath, startBallPosition, holePosition, radius);
+        this.shortestPath = mapSearcher.findShortestPath();
     }
 
     public ArrayList<double[]> hillClimbingAlgorithm() {
         ArrayList<double[]> shots = new ArrayList<>();
         this.goal = false;
-
+        int numOfShots = 0;
         while (!this.goal) {
             double[] shot;
 
@@ -45,10 +46,14 @@ public class HillClimbingBotNEW {
             } else if (!this.useAnotherAlgorithm) {
                 shot = hillClimbing();
             } else {
+                // shot = hillClimbing();
                 shot = hillClimbingFinalShot();
+
             }
 
-            if (!message.contains("water")) {
+            if (!message.contains("water") && shot != null) {
+                numOfShots++;
+                System.out.println("Shot: " + numOfShots+" " + shot[0] + ", " + shot[1]);
                 double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
                 shots.add(currentShot.clone());
 
@@ -58,7 +63,7 @@ public class HillClimbingBotNEW {
                 }
 
                 if (isStuck(startBallPosition)) {
-                    System.out.println("Bot is stuck, reinitializing velocity.");
+                    System.out.println("Bro is stuck, reinitializing velocity.");
                     this.velocity = initializeVelocity();
                 } else {
                     visitedPositions.add(startBallPosition.clone());
@@ -85,7 +90,9 @@ public class HillClimbingBotNEW {
 
         for (int restart = 0; restart < RANDOM_RESTARTS; restart++) {
             this.velocity = initializeVelocity();
-            double currentFitness = evaluateFitness(startBallPosition, velocity);
+            double currentFitness;
+            currentFitness = evaluateFitness(startBallPosition, velocity);
+
             double stepSize = INITIAL_STEP_SIZE;
             int iterationsWithoutImprovement = 0;
 
@@ -93,8 +100,11 @@ public class HillClimbingBotNEW {
                 double[][] neighbors = generateNeighbors(velocity, stepSize);
                 boolean foundBetter = false;
                 for (double[] neighbor : neighbors) {
-                    double fitness = evaluateFitness(startBallPosition, neighbor);
-                    if (fitness > currentFitness) {
+                    double fitness;
+                    fitness = evaluateFitness(startBallPosition, neighbor);
+ 
+                    // double fitness = evaluateFitness(startBallPosition, neighbor);
+                    if (fitness > currentFitness && !message.contains("water")) { 
                         currentFitness = fitness;
                         velocity = neighbor;
                         foundBetter = true;
@@ -112,13 +122,16 @@ public class HillClimbingBotNEW {
                     break;
                 }
 
-                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness);
+                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness + " Message: " + message);
             }
-            if (currentFitness > bestFitness) {
+            if (currentFitness > bestFitness && !message.contains("water")) {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
         }
+        // if(message.contains("water")){
+        //     return null;
+        // }
         return bestVelocity;
     }
 
@@ -136,29 +149,34 @@ public class HillClimbingBotNEW {
                 boolean foundBetter = false;
                 for (double[] neighbor : neighbors) {
                     double fitness = evaluateFinalShotFitness(startBallPosition, neighbor);
-                    if (fitness > currentFitness) {
+                    if (fitness > currentFitness && !message.contains("water")) { 
                         currentFitness = fitness;
                         velocity = neighbor;
                         foundBetter = true;
                     }
+
                 }
                 if (!foundBetter) {
                     stepSize /= 2;
                 } else {
                     stepSize = INITIAL_STEP_SIZE;
                 }
-                if (Math.abs(currentFitness) <= TOLERANCE || bestFitness > -0.2) {
+                if ((Math.abs(currentFitness) <= TOLERANCE || bestFitness > -0.2) && !message.contains("water") ) {
                     this.goal = true;
                     break;
                 }
 
-                System.out.println("Final Shot - Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness);
+                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness + " Message: " + message);
             }
-            if (currentFitness > bestFitness) {
+            if (currentFitness > bestFitness && !message.contains("water")) {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
         }
+
+        // if(message.contains("water")){
+        //     return null;
+        // }
         return bestVelocity;
     }
 
@@ -169,34 +187,48 @@ public class HillClimbingBotNEW {
     }
 
     private double[][] generateNeighbors(double[] currentVelocity, double stepSize) {
-        double[][] neighbors = new double[8][2];
-
-        int index = 0;
+        ArrayList<double[]> neighborsList = new ArrayList<>();
+        
         for (double dx : new double[]{-stepSize, 0, stepSize}) {
             for (double dy : new double[]{-stepSize, 0, stepSize}) {
                 if (dx != 0 || dy != 0) {
-                    neighbors[index][0] = clamp(currentVelocity[0] + dx, -5, 5);
-                    neighbors[index][1] = clamp(currentVelocity[1] + dy, -5, 5);
-                    index++;
+                    double[] neighbor = { clamp(currentVelocity[0] + dx, -5, 5), clamp(currentVelocity[1] + dy, -5, 5) };
+                    // double[] potentialPosition = getTrajectory(startBallPosition, neighbor);
+                    // if (!message.contains("water") && !mapSearcher.isObstacled(startBallPosition, potentialPosition)) {
+                    //     neighborsList.add(neighbor);
+                    // }
+                    neighborsList.add(neighbor);
                 }
             }
         }
-        return neighbors;
+        
+        return neighborsList.toArray(new double[neighborsList.size()][]);
     }
 
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
-        ArrayList<double[]> shortestPath = mapSearcher.findShortestPath();
-        double fitness = mapSearcher.howFarItSee(shortestPath, finalPosition);
-        return fitness;
+        // if (message.contains("water") || mapSearcher.isObstacled(ballPosition, finalPosition)) {
+        //     return -10000; 
+        // }
+        return mapSearcher.howFarItSee(shortestPath, finalPosition);
     }
+    
+
 
     private double[] getTrajectory(double[] ballPosition, double[] velocity) {
         double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
         game.shoot(inputEngine, false);
         message = game.getMessage();
-        return game.getStoppoint();
+        
+        double[] finalPosition = game.getStoppoint();
+        
+        // if (message.contains("water") || mapSearcher.isObstacled(ballPosition, finalPosition)) {
+        //     finalPosition = ballPosition.clone(); 
+        // }
+        
+        return finalPosition;
     }
+    
 
     private static double calculateDistance(double[] finalPosition, double[] targetPosition) {
         return Math.sqrt(Math.pow(finalPosition[0] - targetPosition[0], 2) + Math.pow(finalPosition[1] - targetPosition[1], 2));
