@@ -47,13 +47,21 @@ public class AiBotMultiShots {
             if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
                 allSteps.add(solution.clone());
             }
+
+            // check if it stucks at the last 3 steps
+            if (allSteps.size()>2) {
+                if (isSamePosition(allSteps.get(allSteps.size()-1), allSteps.get(allSteps.size()-2)) && 
+                    isSamePosition(allSteps.get(allSteps.size()-2), allSteps.get(allSteps.size()-3))) {
+                }
+            }
+            
             
             x0=game.getStoppoint();
             System.out.println(Arrays.toString(solution));
             shotNum++;
         }
         if (!goal) {
-            AiBotGA ai=new AiBotGA(game, x0);
+            AiBotGA ai=new AiBotGA(game);
             ai.golfBot(x0);
             allSteps.add(ai.getBest());
         }
@@ -268,5 +276,9 @@ public class AiBotMultiShots {
      */
     public double[] getBest(){
         return this.solution;
+    }
+
+    private boolean isSamePosition(double[]a, double[] b){
+        return a[0]==b[0] && a[1]==b[1];
     }
 }

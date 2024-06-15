@@ -16,6 +16,7 @@ public class AiBotGA {
     private double[] solution=new double[4];
     private double[] des;
     private boolean goal=false;
+    private boolean targetOther=false;
 
 
     private GolfGameEngine game;
@@ -24,11 +25,17 @@ public class AiBotGA {
      * Class constructor
      * @param game The engine to simulate the game.
      */
-    public AiBotGA(GolfGameEngine game, double[] des){
+    AiBotGA(GolfGameEngine game){
         this.game=game;
-        this.des=des;
+    }
+    AiBotGA(GolfGameEngine game, boolean targetOther){
+        this.game=game;
+        this.targetOther=true;
     }
 
+    public void golfBot(){
+        
+    }
     /**
      * this method "plays" the golf game
      * @param x Initial state / initial position of the ball.
