@@ -39,30 +39,41 @@ public class AiBotMultiShots {
         shortestPath=mapSearcher.findShortestPath();
         int shotNum=0;
         ArrayList<double[]> allSteps=new ArrayList<>();
-        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=10) {
+        AiBotGA ai=new AiBotGA(game);
+        int stuckCount=0;
+        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=15) {
             oneShot(x0);
 
             
             game.shoot(solution.clone(), false);
             if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
                 allSteps.add(solution.clone());
+                stuckCount=0;
+            }else{
+                stuckCount++;
             }
-
-            // check if it stucks at the last 3 steps
-            if (allSteps.size()>2) {
-                if (isSamePosition(allSteps.get(allSteps.size()-1), allSteps.get(allSteps.size()-2)) && 
-                    isSamePosition(allSteps.get(allSteps.size()-2), allSteps.get(allSteps.size()-3))) {
-                }
-            }
-            
-            
             x0=game.getStoppoint();
+            // check if it stucks at the last 3 steps
+            if (stuckCount>2) {
+                
+                System.out.println("stucked checked");
+                double[] target=new double[4];
+                for (int i =0; i<shortestPath.size();i++) {
+                    if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
+                        target=shortestPath.get(i).clone();
+                    }
+                }
+                ai.golfBot(x0, target);
+                allSteps.add(ai.getBest().clone());
+                game.shoot(ai.getBest().clone(), false);
+                x0=game.getStoppoint();
+            }
+            
             System.out.println(Arrays.toString(solution));
             shotNum++;
         }
         if (!goal) {
-            AiBotGA ai=new AiBotGA(game);
-            ai.golfBot(x0);
+            ai.golfBot(x0,null);
             allSteps.add(ai.getBest());
         }
         
@@ -279,6 +290,7 @@ public class AiBotMultiShots {
     }
 
     private boolean isSamePosition(double[]a, double[] b){
-        return a[0]==b[0] && a[1]==b[1];
+
+        return (int) (a[0]*10000)==(int) (b[0]*10000) && (int) (a[1]*10000)==(int) (b[1]*10000);
     }
 }
