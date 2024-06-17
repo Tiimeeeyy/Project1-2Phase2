@@ -1,5 +1,6 @@
 package ui.controller;
 
+import engine.bot.AiBotGAV.AiBotGAV;
 import engine.bot.AibotGA.AiBotGA;
 import engine.bot.AibotGA.AiBotMultiShots;
 import engine.bot.hillClimbingBot.old.HillClimbingBot;
@@ -763,6 +764,10 @@ public class ThirdScreenController implements ScreenInterface {
         shots=gaBot.golfBot(x);
         ballHitMultiple(0);
         
+        // AiBotGAV gaBot = new AiBotGAV(golfGame);
+        // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+        // shots=gaBot.golfBot(x);
+        // ballHitMultiple(0);
 
         // ArrayList<double[]> test=new ArrayList<>();
         // double[] t={-3,0,0,2};

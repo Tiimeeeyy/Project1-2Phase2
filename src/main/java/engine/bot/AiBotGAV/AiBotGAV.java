@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import engine.bot.AibotGA.AiBotGA;
-import engine.bot.AibotGA.HeapSort;
-import engine.bot.AibotGA.Individual;
 import engine.bot.AibotGA.MapSearcher;
 import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 
 public class AiBotGAV {
-    private int popSize=50;
-    private double mutationRate=0.10;
+    private int popSize=300;
     private double[] solution=new double[4];
     private boolean goal=false;
     private ArrayList<double[]> shortestPath;
@@ -58,11 +54,11 @@ public class AiBotGAV {
                 stuckCount++;
             }
             x0=game.getStoppoint();
+
             // check if it stucks at the last 3 steps
             if (stuckCount>2) {
-                
                 System.out.println("stucked checked");
-                double[] target=new double[4];
+                double[] target=new double[2];
                 for (int i =0; i<shortestPath.size();i++) {
                     if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
                         target=shortestPath.get(i).clone();
@@ -151,8 +147,8 @@ public class AiBotGAV {
         for (int i = 0; i < 30; i++) {
             for (int j = 0; j < 10; j++) {
                 double power=rand.nextDouble()*5;
-                pop[i]=new IndividualV(new double[]{power*Math.cos(i*Math.PI/30),power*Math.sin(i*Math.PI/30)});
-                pop[i].setFitness(calculateFitness(pop[i], x));
+                pop[i*10+j]=new IndividualV(new double[]{power*Math.cos(i*Math.PI/15),power*Math.sin(i*Math.PI/15)});
+                pop[i*10+j].setFitness(calculateFitness(pop[i], x));
             }
         }
         HeapSortV.sort(pop);
@@ -161,7 +157,7 @@ public class AiBotGAV {
    
 
     private double calculateFitness(IndividualV indi, double[] x){
-        double ball_target_distance=game.getDistance(x,target);
+        double ball_target_distance;
         double fit = 1;
         double[] xin=new double[]{x[0],x[1],indi.getChromosome()[0],indi.getChromosome()[1]};
         double[] x0=xin.clone();
@@ -174,9 +170,11 @@ public class AiBotGAV {
 
         switch (targetType) {
             case HOLE:
+                ball_target_distance=game.getDistance(x,target);
                 fit=-Math.log10((game.getMinDistance()+0.01)/(ball_target_distance+0.01))+1;
                 break;
             case POINT:
+                ball_target_distance=game.getDistance(x,target);
                 fit=-Math.log10((game.getDistance(game.getStoppoint(),target)+0.01)/(ball_target_distance+0.01))+1;
                 break;
             case FARSIGHT:
@@ -233,11 +231,11 @@ public class AiBotGAV {
     private void exploration(IndividualV indiA, IndividualV indiB, IndividualV[] pop,double[] x){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {
-            pop[pop.length-1-i]=new IndividualV(new double[]{indiA.getChromosome()[0]+rnd.nextGaussian()/2,indiA.getChromosome()[1]+rnd.nextGaussian()/2});
+            pop[pop.length-1-i]=new IndividualV(new double[]{indiA.getChromosome()[0]+rnd.nextGaussian(),indiA.getChromosome()[1]+rnd.nextGaussian()});
             pop[pop.length-1-i].setFitness(calculateFitness(pop[pop.length-1-i], x));
         }
         for (int i = 10; i < 20; i++) {
-            pop[pop.length-1-i]=new IndividualV(new double[]{indiB.getChromosome()[0]+rnd.nextGaussian()/2,indiB.getChromosome()[1]+rnd.nextGaussian()/2});
+            pop[pop.length-1-i]=new IndividualV(new double[]{indiB.getChromosome()[0]+rnd.nextGaussian(),indiB.getChromosome()[1]+rnd.nextGaussian()});
             pop[pop.length-1-i].setFitness(calculateFitness(pop[pop.length-1-i], x));
         }
     }
@@ -257,5 +255,13 @@ public class AiBotGAV {
         HOLE,
         POINT,
         FARSIGHT
+    }
+
+    public static void main(String[] args) {
+        Random r=new Random();
+        for (int i = 0; i < 10; i++) {
+            // System.out.println(r.nextDouble()*5);
+            System.out.println(Math.sin(15*Math.PI/30));
+        }
     }
 }

@@ -57,7 +57,7 @@ public class AiBotMultiShots {
             if (stuckCount>2) {
                 
                 System.out.println("stucked checked");
-                double[] target=new double[4];
+                double[] target=new double[2];
                 for (int i =0; i<shortestPath.size();i++) {
                     if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
                         target=shortestPath.get(i).clone();
