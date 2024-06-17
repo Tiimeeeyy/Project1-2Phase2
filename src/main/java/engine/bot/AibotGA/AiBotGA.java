@@ -13,8 +13,8 @@ public class AiBotGA {
     private int popSize=50;
     private char[] vocab={'0','1'};
     private double mutationRate=0.05;
-    private double[] solution=new double[4];
-    private double[] des;
+    private double[] solution;
+    private double[] target;
     private boolean goal=false;
     private boolean targetOther=false;
 
@@ -25,24 +25,29 @@ public class AiBotGA {
      * Class constructor
      * @param game The engine to simulate the game.
      */
-    AiBotGA(GolfGameEngine game){
+    public AiBotGA(GolfGameEngine game){
         this.game=game;
     }
-    AiBotGA(GolfGameEngine game, boolean targetOther){
-        this.game=game;
-        this.targetOther=true;
-    }
-
-    public void golfBot(){
-        
-    }
+    
     /**
      * this method "plays" the golf game
      * @param x Initial state / initial position of the ball.
      */
-    public void golfBot(double[] x){
+    public void golfBot(double[] x, double[] target){
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
+
+        //clear previuos
+        this.solution=new double[4];
+        this.goal=false;
+
+        if (target==null) {
+            this.target=game.getHole().clone();
+        }else{
+            this.target=target;
+            this.targetOther=true;
+        }
+        
 
         // initiate population
         initialPopulation(population, x0);
@@ -69,26 +74,23 @@ public class AiBotGA {
         
     }
 
-    
-
     /**
      * THis method initialises the population for the genetic algorithm
      * @param pop The population size to be initialised.
      * @param x The initial state / position of the ball.
      */
-    void initialPopulation(Individual[] pop, double[] x){
+    private void initialPopulation(Individual[] pop, double[] x){
        
         Random rand=new Random();
         char[][] indi=new char[2][10];
 
         // set 1 try of direct shoot 
-        double[] hole=game.getHole().clone();
-        double cos=(hole[0]-x[0])/game.getHoleBallDistance(x);
-        double sin=(hole[1]-x[1])/game.getHoleBallDistance(x);
+        double cos=(target[0]-x[0])/game.getDistance(x,target);
+        double sin=(target[1]-x[1])/game.getDistance(x,target);
 
         for (int k = -2; k<3; k++) {
-            char[] vxChrom=Integer.toBinaryString((int)(5*(cos*Math.cos(0.17*k)-sin*Math.sin(0.17*k))*100+500)).toCharArray();
-            char[] vyChrom=Integer.toBinaryString((int)(5*(sin*Math.cos(0.17*k)+cos*Math.sin(0.17*k))*100+500)).toCharArray();
+            char[] vxChrom=Integer.toBinaryString((int)(4*(cos*Math.cos(0.17*k)-sin*Math.sin(0.17*k))*100+500)).toCharArray();
+            char[] vyChrom=Integer.toBinaryString((int)(4*(sin*Math.cos(0.17*k)+cos*Math.sin(0.17*k))*100+500)).toCharArray();
             for (int i = 0; i <10; i++) {
                 int j=vxChrom.length+i-10;
                 if(j>=0){
@@ -104,7 +106,7 @@ public class AiBotGA {
                 }  
             }
             pop[k+2]=new Individual(indi);
-            pop[k+2].setFitness(calculateFitness(pop[0], x.clone()));
+            pop[k+2].setFitness(calculateFitness(pop[k+2], x.clone()));
             System.out.println(Arrays.toString(pop[k+2].genoToPhenotype()));
         }
         
@@ -130,20 +132,25 @@ public class AiBotGA {
      * @param x The current position of the ball.
      * @return The fitness of the individual.
      */
-    double calculateFitness(Individual indi, double[] x){
+    private double calculateFitness(Individual indi, double[] x){
         
-        double ball_hole_distance=game.getHoleBallDistance(x);
-
-        x[2]=indi.genoToPhenotype()[0];
-        x[3]=indi.genoToPhenotype()[1];
-        double[] x0=x.clone();
-        game.shoot(x,false);
+        double ball_hole_distance=game.getDistance(x,target);
+        double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
+        double[] x0=xin.clone();
+        double fit=1;
+        game.shoot(xin,false);
         if (game.isGoal() && !this.goal) {
             this.solution=x0.clone();
             this.goal=true;
             System.out.println("Goal!!!!!!!in calcu fitness");;
         }
-        double fit=-Math.log10((game.getMinDistance()+0.01)/(ball_hole_distance+0.01));
+
+        if (targetOther) {
+            fit=-Math.log10((game.getDistance(game.getStoppoint(),target)+0.01)/(ball_hole_distance+0.01))+1;
+        }else{
+            fit=-Math.log10((game.getMinDistance()+0.01)/(ball_hole_distance+0.01))+1;
+        }
+        
         
         return fit;
     }
@@ -155,7 +162,7 @@ public class AiBotGA {
      * @param pop The current population.
      * @return The indices of the two selected individuals.
      */
-    int[] selection(Individual[] pop){
+    private int[] selection(Individual[] pop){
         double sum=0;
         int[] selected={0,0};
         Random rnd= new Random();
@@ -192,7 +199,7 @@ public class AiBotGA {
      * @param slc2 The second selected individual.
      * @param pop The current population.
      */
-    void crossover(Individual slc1, Individual slc2, Individual[] pop){
+    private void crossover(Individual slc1, Individual slc2, Individual[] pop){
         Random rnd=new Random();
         int pivot=rnd.nextInt(7)+1;
         Individual child1=slc1.clone();
@@ -218,7 +225,7 @@ public class AiBotGA {
      * This method performs mutations in the genetic algorithm.
      * @param indi The individual to be mutated.
      */
-    void mutation(Individual indi){
+    private void mutation(Individual indi){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {
             int r=rnd.nextInt((int) (1/mutationRate)) ;

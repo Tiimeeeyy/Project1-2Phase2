@@ -39,30 +39,41 @@ public class AiBotMultiShots {
         shortestPath=mapSearcher.findShortestPath();
         int shotNum=0;
         ArrayList<double[]> allSteps=new ArrayList<>();
-        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=10) {
+        AiBotGA ai=new AiBotGA(game);
+        int stuckCount=0;
+        while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=15) {
             oneShot(x0);
 
             
             game.shoot(solution.clone(), false);
             if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
                 allSteps.add(solution.clone());
+                stuckCount=0;
+            }else{
+                stuckCount++;
             }
-
-            // check if it stucks at the last 3 steps
-            if (allSteps.size()>2) {
-                if (isSamePosition(allSteps.get(allSteps.size()-1), allSteps.get(allSteps.size()-2)) && 
-                    isSamePosition(allSteps.get(allSteps.size()-2), allSteps.get(allSteps.size()-3))) {
-                }
-            }
-            
-            
             x0=game.getStoppoint();
+            // check if it stucks at the last 3 steps
+            if (stuckCount>2) {
+                
+                System.out.println("stucked checked");
+                double[] target=new double[2];
+                for (int i =0; i<shortestPath.size();i++) {
+                    if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
+                        target=shortestPath.get(i).clone();
+                    }
+                }
+                ai.golfBot(x0, target);
+                allSteps.add(ai.getBest().clone());
+                game.shoot(ai.getBest().clone(), false);
+                x0=game.getStoppoint();
+            }
+            
             System.out.println(Arrays.toString(solution));
             shotNum++;
         }
         if (!goal) {
-            AiBotGA ai=new AiBotGA(game);
-            ai.golfBot(x0);
+            ai.golfBot(x0,null);
             allSteps.add(ai.getBest());
         }
         
@@ -104,7 +115,7 @@ public class AiBotMultiShots {
      * @param pop The population size to be initialised.
      * @param x The initial state / position of the ball.
      */
-    void initialPopulation(Individual[] pop, double[] x){
+    private void initialPopulation(Individual[] pop, double[] x){
        
         Random rand=new Random();
         char[][] indi=new char[2][10];
@@ -132,7 +143,7 @@ public class AiBotMultiShots {
                 }  
             }
             pop[k+2]=new Individual(indi);
-            pop[k+2].setFitness(calculateFitness(pop[0], x.clone()));
+            pop[k+2].setFitness(calculateFitness(pop[k+2], x.clone()));
             
         }
         
@@ -154,7 +165,7 @@ public class AiBotMultiShots {
 
    
 
-    double calculateFitness(Individual indi, double[] x){
+    private double calculateFitness(Individual indi, double[] x){
         
         double fit = 1;
         double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
@@ -179,7 +190,7 @@ public class AiBotMultiShots {
      * @param pop The current population.
      * @return The indices of the two selected individuals.
      */
-    int[] selection(Individual[] pop){
+    private int[] selection(Individual[] pop){
         double sum=0;
         int[] selected={0,0};
         Random rnd= new Random();
@@ -218,7 +229,7 @@ public class AiBotMultiShots {
      * @param slc2 The second selected individual.
      * @param pop The current population.
      */
-    void crossover(Individual slc1, Individual slc2, Individual[] pop){
+    private void crossover(Individual slc1, Individual slc2, Individual[] pop){
         Random rnd=new Random();
         int pivot=rnd.nextInt(7)+1;
         Individual child1=slc1.clone();
@@ -244,7 +255,7 @@ public class AiBotMultiShots {
      * This method performs mutations in the genetic algorithm.
      * @param indi The individual to be mutated.
      */
-    void mutation(Individual indi){
+    private void mutation(Individual indi){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {
             int r=rnd.nextInt((int) (1/mutationRate)) ;
@@ -278,7 +289,4 @@ public class AiBotMultiShots {
         return this.solution;
     }
 
-    private boolean isSamePosition(double[]a, double[] b){
-        return a[0]==b[0] && a[1]==b[1];
-    }
 }
