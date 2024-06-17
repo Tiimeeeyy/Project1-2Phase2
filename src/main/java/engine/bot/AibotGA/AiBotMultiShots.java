@@ -115,7 +115,7 @@ public class AiBotMultiShots {
      * @param pop The population size to be initialised.
      * @param x The initial state / position of the ball.
      */
-    void initialPopulation(Individual[] pop, double[] x){
+    private void initialPopulation(Individual[] pop, double[] x){
        
         Random rand=new Random();
         char[][] indi=new char[2][10];
@@ -143,7 +143,7 @@ public class AiBotMultiShots {
                 }  
             }
             pop[k+2]=new Individual(indi);
-            pop[k+2].setFitness(calculateFitness(pop[0], x.clone()));
+            pop[k+2].setFitness(calculateFitness(pop[k+2], x.clone()));
             
         }
         
@@ -165,7 +165,7 @@ public class AiBotMultiShots {
 
    
 
-    double calculateFitness(Individual indi, double[] x){
+    private double calculateFitness(Individual indi, double[] x){
         
         double fit = 1;
         double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
@@ -190,7 +190,7 @@ public class AiBotMultiShots {
      * @param pop The current population.
      * @return The indices of the two selected individuals.
      */
-    int[] selection(Individual[] pop){
+    private int[] selection(Individual[] pop){
         double sum=0;
         int[] selected={0,0};
         Random rnd= new Random();
@@ -229,7 +229,7 @@ public class AiBotMultiShots {
      * @param slc2 The second selected individual.
      * @param pop The current population.
      */
-    void crossover(Individual slc1, Individual slc2, Individual[] pop){
+    private void crossover(Individual slc1, Individual slc2, Individual[] pop){
         Random rnd=new Random();
         int pivot=rnd.nextInt(7)+1;
         Individual child1=slc1.clone();
@@ -255,7 +255,7 @@ public class AiBotMultiShots {
      * This method performs mutations in the genetic algorithm.
      * @param indi The individual to be mutated.
      */
-    void mutation(Individual indi){
+    private void mutation(Individual indi){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {
             int r=rnd.nextInt((int) (1/mutationRate)) ;
@@ -289,8 +289,4 @@ public class AiBotMultiShots {
         return this.solution;
     }
 
-    private boolean isSamePosition(double[]a, double[] b){
-
-        return (int) (a[0]*10000)==(int) (b[0]*10000) && (int) (a[1]*10000)==(int) (b[1]*10000);
-    }
 }

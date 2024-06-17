@@ -1,4 +1,4 @@
-package engine.bot.AibotGA;
+package engine.bot.AiBotGAV;
 
 public class IndividualV {
     
