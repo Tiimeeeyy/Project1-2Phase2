@@ -11,30 +11,30 @@ public class HillClimbingBotNEW {
     private double[] startBallPosition;
     private double[] holePosition;
     private double[] velocity;
-    // private String message = "";
     private boolean useAnotherAlgorithm = false;
-    private static int quadrantIndex = 0;
-
 
     private static final int MAX_ITERATIONS = 10;
     private static final int MAX_ITERATIONS_FINAL = 15;
 
     private static final double INITIAL_STEP_SIZE = 1.0;
-    private static final double TOLERANCE = 0.01;
+    private static final double TOLERANCE = 0.02;
     private static final int RANDOM_RESTARTS = 4;
 
     private MapSearcher mapSearcher;
     private ArrayList<double[]> visitedPositions = new ArrayList<>();
     private static final int MAX_VISITED_COUNT = 3;
     private ArrayList<double[]> shortestPath;
+    private ArrayList<double[]> turningPoints;
 
     public HillClimbingBotNEW(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
         this.startBallPosition = startBallPosition.clone();
         this.holePosition = holePosition;
-        this.velocity = initializeVelocity();
         this.mapSearcher = new MapSearcher(mapPath, startBallPosition, holePosition, radius);
         this.shortestPath = mapSearcher.findShortestPath();
+        this.turningPoints = mapSearcher.getTurningPoints(shortestPath);
+        this.velocity = initializeVelocity();
+        mapSearcher.createImage(shortestPath);
     }
 
     public ArrayList<double[]> hillClimbingAlgorithm() {
@@ -43,9 +43,11 @@ public class HillClimbingBotNEW {
         int numOfShots = 0;
         long startTime = System.currentTimeMillis(); 
         int totalIterations = 0; 
+        double bestFitness = Double.NEGATIVE_INFINITY;
 
         while (!this.goal) {
             double[] shot;
+            double currentFitness;
 
             if (!mapSearcher.isObstacled(startBallPosition, holePosition)) {
                 shot = hillClimbingFinalShot();
@@ -55,7 +57,6 @@ public class HillClimbingBotNEW {
             } else {
                 shot = hillClimbingFinalShot();
             }
-
 
             if (checkNoWater(startBallPosition, shot)) {
                 double[] currentShot = {startBallPosition[0], startBallPosition[1], shot[0], shot[1]};
@@ -71,8 +72,11 @@ public class HillClimbingBotNEW {
                     this.velocity = initializeVelocity();
                 } else {
                     visitedPositions.add(startBallPosition.clone());
+                    updateTurningPoints();
                 }
                 shots.add(currentShot.clone());
+            } else {
+                System.out.println("NO SHOT. WATER!");
             }
 
             totalIterations++; 
@@ -115,9 +119,8 @@ public class HillClimbingBotNEW {
                 for (double[] neighbor : neighbors) {
                     double fitness;
                     fitness = evaluateFitness(startBallPosition, neighbor);
- 
-                    // double fitness = evaluateFitness(startBallPosition, neighbor);
-                    if (fitness > currentFitness) { 
+
+                    if (fitness > currentFitness) {
                         currentFitness = fitness;
                         velocity = neighbor;
                         foundBetter = true;
@@ -131,11 +134,11 @@ public class HillClimbingBotNEW {
                     stepSize = INITIAL_STEP_SIZE;
                 }
 
-                if (iterationsWithoutImprovement >= 8) {
+                if (iterationsWithoutImprovement >= 4) {
                     break;
                 }
 
-                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness );
+                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
             }
             if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
@@ -160,12 +163,11 @@ public class HillClimbingBotNEW {
                 boolean foundBetter = false;
                 for (double[] neighbor : neighbors) {
                     double fitness = evaluateFinalShotFitness(startBallPosition, neighbor);
-                    if (fitness > currentFitness ) { 
+                    if (fitness > currentFitness) {
                         currentFitness = fitness;
                         velocity = neighbor;
                         foundBetter = true;
                     }
-
                 }
                 if (!foundBetter) {
                     stepSize /= 2;
@@ -177,9 +179,9 @@ public class HillClimbingBotNEW {
                     break;
                 }
 
-                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
+                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + "," +velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
             }
-            if (currentFitness > bestFitness ) {
+            if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
@@ -187,103 +189,145 @@ public class HillClimbingBotNEW {
         return bestVelocity;
     }
 
-    private double evaluateFinalShotFitness(double[] ballPosition, double[] velocity) {  
-        // if (!checkNoWater(ballPosition, velocity)){
-        //     return -100;
-        // } else{
+    private double evaluateFinalShotFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
         double distanceToHole = calculateDistance(finalPosition, holePosition);
-        return -distanceToHole;
-        // }
 
+        if (distanceToHole<=4){
+            double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
+            game.shoot(inputEngine, false);
+            if (game.getMessage().contains("Goal!!!")) {
+                return 0.001;
+            }
+        }
+        return -distanceToHole;
     }
 
     private double[][] generateNeighbors(double[] currentVelocity, double stepSize) {
         ArrayList<double[]> neighborsList = new ArrayList<>();
-        
+
         for (double dx : new double[]{-stepSize, 0, stepSize}) {
             for (double dy : new double[]{-stepSize, 0, stepSize}) {
                 if (dx != 0 || dy != 0) {
-                    double[] neighbor = { clamp(currentVelocity[0] + dx, -5, 5), clamp(currentVelocity[1] + dy, -5, 5) };
+                    double[] neighbor = {clamp(currentVelocity[0] + dx, -5, 5), clamp(currentVelocity[1] + dy, -5, 5)};
                     neighborsList.add(neighbor);
                 }
             }
         }
-        
+
         return neighborsList.toArray(new double[neighborsList.size()][]);
     }
 
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
-        // if (!checkNoWater(ballPosition, velocity)){
-        //     return -1;
-        // } else{
         double[] finalPosition = getTrajectory(ballPosition, velocity);
         return mapSearcher.howFarItSee(shortestPath, finalPosition);
-        // }
-       
     }
 
-    private boolean checkNoWater(double[] ballPosition, double[] velocity){
+    private boolean checkNoWater(double[] ballPosition, double[] velocity) {
         double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
         game.shoot(inputEngine, false);
-        if(game.getMessage().contains("water")){
+        if (game.getMessage().contains("Water!")) {
             return false;
         }
         return true;
     }
-    
-
 
     private double[] getTrajectory(double[] ballPosition, double[] velocity) {
         double[] inputEngine = {ballPosition[0], ballPosition[1], velocity[0], velocity[1]};
         game.shoot(inputEngine, false);
-        // message = game.getMessage();
         
+
         double[] finalPosition = game.getStoppoint();
         return finalPosition;
     }
-    
 
     private static double calculateDistance(double[] finalPosition, double[] targetPosition) {
         return Math.sqrt(Math.pow(finalPosition[0] - targetPosition[0], 2) + Math.pow(finalPosition[1] - targetPosition[1], 2));
     }
 
-    // private static double[] initializeVelocity() {
-    //     Random rand = new Random();
-    //     double[] velocity = new double[2];
-    //     velocity[0] = rand.nextDouble() * 10 - 5;
-    //     velocity[1] = rand.nextDouble() * 10 - 5;
-    //     return velocity;
-    // }
-
-    private static double[] initializeVelocity() {
+    private double[] initializeVelocity() {
         Random rand = new Random();
         double[] velocity = new double[2];
-        int quadrantIndex = rand.nextInt(4);
 
-        
-        switch (quadrantIndex) {
-            case 0: // [-;-]
-                velocity[0] = -(rand.nextDouble() * 5);
-                velocity[1] = -(rand.nextDouble() * 5);
-                break;
-            case 1: //  [+;-]
-                velocity[0] = rand.nextDouble() * 5;
-                velocity[1] = -(rand.nextDouble() * 5);
-                break;
-            case 2: //  [+;+]
-                velocity[0] = rand.nextDouble() * 5;
-                velocity[1] = rand.nextDouble() * 5;
-                break;
-            case 3: //  [-;+]
-                velocity[0] = -(rand.nextDouble() * 5);
-                velocity[1] = rand.nextDouble() * 5;
-                break;
+        if (!turningPoints.isEmpty()) {
+            
+            double[] nearestTurningPoint = turningPoints.get(0);
+            for (double[] point : turningPoints) {
+                if (Math.abs(point[1] - startBallPosition[1]) < Math.abs(nearestTurningPoint[1] - startBallPosition[1])) {
+                    nearestTurningPoint = point;
+                }
+            }
+
+            if (Math.abs(nearestTurningPoint[1] - startBallPosition[1]) < 2) {
+                // less than 5 in y, choose based on x
+                if (nearestTurningPoint[0] > startBallPosition[0]) {
+                    // positive x
+                    if (rand.nextBoolean()) {
+                        velocity[0] = rand.nextDouble() * 5;   // 1q
+                        velocity[1] = rand.nextDouble() * 5;
+                    } else {
+                        velocity[0] = rand.nextDouble() * 5;   // 4q
+                        velocity[1] = -(rand.nextDouble() * 5);
+                    }
+                } else {
+                    // negative x
+                    if (rand.nextBoolean()) {
+                        velocity[0] = -(rand.nextDouble() * 5); // 2q
+                        velocity[1] = rand.nextDouble() * 5;
+                    } else {
+                        velocity[0] = -(rand.nextDouble() * 5); // 3q
+                        velocity[1] = -(rand.nextDouble() * 5);
+                    }
+                }
+            } else {
+                // more than 5 in y, choose based on y
+                if (nearestTurningPoint[1] > startBallPosition[1]) {
+                    // y positive
+                    if (rand.nextBoolean()) {
+                        velocity[0] = rand.nextDouble() * 5;   // 1q
+                        velocity[1] = rand.nextDouble() * 5;
+                    } else {
+                        velocity[0] = -(rand.nextDouble() * 5); // 2q
+                        velocity[1] = rand.nextDouble() * 5;
+                    }
+                } else {
+                    // negative y
+                    if (rand.nextBoolean()) {
+                        velocity[0] = rand.nextDouble() * 5;    // 3q
+                        velocity[1] = -(rand.nextDouble() * 5);
+                    } else {
+                        velocity[0] = -(rand.nextDouble() * 5);  // 4q
+                        velocity[1] = -(rand.nextDouble() * 5);
+                    }
+                }
+            }
+        } else {
+            int quadrantIndex = rand.nextInt(4);
+            switch (quadrantIndex) {
+                case 0: // [-;-]
+                    velocity[0] = -(rand.nextDouble() * 5);
+                    velocity[1] = -(rand.nextDouble() * 5);
+                    break;
+                case 1: // [+;-]
+                    velocity[0] = rand.nextDouble() * 5;
+                    velocity[1] = -(rand.nextDouble() * 5);
+                    break;
+                case 2: // [+;+]
+                    velocity[0] = rand.nextDouble() * 5;
+                    velocity[1] = rand.nextDouble() * 5;
+                    break;
+                case 3: // [-;+]
+                    velocity[0] = -(rand.nextDouble() * 5);
+                    velocity[1] = rand.nextDouble() * 5;
+                    break;
+            }
         }
 
-        // quadrantIndex = (quadrantIndex + 1) % 4;
-
         return velocity;
+    }
+
+    private void updateTurningPoints() {
+        turningPoints.removeIf(point -> calculateDistance(point, startBallPosition) < TOLERANCE);
     }
 
     private static double clamp(double value, double min, double max) {
