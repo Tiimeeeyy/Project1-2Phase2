@@ -1,6 +1,7 @@
 package engine.bot.hillClimbingBot.upd;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import engine.solvers.GolfGameEngine;
 import engine.bot.AibotGA.MapSearcher;

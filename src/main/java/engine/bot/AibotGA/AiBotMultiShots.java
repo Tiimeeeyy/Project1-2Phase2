@@ -19,21 +19,12 @@ public class AiBotMultiShots {
 
     private GolfGameEngine game;
 
-    /**
-     * Class constructor
-     * @param game The engine to simulate the game.
-     */
     public AiBotMultiShots(GolfGameEngine game){
         this.game=game;
-        
     }
 
-    /**
-     * this method "plays" the golf game
-     * @param x Initial state / initial position of the ball.
-     */
-   
     public ArrayList<double[]> golfBot(double x[]){
+        long startTime = System.currentTimeMillis();
         double[] x0=x.clone();
         mapSearcher=new MapSearcher(game.getMapPath(), x0, game.getHole(), game.getHoleRadius());
         shortestPath=mapSearcher.findShortestPath();
@@ -44,19 +35,15 @@ public class AiBotMultiShots {
         while (mapSearcher.isObstacled(x0, game.getHole()) && shotNum<=15) {
             oneShot(x0);
 
-            
             game.shoot(solution.clone(), false);
             if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
                 allSteps.add(solution.clone());
                 stuckCount=0;
-            }else{
+            } else {
                 stuckCount++;
             }
             x0=game.getStoppoint();
-            // check if it stucks at the last 3 steps
             if (stuckCount>2) {
-                
-                System.out.println("stucked checked");
                 double[] target=new double[2];
                 for (int i =0; i<shortestPath.size();i++) {
                     if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
@@ -68,26 +55,21 @@ public class AiBotMultiShots {
                 game.shoot(ai.getBest().clone(), false);
                 x0=game.getStoppoint();
             }
-            
-            System.out.println(Arrays.toString(solution));
             shotNum++;
         }
         if (!goal) {
             ai.golfBot(x0,null);
             allSteps.add(ai.getBest());
         }
-        
+        long endTime = System.currentTimeMillis();
+        System.out.println("Algorithm completed in " + (endTime - startTime)/1000.0 + " seconds");
         return allSteps;
     }
 
     public void oneShot(double[] x){
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
-
-        // initiate population
         initialPopulation(population, x0);
- 
-        // Run the algorithm
         for (int i = 0; i < 300; i++) {
             int[] slcIndex=selection(population);
             crossover(population[slcIndex[0]], population[slcIndex[1]], population);
@@ -97,30 +79,18 @@ public class AiBotMultiShots {
                 break;
             }
             HeapSort.sort(population);
-            // System.out.println(population[0].getFitness()+"  "+i);
-            
         }
-        // If the goal is not reached, set the solution to the best solution found
         if (!this.goal) {
             double[] best=x0;
             best[2]=population[0].genoToPhenotype()[0];
             best[3]=population[0].genoToPhenotype()[1];
             this.solution=best.clone();
         }
-        
     }
 
-    /**
-     * THis method initialises the population for the genetic algorithm
-     * @param pop The population size to be initialised.
-     * @param x The initial state / position of the ball.
-     */
     private void initialPopulation(Individual[] pop, double[] x){
-       
         Random rand=new Random();
         char[][] indi=new char[2][10];
-
-        // set 1 try of direct shoot 
         double[] hole=game.getHole().clone();
         double cos=(hole[0]-x[0])/game.getHoleBallDistance(x);
         double sin=(hole[1]-x[1])/game.getHoleBallDistance(x);
@@ -144,11 +114,8 @@ public class AiBotMultiShots {
             }
             pop[k+2]=new Individual(indi);
             pop[k+2].setFitness(calculateFitness(pop[k+2], x.clone()));
-            
         }
-        
 
-        // Random the rest in population
         for (int i = 5; i < popSize; i++) {
             for (int j = 0; j < 2; j++) {
                 for(int k=0;k<10;k++){
@@ -156,17 +123,12 @@ public class AiBotMultiShots {
                 }
             }
             pop[i]=new Individual(indi);
-
             pop[i].setFitness(calculateFitness(pop[i], x.clone()));
         }
         HeapSort.sort(pop);
-
     }
 
-   
-
     private double calculateFitness(Individual indi, double[] x){
-        
         double fit = 1;
         double[] xin=new double[]{x[0],x[1],indi.genoToPhenotype()[0],indi.genoToPhenotype()[1]};
         double[] x0=xin.clone();
@@ -174,9 +136,7 @@ public class AiBotMultiShots {
         if (game.isGoal() && !this.goal) {
             this.solution=x0.clone();
             this.goal=true;
-            System.out.println("Goal!!!!!!!in calcu fitness");;
         }
-
         for (int i =0; i<shortestPath.size();i++) {
             if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
                 fit = i*5+5;
@@ -185,11 +145,6 @@ public class AiBotMultiShots {
         return fit;
     }
 
-    /**
-     * This method performs selection in the genetic algorithm
-     * @param pop The current population.
-     * @return The indices of the two selected individuals.
-     */
     private int[] selection(Individual[] pop){
         double sum=0;
         int[] selected={0,0};
@@ -199,7 +154,6 @@ public class AiBotMultiShots {
         }
         double s1=rnd.nextDouble()*sum;
         double s2=rnd.nextDouble()*sum;
-
         for (int i = 0; i < pop.length; i++) {
             s1=s1-pop[i].getFitness();
             if (s1<=0) {
@@ -214,28 +168,17 @@ public class AiBotMultiShots {
                 break;
             }
         }
-        // check whether duplicated choices. 
         if (selected[0]==selected[1]) {
             selected=selection(pop);
         }
         return selected;
     }
 
-    
-
-    /**
-     * This method performs crossover in the genetic algorithm.
-     * @param slc1 The first selected individual.
-     * @param slc2 The second selected individual.
-     * @param pop The current population.
-     */
     private void crossover(Individual slc1, Individual slc2, Individual[] pop){
         Random rnd=new Random();
         int pivot=rnd.nextInt(7)+1;
         Individual child1=slc1.clone();
         Individual child2=slc2.clone();
-
-
         for (int i = pivot; i < 10; i++) {
             char temp=child1.getChromosome()[0][i];
             child1.getChromosome()[0][i]=child2.getChromosome()[0][i];
@@ -251,10 +194,6 @@ public class AiBotMultiShots {
         pop[popSize-2]=child2.clone();
     }
 
-    /**
-     * This method performs mutations in the genetic algorithm.
-     * @param indi The individual to be mutated.
-     */
     private void mutation(Individual indi){
         Random rnd=new Random();
         for (int i = 0; i < 10; i++) {
@@ -267,7 +206,6 @@ public class AiBotMultiShots {
                     indi.getChromosome()[0][i]='0';
                 }
             }
-
             r=rnd.nextInt((int) (1/mutationRate)) ;
             if (r==0) {
                 if (indi.getChromosome()[1][i]=='0') {
@@ -277,16 +215,10 @@ public class AiBotMultiShots {
                     indi.getChromosome()[1][i]='0';
                 }
             }
-
         }
     }
 
-    /**
-     * Gets the best solution.
-     * @return The best solution.
-     */
     public double[] getBest(){
         return this.solution;
     }
-
 }
