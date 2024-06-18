@@ -116,7 +116,8 @@ public class ThirdScreenController implements ScreenInterface {
     private ArrayList<double[]> shots;
     private boolean botActivated = false;
     private double radiusHole; // Radius of the hole
-    // private ArrayList<double[]> replayShots;
+    private ArrayList<double[]> plays;
+    
 
     private Parent root; // Root node
 
@@ -531,6 +532,8 @@ public class ThirdScreenController implements ScreenInterface {
                 this.REACHED_THE_HOLE = true;
                 if(this.ruleBasedBot){
                     logEvent("The rule based bot reached the hole.");
+                    // this.ruleBasedBot = false;
+
                     }
                 logEvent("CONGRATULATIONS! The ball reached the hole.");
                 showGoalAlert();
@@ -685,8 +688,15 @@ public class ThirdScreenController implements ScreenInterface {
 
             ButtonType backButton = new ButtonType("Back");
             ButtonType seeStatsButton = new ButtonType("See the stat");
+    
             ButtonType seeReplayButton = new ButtonType("See the replay");
-            alert.getButtonTypes().setAll(backButton, seeReplayButton, seeStatsButton);
+            if(this.ruleBasedBot){
+                this.ruleBasedBot = false;
+                alert.getButtonTypes().setAll(backButton, seeStatsButton);
+            }else{
+                alert.getButtonTypes().setAll(backButton, seeReplayButton, seeStatsButton);
+
+                }
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent()) {
@@ -723,13 +733,14 @@ public class ThirdScreenController implements ScreenInterface {
         if(!ruleBasedBot){
             logEvent("!!--Rule-based bot entered the party--!!");
         }
+        // this.shots = new ArrayList<>();
+
         this.ruleBasedBot = true;
         double[] ballP = BallPosition.clone();
-        ArrayList<double[]> plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
-        // shots=plays;
+        plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
         if (!plays.isEmpty()) {
             playBotShot(plays, 0);
-        }
+        } 
         // ballHitMultiple(0);
     }
     
@@ -739,13 +750,25 @@ public class ThirdScreenController implements ScreenInterface {
     private void playBotShot(ArrayList<double[]> plays, int index) {
         if (index < plays.size()) {
             double[] play = plays.get(index);
+            // double[] x ={play[0]*play[2], play[1]*play[2]};
+            // this.shots.add(x.clone());
             // System.out.println(Arrays.toString(play));
             ballHit(play[2], new double[]{play[0], play[1]});
-            
+
+
             timeline.setOnFinished(event -> {
                 Platform.runLater(() -> {
-                    playBotShot(plays, index + 1);
-                    ruleBot.fire(); 
+                    try{
+                        
+                        playBotShot(plays, index + 1);
+                        ruleBot.fire(); 
+
+                    } catch (Exception e) {
+                        this.ruleBasedBot = true;
+                        handlePostAnimation();
+                        
+                    }
+
                 });
             });
         } else {
@@ -754,37 +777,70 @@ public class ThirdScreenController implements ScreenInterface {
     }
     
 
+    // @FXML
+    // private void gaBotFunc() {
+    //     // logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
+    //     // AiBotGA gaBot = new AiBotGA(golfGame, HolePostion);
+    //     // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+    //     // gaBot.golfBot(x);
+    //     // double[] solution = gaBot.getBest();
+    //     // double[] velocity = {solution[2], solution[3]};
+    //     // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
+
+    //     logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
+    //     // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
+    //     // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+    //     // shots=gaBot.golfBot(x);
+    //     // ballHitMultiple(0);
+        
+    //     AiBotGAV gaBot = new AiBotGAV(golfGame);
+    //     double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+    //     shots=gaBot.golfBot(x);
+    //     ballHitMultiple(0);
+
+    //     // ArrayList<double[]> test=new ArrayList<>();
+    //     // double[] t={-3,0,0,2};
+    //     // test.add(t.clone());
+    //     // t=new double[]{-3,5,2,0};
+    //     // test.add(t.clone());
+    //     // t=new double[]{-3,5,2,2};
+    //     // test.add(t.clone());
+    //     // shots=test;
+    //     // ballHit(0);
+    // }
+
     @FXML
     private void gaBotFunc() {
-        // logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        // AiBotGA gaBot = new AiBotGA(golfGame, HolePostion);
-        // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        // gaBot.golfBot(x);
-        // double[] solution = gaBot.getBest();
-        // double[] velocity = {solution[2], solution[3]};
-        // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-
+        playMusic();
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-        // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
-        // double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        // shots=gaBot.golfBot(x);
-        // ballHitMultiple(0);
-        
-        AiBotGAV gaBot = new AiBotGAV(golfGame);
-        double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-        shots=gaBot.golfBot(x);
-        ballHitMultiple(0);
 
-        // ArrayList<double[]> test=new ArrayList<>();
-        // double[] t={-3,0,0,2};
-        // test.add(t.clone());
-        // t=new double[]{-3,5,2,0};
-        // test.add(t.clone());
-        // t=new double[]{-3,5,2,2};
-        // test.add(t.clone());
-        // shots=test;
-        // ballHit(0);
+        Task<ArrayList<double[]>> task = new Task<>() {
+            @Override
+            protected ArrayList<double[]> call() {
+                AiBotGAV gaBot = new AiBotGAV(golfGame);
+                double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+                return gaBot.golfBot(x);
+            }
+
+            @Override
+            protected void succeeded() {
+                stopMusic();
+                ArrayList<double[]> velocities = getValue();
+                shots = velocities;
+                ballHitMultiple(0);
+            }
+
+            @Override
+            protected void failed() {
+                stopMusic();
+                Throwable exception = getException();
+                exception.printStackTrace();
+            }
+        };
+
+        new Thread(task).start();
     }
+
 
     /**
      * Handles the Play button action for selected bot.
@@ -851,6 +907,11 @@ public class ThirdScreenController implements ScreenInterface {
     @FXML
     private void replay(){
         // shots = replayShots;
+        // if (shots == null || shots.isEmpty()) {
+        //     this.ruleBasedBot = false;
+
+        //     return;
+        // }
         this.REACHED_THE_HOLE=false;
         ballHitMultiple(0);
     }
