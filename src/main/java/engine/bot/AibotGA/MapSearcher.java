@@ -172,7 +172,7 @@ public class MapSearcher {
             }
             for (double i =a[1] ; i < b[1]; i=i+1.0/Utility.ratio) {
                 int[] p=Utility.coordinateToPixel(new double[]{i*slope+intercept,i});
-                if (!grass[p[0]][p[1]]) {
+                if ((!terrain[p[0]][p[1]].equals(TerrainType.Grass)) && (!terrain[p[0]][p[1]].equals(TerrainType.Sand))) {
                     return true;
                 }
             }
