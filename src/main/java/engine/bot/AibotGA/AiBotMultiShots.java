@@ -55,6 +55,7 @@ public class AiBotMultiShots {
                 game.shoot(ai.getBest().clone(), false);
                 x0=game.getStoppoint();
             }
+            System.out.println(Arrays.toString(solution));
             shotNum++;
         }
         if (!goal) {

@@ -2,8 +2,8 @@ package engine.bot.AiBotGAV;
 
 public class IndividualV {
     
-	double[] chromosome;
-	double fitness;
+	private double[] chromosome;
+	private double fitness;
 
 
 	public IndividualV(double[] chromosome) {
