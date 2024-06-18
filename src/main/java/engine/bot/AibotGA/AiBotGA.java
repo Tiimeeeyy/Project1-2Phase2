@@ -107,7 +107,7 @@ public class AiBotGA {
             }
             pop[k+2]=new Individual(indi);
             pop[k+2].setFitness(calculateFitness(pop[k+2], x.clone()));
-            System.out.println(Arrays.toString(pop[k+2].genoToPhenotype()));
+            // System.out.println(Arrays.toString(pop[k+2].genoToPhenotype()));
         }
         
 
