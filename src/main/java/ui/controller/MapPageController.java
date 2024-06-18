@@ -19,6 +19,12 @@ import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import java.util.Stack;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyCodeCombination;
 
 
 /**
@@ -29,6 +35,8 @@ public class MapPageController implements ScreenInterface {
     private static final double MIN_HEIGHT = -10.0; // Minimum height for the height map
     private static double minCurrentHeight;
     private static double maxCurrentHeight;
+    private Stack<WritableImage> canvasHistory = new Stack<>();
+
 
     @FXML
     private Canvas drawingCanvas; // Canvas for drawing
@@ -71,6 +79,7 @@ public class MapPageController implements ScreenInterface {
     private double grassFrictionKINETIC; // Kinetic friction for grass
     private double grassFrictionSTATIC; // Static friction for grass
     private boolean disableWater = false; // Flag for disabling water
+    
 
     GraphicsContext gc; // Graphics context for drawing
 
@@ -89,6 +98,14 @@ public class MapPageController implements ScreenInterface {
      */
     public void setRoot(Parent root) {
         this.root = root;
+        this.root.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                if (new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN).match(event)) {
+                    undoLastAction();
+                }
+            }
+        });
     }
 
     /**
@@ -147,6 +164,21 @@ public class MapPageController implements ScreenInterface {
     public void initialize() {
         setUpChoiceBoxes();
         setUpCanvas();
+
+    }
+
+    private void saveCanvasState() {
+        WritableImage snapshot = new WritableImage((int) drawingCanvas.getWidth(), (int) drawingCanvas.getHeight());
+        drawingCanvas.snapshot(null, snapshot);
+        canvasHistory.push(snapshot);
+    }
+
+    private void undoLastAction() {
+        if (!canvasHistory.isEmpty()) {
+            WritableImage lastState = canvasHistory.pop();
+            GraphicsContext gc = drawingCanvas.getGraphicsContext2D();
+            gc.drawImage(lastState, 0, 0);
+        }
     }
 
     /**
@@ -355,6 +387,7 @@ public class MapPageController implements ScreenInterface {
      * @param heightStep the step value for height adjustment
      */
     private void updateHeightMap(int x, int y, double heightStep) {
+        saveCanvasState();
         if (x >= 0 && x < 500 && y >= 0 && y < 500) {
             heightStorage[x][y] += heightStep;
             if (heightStorage[x][y] > MAX_HEIGHT) {
@@ -444,4 +477,6 @@ public class MapPageController implements ScreenInterface {
             return name;
         }
     }
+
+    
 }

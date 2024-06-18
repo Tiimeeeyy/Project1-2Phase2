@@ -190,11 +190,11 @@ public class MapSearcher {
         return fit;
     }
 
-    private void createImage() {
-        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-24, -24}, new double[]{24, 24}, 0.1);
-        ArrayList<double[]> test = mapSearcher.findShortestPath();
+    public void createImage( ArrayList<double[]> path) {
+        // MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", startBallPostion, holePosition, radisus);
+        // ArrayList<double[]> test = mapSearcher.findShortestPath();
         MapHandler aa=new MapHandler();
-        aa.plotTrajectory("src/main/resources/userInputMap.png", "src/main/resources/outtest.png", test);
+        aa.plotTrajectory("src/main/resources/userInputMap.png", "src/main/resources/outtest.png", path);
     }
 
     public static void main(String[] args) {
