@@ -5,6 +5,8 @@ module ui {
     requires java.desktop;
     requires javafx.graphics;
     requires javafx.base;
+    requires javafx.media;
+
     requires jzy3d.api;
     requires jzy3d.javafx;
     requires org.jfree.chart3d;

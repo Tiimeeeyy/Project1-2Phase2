@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
+import javafx.scene.media.*;
+import java.net.URL;
 
 
 /**
@@ -94,6 +97,8 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML   
     private Button replayButton;
+    private MediaPlayer mediaPlayer;
+
 
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
@@ -721,10 +726,11 @@ public class ThirdScreenController implements ScreenInterface {
         this.ruleBasedBot = true;
         double[] ballP = BallPosition.clone();
         ArrayList<double[]> plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
-
+        // shots=plays;
         if (!plays.isEmpty()) {
             playBotShot(plays, 0);
         }
+        // ballHitMultiple(0);
     }
     
     /**
@@ -812,19 +818,34 @@ public class ThirdScreenController implements ScreenInterface {
 
 
     @FXML
-    private void chBotPlay(){
-        // System.out.println("hello");
+    private void chBotPlay() {
+        playMusic();
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-        // HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-        HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
 
-        ArrayList<double[]> velocities = chBot.hillClimbingAlgorithm();
-        // double[] velocity = velocities.get(0);
-        // System.out.println(Arrays.toString(velocity));
-        // ballHit(Utility.getPowerFromVelocity(velocity), Utility.getDirectionFromVelocity(velocity));
-        shots = velocities;
-        ballHitMultiple(0);
-        return;
+        Task<ArrayList<double[]>> task = new Task<>() {
+            @Override
+            protected ArrayList<double[]> call() {
+                HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+                return chBot.hillClimbingAlgorithm();
+            }
+
+            @Override
+            protected void succeeded() {
+                stopMusic();
+                ArrayList<double[]> velocities = getValue();
+                shots = velocities;
+                ballHitMultiple(0);
+            }
+
+            @Override
+            protected void failed() {
+                stopMusic();
+                Throwable exception = getException();
+                exception.printStackTrace();
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
@@ -838,5 +859,28 @@ public class ThirdScreenController implements ScreenInterface {
     private void mlBotPlay(){
         return;
     }
+
+    private void playMusic() {
+    // try {
+        String musicFile = "/music/elevator-music-vanoss-gaming-background-music.mp3";
+        URL resource = getClass().getResource(musicFile);
+        Media sound = new Media(resource.toString());
+        mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.setVolume(1.0);
+        // mediaPlayer.setAutoPlay(true);
+
+        mediaPlayer.play();
+    // } catch (Exception e) {
+    //     e.printStackTrace();
+    // }
+    }
+
+    private void stopMusic() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+    }
+    
+
 
 }
