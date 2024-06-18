@@ -13,11 +13,9 @@ import engine.parser.ExpressionParser;
 import java.awt.Color;
 
 public class MapHandler {
-    private int[][] redAry;
-    private int[][] blueAry;
+    
     private double[][][] gradient;
-    private boolean[][] treeAry;
-    private boolean grass[][];
+    private TerrainType[][] terrain;
     /**
      * Read the map and store the gradient.
      *
@@ -38,25 +36,27 @@ public class MapHandler {
             System.out.println("Error: " + e);
         }
         int[][] gAry=new int[width][height];
-        redAry=new int[width][height];
-        blueAry=new int[width][height];
-        treeAry=new boolean[width][height];
-        grass=new boolean[width][height];
+        
+        terrain=new TerrainType[width][height];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int rgb = image.getRGB(i, j); // Get the RGB value at a specific pixel
-                redAry[i][j] = (rgb >> 16) & 0xFF;   // Red component, Red is the friction, 0-255
+                int red = (rgb >> 16) & 0xFF;   // Red component, Red is the friction, 0-255
                 gAry[i][j] = (rgb >> 8) & 0xFF;    // Green component, Green is the height, 0-255. 
-                blueAry[i][j] = rgb & 0xFF; 
-                if(blueAry[i][j]<10){
-                    grass[i][j]=true;
-                }else{
-                    grass[i][j]=false;
-                }
+                int blue = rgb & 0xFF;    
+                
                 if (rgb==-8897501) {
-                    treeAry[i][j]=true;
+                    terrain[i][j]=TerrainType.Tree;
                 }else{
-                    treeAry[i][j]=false;
+                    if (blue>=100) {
+                        terrain[i][j]=TerrainType.Water;
+                    }else{
+                        if (red>=100) {
+                            terrain[i][j]=TerrainType.Sand;
+                        }else{
+                            terrain[i][j]=TerrainType.Grass;
+                        }
+                    }
                 }
             }
         }
@@ -65,9 +65,9 @@ public class MapHandler {
         for (int i = 0; i < width-1; i++) {
             for (int j = 1; j < height; j++) {
                 for(int k=0;k<2;k++){
-                    if(treeAry[i+1-k][j-k] || gAry[i+1-k][j-k]==0){
+                    if(terrain[i+1-k][j-k].equals(TerrainType.Tree) || gAry[i+1-k][j-k]==0){
                         gradient[i][j][k]=0;
-                    }else if(treeAry[i][j] || gAry[i][j]==0){
+                    }else if(terrain[i][j].equals(TerrainType.Tree) || gAry[i][j]==0){
                         gradient[i][j][k]=0;
                     }
                     else{
@@ -78,20 +78,13 @@ public class MapHandler {
         }
         
     }
-    public int[][] getRed(){
-        return this.redAry;
-    }
-    public int[][] getBlue(){
-        return this.blueAry;
-    }
+    
     public double[][][] getGradient(){
         return this.gradient;
     }
-    public boolean[][] getTree(){
-        return this.treeAry;
-    }
-    public boolean[][] getGrass(){
-        return this.grass;
+    
+    public TerrainType[][] getTerrain(){
+        return this.terrain;
     }
 
     /**

@@ -11,20 +11,23 @@ import java.util.Set;
 
 
 import engine.solvers.MapHandler;
+import engine.solvers.TerrainType;
 import engine.solvers.Utility;
 
 public class MapSearcher {
     private boolean[][] grass;
+    private TerrainType[][] terrain;
     private int[] startBallPostion;
     private int[] holePostion;
     private int[] lastPoint;
     private double r;
-    private int resolution = 5;
+    private int sandResolution=3;
+    private int grassResolution=8;
 
     public MapSearcher(String mappath, double[] startBallPostion, double[] holePostion, double r) {
         MapHandler map = new MapHandler();
         map.readmap(mappath);
-        this.grass = map.getGrass();
+        this.terrain=map.getTerrain();
         this.startBallPostion = Utility.coordinateToPixel(startBallPostion);
         this.holePostion = Utility.coordinateToPixel(holePostion);
         this.r = r;
@@ -44,52 +47,41 @@ public class MapSearcher {
             int[] current = queue.poll();
             int i = current[0];
             int j = current[1];
-            if (Utility.getDistance(Utility.pixelToCoordinate(current), Utility.pixelToCoordinate(holePostion)) <= resolution / Utility.ratio) {
+            if (Utility.getDistance(Utility.pixelToCoordinate(current), Utility.pixelToCoordinate(holePostion)) <= grassResolution / Utility.ratio) {
                 lastPoint = current.clone();
                 // System.out.println("holereached");
                 break;
             }
             
-            // if (i < resolution || j < resolution || i >= 500 - resolution || j >= 500 - resolution) {
-            //     continue;
-            // }
-            if (i+resolution<=499) {
-                if (grass[i + resolution][j] && (!contains(visited, new int[]{i + resolution, j}))) {
-                    int[] temp = new int[]{i + resolution, j};
-                    visited.add(temp.clone());
-                    queue.add(temp.clone());
-                    previous.put(temp.clone(), current.clone());
-                }
+            int res= terrain[i][j].equals(TerrainType.Sand) ? sandResolution : grassResolution;
+            
+
+            if (i+res<=499) {
+                checkPoint(new int[]{i + res, j}, current, visited, queue, previous);  
             }
-            if (j+resolution<=499) {
-                if (grass[i][j + resolution] && (!contains(visited, new int[]{i, j + resolution}))) {
-                    int[] temp = new int[]{i, j + resolution};
-                    visited.add(temp.clone());
-                    queue.add(temp.clone());
-                    previous.put(temp.clone(), current.clone());
-                }
+            if (j+res<=499) {
+                checkPoint(new int[]{i, j + res}, current, visited, queue, previous);
             }
-            if (i-resolution>=0) {
-                if (grass[i - resolution][j] && (!contains(visited, new int[]{i - resolution, j}))) {
-                    int[] temp = new int[]{i - resolution, j};
-                    visited.add(temp.clone());
-                    queue.add(temp.clone());
-                    previous.put(temp.clone(), current.clone());
-                } 
+            if (i-res>=0) {
+                checkPoint(new int[]{i - res, j}, current, visited, queue, previous);
             }
-            if (j-resolution>=0) {
-                if (grass[i][j - resolution] && (!contains(visited, new int[]{i, j - resolution}))) {
-                    int[] temp = new int[]{i, j - resolution};
-                    visited.add(temp.clone());
-                    queue.add(temp.clone());
-                    previous.put(temp.clone(), current.clone());
-                } 
+            if (j-res>=0) {
+                checkPoint(new int[]{i, j - res}, current, visited, queue, previous);
             }
             
             
         }
         return reConstruct(previous);
 
+    }
+
+    private void checkPoint(int[] point,int[] current, Set<int[]> visited, Queue<int[]> queue, Map<int[],int[]>previous){
+        if ((terrain[point[0]][point[1]].equals(TerrainType.Grass) || terrain[point[0]][point[1]].equals(TerrainType.Sand)) 
+                && (!contains(visited, point))) {
+            visited.add(point.clone());
+            queue.add(point.clone());
+            previous.put(point.clone(), current.clone());
+        }
     }
 
     private ArrayList<double[]> reConstruct(Map<int[], int[]> previous) {
@@ -166,7 +158,7 @@ public class MapSearcher {
             }
             for (double i =a[0] ; i < b[0]; i=i+1.0/Utility.ratio) {
                 int[] p=Utility.coordinateToPixel(new double[]{i,i*slope+intercept});
-                if (!grass[p[0]][p[1]]) {
+                if ((!terrain[p[0]][p[1]].equals(TerrainType.Grass)) && (!terrain[p[0]][p[1]].equals(TerrainType.Sand))){
                     return true;
                 }
             }
@@ -206,7 +198,7 @@ public class MapSearcher {
     }
 
     public static void main(String[] args) {
-        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-24, -24}, new double[]{24, 24}, 0.1);
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{0, 24}, new double[]{0, 5}, 0.1);
         ArrayList<double[]> test = mapSearcher.findShortestPath();
         
 

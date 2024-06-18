@@ -29,6 +29,9 @@ public class GolfGameEngine {
     private double r;
     private String mappath;
     
+    //about map
+    private double[][][] mapgradient;
+    private TerrainType[][] terrain;
 
     /**
      * Construct the game engine
@@ -47,6 +50,13 @@ public class GolfGameEngine {
         this.hole=hole;
         this.r=r;
         this.mappath=mappath;
+
+        MapHandler map=new MapHandler();
+        map.readmap(mappath);
+        mapgradient=map.getGradient();
+        terrain=map.getTerrain();
+        
+        
     }
 
 
@@ -78,10 +88,7 @@ public class GolfGameEngine {
         
         //Read the map 
         map.readmap(mappath);
-        double[][][] mapgradient=map.getGradient();
-        int[][] redElm=map.getRed();
-        int[][] blueElm=map.getBlue();
-        boolean[][] treeAry=map.getTree();
+        
         boolean bounceCheck=false;
         this.minDis=getDistance(x, hole);
         double dis=100;
@@ -113,7 +120,7 @@ public class GolfGameEngine {
                 break;
             }
             //check whether in water.
-            if (blueElm[pixelX][pixelY]>=100) {
+            if (terrain[pixelX][pixelY].equals(TerrainType.Water)) {
                 this.message="In Water! Start again.";
                 status=BallStatus.HitWater;
                 x=x0.clone();
@@ -124,10 +131,10 @@ public class GolfGameEngine {
                 break;
             }
             //ckeck hit the tree
-            if (treeAry[pixelX][pixelY]) {
+            if (terrain[pixelX][pixelY].equals(TerrainType.Tree)) {
                 if (!bounceCheck) {
                     this.treeHit=true;
-                    double[] normVec=findTreeNormVec(pixelX, pixelY, treeAry);
+                    double[] normVec=findTreeNormVec(pixelX, pixelY, terrain);
                     bouncingHandler(x, normVec);
                     bounceCheck=true;
                 }
@@ -135,7 +142,7 @@ public class GolfGameEngine {
                 bounceCheck=false;
             }
             //check if in sand
-            if (redElm[pixelX][pixelY]>=100 && blueElm[pixelX][pixelY]==0) {
+            if (terrain[pixelX][pixelY].equals(TerrainType.Sand)) {
                 fric[0]=3*a[0];
                 fric[1]=3*a[1];
             }else{
@@ -267,13 +274,13 @@ public class GolfGameEngine {
      * @param treeAry The locations of the trees.
      * @return The norm-vector of the collision surface.
      */
-    private double[] findTreeNormVec(int x, int y,boolean[][] treeAry){
+    private double[] findTreeNormVec(int x, int y,TerrainType[][] terrain){
         double[] normVec ={Utility.pixelToCoordinate_X(x),Utility.pixelToCoordinate_Y(y)};
         Set<Integer> xSet=new HashSet<>();
         Set<Integer> ySet=new HashSet<>();
         // int pixelX=Utility.coordinateToPixel_X(x);
         // int pixelY=Utility.coordinateToPixel_Y(y);
-        findTree(x, y, xSet, ySet, treeAry);
+        findTree(x, y, xSet, ySet, terrain);
         int xSum=0;
         for (Integer i : xSet) {
             xSum=xSum+i;
@@ -298,17 +305,17 @@ public class GolfGameEngine {
      * @param ySet  The collection of pixels' y coordinate for the hitting tree
      * @param treeAry The location information of the trees in the map.
      */
-    private void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,boolean[][] treeAry){
+    private void findTree(int x, int y, Set<Integer> xSet, Set<Integer> ySet,TerrainType[][] terrain){
         if (xSet.contains(x) && ySet.contains(y)) {
             return;
         }
-        if (treeAry[x][y]) {
+        if (terrain[x][y].equals(TerrainType.Tree)) {
             xSet.add(x);
             ySet.add(y);
-            findTree(x-1, y, xSet, ySet, treeAry);
-            findTree(x, y-1, xSet, ySet, treeAry);
-            findTree(x+1, y, xSet, ySet, treeAry);
-            findTree(x, y+1, xSet, ySet, treeAry);
+            findTree(x-1, y, xSet, ySet, terrain);
+            findTree(x, y-1, xSet, ySet, terrain);
+            findTree(x+1, y, xSet, ySet, terrain);
+            findTree(x, y+1, xSet, ySet, terrain);
         }else{
             return;
         }
