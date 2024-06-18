@@ -15,14 +15,13 @@ import engine.solvers.TerrainType;
 import engine.solvers.Utility;
 
 public class MapSearcher {
-    private boolean[][] grass;
     private TerrainType[][] terrain;
     private int[] startBallPostion;
     private int[] holePostion;
     private int[] lastPoint;
     private double r;
-    private int sandResolution=3;
-    private int grassResolution=8;
+    private int sandResolution=4;
+    private int grassResolution=10;
 
     public MapSearcher(String mappath, double[] startBallPostion, double[] holePostion, double r) {
         MapHandler map = new MapHandler();
@@ -198,7 +197,7 @@ public class MapSearcher {
     }
 
     public static void main(String[] args) {
-        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{0, 24}, new double[]{0, 5}, 0.1);
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3, 0}, new double[]{4, 1}, 0.1);
         ArrayList<double[]> test = mapSearcher.findShortestPath();
         
 

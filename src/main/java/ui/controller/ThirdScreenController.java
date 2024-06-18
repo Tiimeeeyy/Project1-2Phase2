@@ -817,6 +817,7 @@ public class ThirdScreenController implements ScreenInterface {
         Task<ArrayList<double[]>> task = new Task<>() {
             @Override
             protected ArrayList<double[]> call() {
+                // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
                 AiBotGAV gaBot = new AiBotGAV(golfGame);
                 double[] x = {BallPosition[0], BallPosition[1], 0, 0};
                 return gaBot.golfBot(x);
