@@ -802,7 +802,7 @@ public class ThirdScreenController implements ScreenInterface {
                     gaBotFunc();
                     break;
                 case "HC Bot":
-                    chBotPlay();
+                    hcBotPlay();
                     break;
                 case "ML Bot":
                     mlBotPlay();
@@ -818,7 +818,7 @@ public class ThirdScreenController implements ScreenInterface {
 
 
     @FXML
-    private void chBotPlay() {
+    private void hcBotPlay() {
         playMusic();
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
 
