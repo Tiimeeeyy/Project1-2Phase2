@@ -451,6 +451,7 @@ public class ThirdScreenController implements ScreenInterface {
             animateBallMovement(fullTrajectory, step);
 
         } else {
+            playMusic("/music/goalSound.mp3");
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Goal!");
             alert.setHeaderText("Goal Reached, The ball has already reached the hole.");
@@ -811,7 +812,7 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private void gaBotFunc() {
-        playMusic();
+        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
 
         Task<ArrayList<double[]>> task = new Task<>() {
@@ -875,7 +876,7 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private void hcBotPlay() {
-        playMusic();
+        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
 
         Task<ArrayList<double[]>> task = new Task<>() {
@@ -921,10 +922,10 @@ public class ThirdScreenController implements ScreenInterface {
         return;
     }
 
-    private void playMusic() {
+    private void playMusic(String path) {
     // try {
-        String musicFile = "/music/elevator-music-vanoss-gaming-background-music.mp3";
-        URL resource = getClass().getResource(musicFile);
+        // String musicFile = "/music/elevator-music-vanoss-gaming-background-music.mp3";
+        URL resource = getClass().getResource(path);
         Media sound = new Media(resource.toString());
         mediaPlayer = new MediaPlayer(sound);
         mediaPlayer.setVolume(1.0);
