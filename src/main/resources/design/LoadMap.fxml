@@ -110,13 +110,45 @@
                         </HBox>
                     </content>
                   </Tab>
-                  <Tab text="Maze">
+                  <Tab text="Maze 2">
                      <content>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <ImageView fx:id="mapImage31" fitHeight="426.0" fitWidth="445.0">
                                  <image>
                                     <Image url="@../maps/maze.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox prefHeight="426.0" prefWidth="426.0">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Maze Map" textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Text>
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="This map offers a challenging and intricate maze set against a green, diagonally striped background. You must navigate carefully to find the correct route through the maze, avoiding deceptive paths that loop back on themselves. Precision and strategy are key to overcoming this labyrinth and reaching the final destination. The contrast between the vivid blue paths and the green backdrop adds to the visual complexity, making it a true test of skill and patience." wrapText="true">
+                                       <VBox.margin>
+                                          <Insets top="40.0" />
+                                       </VBox.margin>
+                                    </TextArea>
+                                    <Button mnemonicParsing="false" onAction="#goNext" prefHeight="48.0" prefWidth="200.0" text="Play!" textAlignment="CENTER">
+                                       <VBox.margin>
+                                          <Insets left="100.0" top="30.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Maze">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fx:id="mapImage31" fitHeight="426.0" fitWidth="445.0">
+                                 <image>
+                                    <Image url="@../maps/maze2.png" />
                                  </image>
                               </ImageView>
                               <VBox prefHeight="426.0" prefWidth="426.0">

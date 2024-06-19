@@ -1,10 +1,9 @@
 package ui.controller;
 
 import engine.bot.AiBotGAV.AiBotGAV;
-import engine.bot.AibotGA.AiBotGA;
-import engine.bot.AibotGA.AiBotMultiShots;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
+import engine.bot.newtonRaphsonBot.NewtonRaphsonBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
@@ -28,10 +27,8 @@ import ui.screenFactory.ScreenInterface;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -818,6 +815,7 @@ public class ThirdScreenController implements ScreenInterface {
         Task<ArrayList<double[]>> task = new Task<>() {
             @Override
             protected ArrayList<double[]> call() {
+                // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
                 AiBotGAV gaBot = new AiBotGAV(golfGame);
                 double[] x = {BallPosition[0], BallPosition[1], 0, 0};
                 return gaBot.golfBot(x);
@@ -942,7 +940,19 @@ public class ThirdScreenController implements ScreenInterface {
             mediaPlayer.stop();
         }
     }
+
+
+    @FXML
+    private void nrBotPlay(){
+        logEvent("!!--NR bot entered the party (it is slow, be patient)--!!");
+        NewtonRaphsonBot nrBot = new NewtonRaphsonBot(golfGame, BallPosition, HolePostion);
+        ArrayList<double[]> velocities = nrBot.NewtonRaphsonMethod();
+        shots = velocities;
+        ballHitMultiple(0);
+        return;
+    }
     
-
-
+    
 }
+
+
