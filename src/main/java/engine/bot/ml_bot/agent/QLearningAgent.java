@@ -3,10 +3,12 @@ package engine.bot.ml_bot.agent;
 import engine.bot.ml_bot.math.q_calculations.QCalculations;
 import engine.bot.ml_bot.network.NeuralNetwork;
 import engine.bot.ml_bot.network.ReplayBuffer;
+import engine.solvers.GolfGameEngine;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -14,30 +16,37 @@ import java.util.logging.Logger;
 
 public class QLearningAgent implements Serializable {
     // TODO: Add tests.
-    // TODO: Connect to game engine.
     // TODO: Hyperparameter (Report).
-    // TODO: Visualisation.
     private static final int NUM_ANGLES = 100; // The amount of angles we let the agent explore.
     private static final int NUM_POWERS = 5; // The amount of shot powers the agent can use (In our case 0-5 m/s).
     private static final double EPSILON_DECAY = 0.995;
     private static final double MIN_EPSILON = 0.01;
+    private final transient Logger logger = Logger.getLogger(QLearningAgent.class.getName());
     private NeuralNetwork qNetwork;
     private ReplayBuffer replayBuffer;
     private double epsilon;
     private Random random;
     private transient QCalculations qCalculations;
-    private final transient Logger logger = Logger.getLogger(QLearningAgent.class.getName());
+    private transient GolfGameEngine golfGameEngine;
+    private State initialState;
+    private Reward reward;
+    private RealVector holePosition;
 
-    public QLearningAgent(NeuralNetwork qNetwork, ReplayBuffer replayBuffer, double epsilon, QCalculations qCalculations) {
+    public QLearningAgent(NeuralNetwork qNetwork, ReplayBuffer replayBuffer, double epsilon, QCalculations qCalculations, GolfGameEngine golfGameEngine, State initialState, Reward reward, RealVector holePosition) {
 
         this.qNetwork = qNetwork;
         this.replayBuffer = replayBuffer;
         this.epsilon = epsilon;
         this.qCalculations = qCalculations;
+        this.golfGameEngine = golfGameEngine;
+        this.initialState = initialState;
+        this.reward = reward;
+        this.holePosition = holePosition;
     }
 
     /**
      * Chooses an Action based on the Epsilon Greedy method.
+     *
      * @param state The State the game is in.
      * @return A Vector containing the Action.
      */
@@ -56,6 +65,7 @@ public class QLearningAgent implements Serializable {
 
     /**
      * Gets the best action out of a finite set by calculating the Q value of each action.
+     *
      * @param state The current state.
      * @return The best action (as a Vector).
      */
@@ -70,8 +80,7 @@ public class QLearningAgent implements Serializable {
                 double yDir = Math.sin(rad);
 
                 RealVector action = new ArrayRealVector(new double[]{xDir, yDir, power});
-                // TODO: Connect the Null value to the game engine!!
-                double qValue = qCalculations.calculateQValue(state, new Action(action), 0, null);
+                double qValue = qCalculations.calculateQValue(state, new Action(action), 0, new State(calculateNextState(action)));
 
                 if (qValue > maxQValue) {
                     maxQValue = qValue;
@@ -82,26 +91,39 @@ public class QLearningAgent implements Serializable {
         }
         return bestAction;
     }
-    
+
+    public RealVector calculateNextState(RealVector currentAction) {
+
+        double[] arrayAction = currentAction.toArray();
+
+        ArrayList<double[]> result = golfGameEngine.shoot(arrayAction, false);
+
+        return new ArrayRealVector(result.getLast());
+    }
+
     public void train(int numEpisodes) {
         for (int episode = 0; episode < numEpisodes; episode++) {
-            // TODO: Reset the environment.
-            State state = null;
 
-            /**
-             * step results = takeStep() <- this should return the new state and the reward for the state.
-             * get the next state.
-             * get the reward.
-             * check if the hole is reached.
-             *
-             * add experience to buffer
-             *
-             * update q values
-             *
-             * set the next state to current state
-             */
+            logger.log(Level.INFO, "Episode: {}", episode);
+
+            State state = initialState;
+
+            RealVector action = chooseAction(state);
+
+            State nextState = new State(calculateNextState(action));
+
+            Action action1 = new Action(action);
+            double calcReward = reward.calculateReward(nextState, state, holePosition);
+
+            addExperienceToBuffer(state, action1, calcReward, nextState);
+
+            updateQValues();
+
+            state = nextState;
+
+            logger.log(Level.INFO, "Episode {} completed!", episode);
         }
-        // decay epsilon.
+        decayEpsilon();
     }
 
     /**
@@ -137,10 +159,10 @@ public class QLearningAgent implements Serializable {
             if (!dir.exists()) {
                 dir.mkdir();
             }
-        }catch (SecurityException securityException) {
-            logger.log(Level.SEVERE,"Permission denied! Unable to create directory.", securityException);
+        } catch (SecurityException securityException) {
+            logger.log(Level.SEVERE, "Permission denied! Unable to create directory.", securityException);
         }
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))){
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName))) {
             out.writeObject(model);
         } catch (IOException i) {
             logger.log(Level.SEVERE, "An error occurred while saving the file: ", i);
@@ -150,9 +172,9 @@ public class QLearningAgent implements Serializable {
 
     public NeuralNetwork loadModel(String fileName) {
         NeuralNetwork model = null;
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))){
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName))) {
             model = (NeuralNetwork) in.readObject();
-        } catch (IOException i){
+        } catch (IOException i) {
             logger.log(Level.SEVERE, "An error occurred while loading: ", i);
         } catch (ClassNotFoundException c) {
             logger.log(Level.SEVERE, "Neural Network class not found!", c);
