@@ -1,6 +1,7 @@
 package ui.controller;
 
 import engine.bot.AiBotGAV.AiBotGAV;
+import engine.bot.AibotGA.AiBotGA;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
 import engine.bot.newtonRaphsonBot.NewtonRaphsonBot;
@@ -815,8 +816,8 @@ public class ThirdScreenController implements ScreenInterface {
         Task<ArrayList<double[]>> task = new Task<>() {
             @Override
             protected ArrayList<double[]> call() {
-                // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
-                AiBotGAV gaBot = new AiBotGAV(golfGame);
+                AiBotGA gaBot = new AiBotGA(golfGame);
+                // AiBotGAV gaBot = new AiBotGAV(golfGame);
                 double[] x = {BallPosition[0], BallPosition[1], 0, 0};
                 return gaBot.golfBot(x);
             }
