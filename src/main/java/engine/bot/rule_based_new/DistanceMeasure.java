@@ -15,6 +15,9 @@ public class DistanceMeasure {
     private final double[] hole;
     private double[] position;
     private boolean reachedHole;
+    private double duration;
+    private boolean goal;
+
 
     /**
      * Constructor for the class of the Rule-Based bot.
@@ -192,9 +195,13 @@ public class DistanceMeasure {
      * @return List containing the plays necessary to reach the goal.
      */
     public ArrayList<double[]> playGame(double[] position, double[] hole, boolean reachedHole) {
+        long startTime = System.currentTimeMillis();
+    
         ArrayList<double[]> gameplay = new ArrayList<>();
+        int maxAttempts = 20; 
+        int attempts = 0; 
         
-        while (!reachedHole) {
+        while (!reachedHole && attempts < maxAttempts) {
             double[] play = getOnePlay(position, hole);
             if (play.length == 0) {
                 break;
@@ -207,10 +214,31 @@ public class DistanceMeasure {
             position[1] = newPos[1];
             reachedHole = checkHole(position, hole);
             
+            attempts++; 
+            
             if (reachedHole) {
+                this.goal = true;
                 break;
             }
         }
+        
+        if (!reachedHole) {
+            this.goal = false; 
+        }
+    
+        long endTime = System.currentTimeMillis();
+        this.duration = (endTime - startTime) / 1000.0;
+    
+        System.out.println("Algorithm completed in " + duration + " seconds");
         return gameplay;
+    }
+    
+
+    public double getDuration(){
+        return this.duration;
+    }
+
+    public boolean isGoal(){
+        return this.goal;
     }
 }

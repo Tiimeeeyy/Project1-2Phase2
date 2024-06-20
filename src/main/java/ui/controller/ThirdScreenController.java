@@ -9,6 +9,7 @@ import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -20,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import ui.Main;
 import ui.helpers.CircularSlider;
@@ -115,6 +117,9 @@ public class ThirdScreenController implements ScreenInterface {
     private boolean botActivated = false;
     private double radiusHole; // Radius of the hole
     private ArrayList<double[]> plays;
+    private double[] initPosit;
+    private double[] a;
+
     
 
     private Parent root; // Root node
@@ -160,7 +165,7 @@ public class ThirdScreenController implements ScreenInterface {
         this.grassFrictionKINETIC = grassFrictionKINETIC;
         this.grassFrictionSTATIC = grassFrictionSTATIC;
         this.REACHED_THE_HOLE = false;
-        double[] a = {grassFrictionKINETIC, grassFrictionSTATIC};
+        this.a = new double[]{grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
 
@@ -283,7 +288,7 @@ public class ThirdScreenController implements ScreenInterface {
      * @param currentIndex the current index in the trajectory
      */
     private void drawTrajectory(GraphicsContext gc, int currentIndex) {
-        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.setFill(Color.RED);
 
         for (int i = 0; i <= currentIndex; i++) {
             double[] point = fullTrajectory.get(i);
@@ -307,7 +312,7 @@ public class ThirdScreenController implements ScreenInterface {
             double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
             double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-            gc.setFill(javafx.scene.paint.Color.WHITE);
+            gc.setFill(Color.WHITE);
             gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
 
             double[] directionVector = circularSlider.getDirectionVector();
@@ -315,7 +320,7 @@ public class ThirdScreenController implements ScreenInterface {
             double arrowX = ballX + ballRadius + directionVector[0] * arrowLength;
             double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
 
-            gc.setStroke(javafx.scene.paint.Color.RED);
+            gc.setStroke(Color.RED);
             gc.setLineWidth(1);
 
             // Draw the arrow shaft
@@ -348,7 +353,7 @@ public class ThirdScreenController implements ScreenInterface {
         double x2 = x - arrowHeadSize * Math.cos(angle + Math.PI / 6);
         double y2 = y - arrowHeadSize * Math.sin(angle + Math.PI / 6);
 
-        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.setFill(Color.RED);
         gc.fillPolygon(new double[]{x, x1, x2}, new double[]{y, y1, y2}, 3);
     }
 
@@ -423,6 +428,7 @@ public class ThirdScreenController implements ScreenInterface {
 
     private void ballHitMultiple(int step) {
         if (!REACHED_THE_HOLE) {
+            shotCount = 0;
             double[] currentShot=shots.get(step).clone();
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
@@ -449,6 +455,7 @@ public class ThirdScreenController implements ScreenInterface {
             animateBallMovement(fullTrajectory, step);
 
         } else {
+            System.out.println("Number of shots: "+shotCount);
             playMusic("/music/goalSound.mp3");
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Goal!");
@@ -479,7 +486,7 @@ public class ThirdScreenController implements ScreenInterface {
      * Animates the ball movement along the trajectory.
      *
      * @param trajectory the trajectory of the ball
-     * @param power      the power of the hit
+     * @param step      the power of the hit
      */
     public void animateBallMovement(ArrayList<double[]> trajectory, int step) {
         timeline = new Timeline();
@@ -571,7 +578,7 @@ public class ThirdScreenController implements ScreenInterface {
         double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
         double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFill(Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 
@@ -596,7 +603,7 @@ public class ThirdScreenController implements ScreenInterface {
         double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
         double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFill(Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 
@@ -728,20 +735,59 @@ public class ThirdScreenController implements ScreenInterface {
     /**
      * Rule-based bot plays the game.
      */
+    // private void ruleBotPlay() {
+    //     if(!ruleBasedBot){
+    //         logEvent("!!--Rule-based bot entered the party--!!");
+    //     }
+    //     // this.shots = new ArrayList<>();
+
+    //     this.ruleBasedBot = true;
+    //     double[] ballP = BallPosition.clone();
+    //     plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
+    //     if (!plays.isEmpty()) {
+    //         playBotShot(plays, 0);
+    //     } 
+    //     // ballHitMultiple(0);
+    // }
+
     private void ruleBotPlay() {
         if(!ruleBasedBot){
             logEvent("!!--Rule-based bot entered the party--!!");
         }
+        initPosit = BallPosition.clone();
+        int i = 0;
+        int currentShots = 0;
+        int totalShots = 0;
+        double currentDuration = 0;
+        double totalDuration = 0;
+        int succes = 0;
         // this.shots = new ArrayList<>();
-
-        this.ruleBasedBot = true;
-        double[] ballP = BallPosition.clone();
-        plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
-        if (!plays.isEmpty()) {
-            playBotShot(plays, 0);
-        } 
-        // ballHitMultiple(0);
+        while(i<10){
+            System.out.println(initPosit[0]+" "+initPosit[1]);
+            System.out.println("Iteration: "+i);
+            DistanceMeasure distanceMeasureT = new DistanceMeasure(initPosit, a, HolePostion, radiusHole, REACHED_THE_HOLE);
+            plays = distanceMeasureT.playGame(initPosit, HolePostion, REACHED_THE_HOLE);
+            currentShots = plays.size();
+            currentDuration = distanceMeasureT.getDuration();
+            totalDuration += currentDuration;
+            totalShots += currentShots;
+            if (distanceMeasureT.isGoal()) {
+                succes++;
+            }
+            i++;
+        }
+        double averageShots = (double) totalShots / 10;
+        double averageDuration = (double) totalDuration / 10;
+        double successRate = (double) succes / 10 *100;
+        System.out.println("-------------------------------");
+        System.out.println("\nTotal shots: " + totalShots);
+        System.out.println("Average shots per game: " + averageShots);
+        System.out.println("Total duration: " + totalDuration+" seconds");
+        System.out.println("Average duration per game: " + averageDuration+" seconds");
+        System.out.println("Success rate: " + successRate+"%");
+    
     }
+    
     
     /**
      * Rule-based bot method to animate the shoot.
@@ -808,37 +854,75 @@ public class ThirdScreenController implements ScreenInterface {
     //     // ballHit(0);
     // }
 
+    // @FXML
+    // private void gaBotFunc() {
+    //     playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
+
+    //     Task<ArrayList<double[]>> task = new Task<>() {
+    //         @Override
+    //         protected ArrayList<double[]> call() {
+    //             // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
+    //             AiBotGAV gaBot = new AiBotGAV(golfGame);
+    //             double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+    //             return gaBot.golfBot(x);
+    //         }
+
+    //         @Override
+    //         protected void succeeded() {
+    //             stopMusic();
+    //             ArrayList<double[]> velocities = getValue();
+    //             shots = velocities;
+    //             ballHitMultiple(0);
+    //         }
+
+    //         @Override
+    //         protected void failed() {
+    //             stopMusic();
+    //             Throwable exception = getException();
+    //             exception.printStackTrace();
+    //         }
+    //     };
+
+    //     new Thread(task).start();
+    // }
+
     @FXML
     private void gaBotFunc() {
-        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
         logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-
-        Task<ArrayList<double[]>> task = new Task<>() {
-            @Override
-            protected ArrayList<double[]> call() {
-                AiBotGA gaBot = new AiBotGA(golfGame);
-                // AiBotGAV gaBot = new AiBotGAV(golfGame);
-                double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-                return gaBot.golfBot(x);
+        initPosit = BallPosition.clone();
+        int i = 0;
+        int currentShots = 0;
+        int totalShots = 0;
+        double currentDuration = 0;
+        double totalDuration = 0;
+        int succes = 0;
+        while(i<10){
+            System.out.println(initPosit[0]+" "+initPosit[1]);
+            System.out.println("Iteration: "+i);
+            AiBotGAV gaBot = new AiBotGAV(golfGame);
+            double[] x = {initPosit[0], initPosit[1], 0, 0};
+            ArrayList<double[]> velocities =gaBot.golfBot(x);
+            currentShots = velocities.size();
+            currentDuration = gaBot.getDuration();
+            totalShots += currentShots;
+            totalDuration += currentDuration;
+            if (gaBot.isGoal()) {
+                succes++;
             }
-
-            @Override
-            protected void succeeded() {
-                stopMusic();
-                ArrayList<double[]> velocities = getValue();
-                shots = velocities;
-                ballHitMultiple(0);
-            }
-
-            @Override
-            protected void failed() {
-                stopMusic();
-                Throwable exception = getException();
-                exception.printStackTrace();
-            }
-        };
-
-        new Thread(task).start();
+            i++;
+        }
+        double averageShots = (double) totalShots / 10;
+        double averageDuration = (double) totalDuration / 10;
+        double successRate = (double) succes / 10 *100;
+        System.out.println("-------------------------------");
+        System.out.println("\nTotal shots: " + totalShots);
+        System.out.println("Average shots per game: " + averageShots);
+        System.out.println("Total duration: " + totalDuration+" seconds");
+        System.out.println("Average duration per game: " + averageDuration+" seconds");
+        System.out.println("Success rate: " + successRate+"%");
+    
     }
 
 
@@ -871,37 +955,78 @@ public class ThirdScreenController implements ScreenInterface {
         }
     }
 
+    // @FXML
+    // private void hcBotPlay() {
+        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
+
+    //         Task<ArrayList<double[]>> task = new Task<>() {
+    //             @Override
+    //             protected ArrayList<double[]> call() {
+    //                 HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+    //                 return chBot.hillClimbingAlgorithm();
+    //             }
+    
+    //             @Override
+    //             protected void succeeded() {
+    //                 stopMusic();
+    //                 ArrayList<double[]> velocities = getValue();
+    //                 shots = velocities;
+    //                 ballHitMultiple(0);
+    //             }
+    
+    //             @Override
+    //             protected void failed() {
+    //                 stopMusic();
+    //                 Throwable exception = getException();
+    //                 exception.printStackTrace();
+    //             }
+    //         };
+    
+    //         new Thread(task).start();
+
+    // }
+
 
 
     @FXML
     private void hcBotPlay() {
-        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-
-        Task<ArrayList<double[]>> task = new Task<>() {
-            @Override
-            protected ArrayList<double[]> call() {
-                HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-                return chBot.hillClimbingAlgorithm();
+        initPosit = BallPosition.clone();
+        int i = 0;
+        int currentShots = 0;
+        int totalShots = 0;
+        double currentDuration = 0;
+        double totalDuration = 0;
+        int succes = 0;
+        while(i<10){
+            System.out.println(initPosit[0]+" "+initPosit[1]);
+            System.out.println("Iteration: "+i);
+            HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+            ArrayList<double[]> velocities =chBot.hillClimbingAlgorithm(); 
+            currentDuration = chBot.getDuration();
+            
+            // shots = velocities;
+            currentShots = velocities.size();
+            // ballHitMultiple(0);
+            totalShots += currentShots;
+            totalDuration += currentDuration;
+            if (chBot.isGoal()) {
+                succes++;
             }
 
-            @Override
-            protected void succeeded() {
-                stopMusic();
-                ArrayList<double[]> velocities = getValue();
-                shots = velocities;
-                ballHitMultiple(0);
-            }
-
-            @Override
-            protected void failed() {
-                stopMusic();
-                Throwable exception = getException();
-                exception.printStackTrace();
-            }
-        };
-
-        new Thread(task).start();
+            i++;
+        }
+        double averageShots = (double) totalShots / 10;
+        double averageDuration = (double) totalDuration / 10;
+        double successRate = (double) succes / 10 *100;
+        System.out.println("-------------------------------");
+        System.out.println("\nTotal shots: " + totalShots);
+        System.out.println("Average shots per game: " + averageShots);
+        System.out.println("Total duration: " + totalDuration+" seconds");
+        System.out.println("Average duration per game: " + averageDuration+" seconds");
+        System.out.println("Success rate: " + successRate+"%");
     }
 
     @FXML

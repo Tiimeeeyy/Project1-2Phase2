@@ -24,7 +24,8 @@ public class AiBotGAV {
     private double stuckMemory=0;
 
     private GolfGameEngine game;
-    
+    private double duration;
+
     /**
      * Class constructor
      * @param game The engine to simulate the game.
@@ -40,7 +41,10 @@ public class AiBotGAV {
      */
    
     public ArrayList<double[]> golfBot(double x[]){
+        long startTime = System.currentTimeMillis();
+
         double[] x0=x.clone();
+
         mapSearcher=new MapSearcher(game.getMapPath(), x0, game.getHole(), game.getHoleRadius());
         shortestPath=mapSearcher.findShortestPath();
         int shotNum=0;
@@ -74,9 +78,22 @@ public class AiBotGAV {
             oneShot(x0, TargetType.HOLE, null);
             allSteps.add(solution.clone());
         }
+        long endTime = System.currentTimeMillis();
+        this.duration = (endTime - startTime)/1000.0;
+
+        System.out.println("Algorithm completed in " + duration + " seconds");
         
         return allSteps;
     }
+
+    public double getDuration(){
+        return this.duration;
+    }
+
+    public boolean isGoal(){
+        return this.goal;
+    }
+
     /**
      * Calculate one step
      * 
