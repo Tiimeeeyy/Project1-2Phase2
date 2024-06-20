@@ -34,6 +34,7 @@ public class AiBotGA {
      * @param x Initial state / initial position of the ball.
      */
     public void golfBot(double[] x, double[] target){
+
         Individual[] population=new Individual[popSize];
         double[] x0=x.clone();
 

@@ -14,6 +14,38 @@
          <children>
             <TabPane fx:id="mapTabPane" layoutX="215.0" layoutY="148.0" prefHeight="459.0" prefWidth="849.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
+              <Tab text="GreenField">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ImageView fx:id="mapImage31" fitHeight="426.0" fitWidth="445.0">
+                                 <image>
+                                    <Image url="@../maps/field.png" />
+                                 </image>
+                              </ImageView>
+                              <VBox prefHeight="426.0" prefWidth="426.0">
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Green Field " textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Text>
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="The Green Field map offers the player a challenge in the expanse of a green field. This map is a clear green space, which at first glance may seem easy, but requires attention and patience. The player must find the right route, avoiding hidden traps and dead ends.The simplicity of the field design is deceptive: it requires strategic thinking and precise actions for a successful passage." wrapText="true">
+                                       <VBox.margin>
+                                          <Insets top="40.0" />
+                                       </VBox.margin>
+                                    </TextArea>
+                                    <Button mnemonicParsing="false" onAction="#goNext" prefHeight="48.0" prefWidth="200.0" text="Play!" textAlignment="CENTER">
+                                       <VBox.margin>
+                                          <Insets left="100.0" top="30.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
                 <Tab text="Hills">
                      <content>
                         <HBox prefHeight="100.0" prefWidth="200.0">
@@ -46,6 +78,7 @@
                         </HBox>
                      </content>
                   </Tab>
+
                 <Tab text="Forest">
                      <content>
                         <HBox prefHeight="100.0" prefWidth="200.0">
@@ -110,7 +143,7 @@
                         </HBox>
                     </content>
                   </Tab>
-                  <Tab text="Maze 2">
+                  <Tab text="Maze">
                      <content>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
@@ -142,7 +175,7 @@
                         </HBox>
                      </content>
                   </Tab>
-                  <Tab text="Maze">
+                  <Tab text="Maze HARD">
                      <content>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
@@ -153,12 +186,12 @@
                               </ImageView>
                               <VBox prefHeight="426.0" prefWidth="426.0">
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Maze Map" textAlignment="CENTER" wrappingWidth="401.6708984375">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Maze Map (HARD)" textAlignment="CENTER" wrappingWidth="401.6708984375">
                                        <font>
                                           <Font size="24.0" />
                                        </font>
                                     </Text>
-                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="This map offers a challenging and intricate maze set against a green, diagonally striped background. You must navigate carefully to find the correct route through the maze, avoiding deceptive paths that loop back on themselves. Precision and strategy are key to overcoming this labyrinth and reaching the final destination. The contrast between the vivid blue paths and the green backdrop adds to the visual complexity, making it a true test of skill and patience." wrapText="true">
+                                    <TextArea editable="false" prefHeight="270.0" prefWidth="404.0" styleClass="transparent-text-area" text="The Maze(Hard edition) map is an exciting challenge with winding blue paths on a background of bright green stripes. The player must navigate this complex maze. Only those who show stamina, precision and strategic thinking will be able to make it to the end. Unusual design and visual effects make this map interesting and require maximum concentration." wrapText="true">
                                        <VBox.margin>
                                           <Insets top="40.0" />
                                        </VBox.margin>

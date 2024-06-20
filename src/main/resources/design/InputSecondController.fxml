@@ -31,7 +31,7 @@
                         <Font size="16.0" />
                      </font>
                   </Text>
-                  <TextField fx:id="X_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyReleased="#updateMap" prefHeight="30.0" prefWidth="61.0" promptText="X" text="-3" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="X_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyReleased="#updateMap" prefHeight="30.0" prefWidth="61.0" promptText="X" text="-24" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="Y_BALL" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyReleased="#updateMap" prefHeight="30.0" prefWidth="63.0" promptText="Y" text="0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hole Position(X,Y,R):" GridPane.rowIndex="2">
                      <font>

@@ -26,6 +26,7 @@ public class HillClimbingBotNEW {
     private static final int MAX_VISITED_COUNT = 3;
     private ArrayList<double[]> shortestPath;
     private ArrayList<double[]> turningPoints;
+    private double duration;
 
     public HillClimbingBotNEW(GolfGameEngine game, double[] startBallPosition, double[] holePosition, String mapPath, double radius) {
         this.game = game;
@@ -84,12 +85,20 @@ public class HillClimbingBotNEW {
         }
 
         long endTime = System.currentTimeMillis(); 
-        long duration = endTime - startTime;
+        duration =( endTime - startTime)/1000.0;
 
-        System.out.println("Algorithm completed in " + (duration / 1000.0) + " seconds");
+        System.out.println("Algorithm completed in " + duration  + " seconds");
         System.out.println("Total iterations: " + totalIterations);
 
         return shots;
+    }
+
+    public double getDuration(){
+        return this.duration;
+    }
+
+    public boolean isGoal() {
+        return this.goal;
     }
 
     private boolean isStuck(double[] position) {

@@ -264,7 +264,7 @@ public class MapPageController implements ScreenInterface {
 
         MapHandler map = new MapHandler();
         String path = System.getProperty("user.dir") + "/src/main/resources/userInputMap.png";
-        map.renderMap(this.initialGreen, path, HolePostion, radiusHole, true);
+        map.renderMap(this.initialGreen, path, HolePostion, radiusHole, false);
 
         Main mainInst = new Main();
         mainInst.setScreen("GAME", "", 0, 0, 0, 0, radiusHole, 0, grassFrictionKINETIC, grassFrictionSTATIC, startBallPostion, HolePostion);
