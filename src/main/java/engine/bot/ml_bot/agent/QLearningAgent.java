@@ -150,7 +150,7 @@ public class QLearningAgent implements Serializable {
     public void updateQValues(int batchSize) {
 
         List<ReplayBuffer.Experience> batch = ReplayBuffer.sampleBatch(batchSize);
-        for (ReplayBuffer.Experience experience : batch) {
+        batch.parallelStream().forEach(experience -> {
             double targetQ = qCalculations.calculateQValue(
                     experience.getState(),
                     experience.getAction(),
@@ -160,15 +160,20 @@ public class QLearningAgent implements Serializable {
             qNetwork.train(
                     experience.getState().getCurrentPosition().append(experience.getAction().getAction()), new ArrayRealVector(new double[]{targetQ}), 0.01
             );
-        }
+        });
     }
 
-    public RealVector getOnePlay(State currentState){
+    /**
+     * Method, that gets one play from the agent.
+     * @param currentState The state the system is in currently.
+     * @return The vector containing the play the agent believes to be the best.
+     */
+    public RealVector getOnePlay(State currentState) {
         // Check if the model is trained
         if (!isTrained) {
             throw new IllegalStateException("The Agent is not trained! Please train the agent before using this method!");
         }
-        return new ArrayRealVector();
+        return getBestAction(currentState);
     }
 
     /**
