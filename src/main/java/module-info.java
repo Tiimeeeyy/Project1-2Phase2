@@ -12,6 +12,7 @@ module ui {
     requires org.jfree.chart3d;
     requires org.jfree.chart3d.fx;
     requires javafx.swing;
+    requires commons.math3;
 
     opens ui to javafx.fxml;
     opens ui.controller to javafx.fxml;
