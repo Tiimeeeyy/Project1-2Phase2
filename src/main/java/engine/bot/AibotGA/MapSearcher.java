@@ -20,7 +20,7 @@ public class MapSearcher {
     private int[] holePostion;
     private int[] lastPoint;
     private double r;
-    private int sandResolution=4;
+    private int sandResolution=5;
     private int grassResolution=10;
 
     public MapSearcher(String mappath, double[] startBallPostion, double[] holePostion, double r) {
