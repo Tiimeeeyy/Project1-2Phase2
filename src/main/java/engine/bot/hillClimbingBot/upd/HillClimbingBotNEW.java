@@ -14,7 +14,7 @@ public class HillClimbingBotNEW {
     private double[] velocity;
     private boolean useAnotherAlgorithm = false;
 
-    private static final int MAX_ITERATIONS = 10;
+    private static final int MAX_ITERATIONS = 5;
     private static final int MAX_ITERATIONS_FINAL = 15;
 
     private static final double INITIAL_STEP_SIZE = 1.0;
@@ -230,14 +230,10 @@ public class HillClimbingBotNEW {
 
     private double evaluateFitness(double[] ballPosition, double[] velocity) {
         double[] finalPosition = getTrajectory(ballPosition, velocity);
-        double[] nearestTurningPoint = turningPoints.get(0);
-        for (double[] point : turningPoints) {
-            if (Math.abs(point[1] - startBallPosition[1]) < Math.abs(nearestTurningPoint[1] - startBallPosition[1])) {
-                nearestTurningPoint = point;
-            }
-        }
+        int fit = (int)mapSearcher.howFarItSee(shortestPath, finalPosition);
 
-        return mapSearcher.howFarItSee(shortestPath, finalPosition)-Math.log10((game.getDistance(game.getStoppoint(), nearestTurningPoint)+0.01)/(calculateDistance(startBallPosition, nearestTurningPoint)+0.01)) ;
+        // turningPoints.remove(nearestTurningPoint);
+        return fit-Math.log10((game.getDistance(game.getStoppoint(),  shortestPath.get(fit))+0.01)/(calculateDistance(startBallPosition,shortestPath.get(fit) )+0.01)) ;
     }
 
     private boolean checkNoWater(double[] ballPosition, double[] velocity) {
