@@ -27,20 +27,17 @@ public class UpdateParams {
      * @param error        The error with which the parameters are to be updated.
      * @param learningRate The learning rate of the System.
      */
-    public static void update(PerceptronParams params, RealVector input, RealVector error, double learningRate) {
+    public static void update(PerceptronParams params, RealVector input, double error, double learningRate) {
         int size = params.getSize();
         double[] weights = params.getWeights();
 
         for (int i = 0; i < weights.length; i++) {
-            weights[i] += learningRate * error.getEntry(0) * input.getEntry(i / size);
+            weights[i] += learningRate * error * input.getEntry(i / size);
         }
         params.setWeights(weights);
 
         double bias = params.getBias();
-        for (int i = 0; i < error.getDimension(); i++) { // Assuming error vector has same size as output
-            bias += learningRate * error.getEntry(i);
-        }
+        bias += learningRate * error;
         params.setBias(bias);
-        logger.log(Level.INFO, "Parameters updated!");
     }
 }

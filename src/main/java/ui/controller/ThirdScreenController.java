@@ -4,6 +4,8 @@ import engine.bot.AiBotGAV.AiBotGAV;
 import engine.bot.AibotGA.AiBotGA;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
+import engine.bot.ml_bot.agent.QLearningAgent;
+import engine.bot.ml_bot.agent.State;
 import engine.bot.newtonRaphsonBot.NewtonRaphsonBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
@@ -23,6 +25,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 import ui.Main;
 import ui.helpers.CircularSlider;
 import ui.screenFactory.ScreenInterface;
@@ -32,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -102,6 +107,7 @@ public class ThirdScreenController implements ScreenInterface {
 
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
+    private QLearningAgent agent;
     private double[] BallPosition; // Starting position of the ball
     private double[] HolePostion; // Position of the hole
     private GolfGameEngine golfGame; // Golf game engine
@@ -168,6 +174,7 @@ public class ThirdScreenController implements ScreenInterface {
         this.a = new double[]{grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
+        this.agent = new QLearningAgent(1, golfGame, new State(new ArrayRealVector(BallPosition)), new ArrayRealVector(HolePostion));
 
         initialize();
     }
@@ -1045,7 +1052,16 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private void mlBotPlay(){
-        return;
+        this.shots = new ArrayList<>();
+        if (!agent.isTrained) {
+            agent.train(100);
+        }
+        RealVector hi = agent.getOnePlay(new State(new ArrayRealVector(BallPosition)));
+        double [] action = hi.toArray();
+        double[] velos = new double[]{action[2], action[3]};
+        System.out.println("Action: " + Arrays.toString(action));
+        shots.add(action);
+        ballHitMultiple(0);
     }
 
     private void playMusic(String path) {
