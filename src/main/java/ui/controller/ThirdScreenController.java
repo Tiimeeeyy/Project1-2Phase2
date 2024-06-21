@@ -903,7 +903,7 @@ public class ThirdScreenController implements ScreenInterface {
         while(i<10){
             System.out.println(initPosit[0]+" "+initPosit[1]);
             System.out.println("Iteration: "+i);
-            AiBotGAV gaBot = new AiBotGAV(golfGame);
+            AiBotGA gaBot = new AiBotGA(golfGame);
             double[] x = {initPosit[0], initPosit[1], 0, 0};
             ArrayList<double[]> velocities =gaBot.golfBot(x);
             currentShots = velocities.size();
