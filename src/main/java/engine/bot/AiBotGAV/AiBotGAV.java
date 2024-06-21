@@ -2,6 +2,7 @@ package engine.bot.AiBotGAV;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import engine.bot.AibotGA.MapSearcher;
@@ -57,21 +58,13 @@ public class AiBotGAV {
             game.shoot(solution.clone(), false);
             if (game.getStatus().equals(BallStatus.Normal) || game.getStatus().equals(BallStatus.Goal)) {
                 allSteps.add(solution.clone());
-                
-            }else{
-                
             }
             x0=game.getStoppoint();
 
             // check if it stucks at the last 3 steps
             if (stuckCkecker) {
                 System.out.println("stucked checked");
-                double[] target=new double[2];
-                for (int i =0; i<shortestPath.size();i++) {
-                    if (!mapSearcher.isObstacled(game.getStoppoint(), shortestPath.get(i))) {
-                        target=shortestPath.get(i).clone();
-                    }
-                }
+                target= getFarestPoint(game.getStoppoint(), shortestPath);
                 oneShot(x0, TargetType.POINT, target);
                 allSteps.add(solution.clone());
                 game.shoot(solution.clone(), false);
@@ -138,20 +131,14 @@ public class AiBotGAV {
         // initiate population
         initialPopulation(population, x0);
         exploration(population[0],population[1], population, x0);
+        
+        for (int i = 0; i < 5; i++) {
+            int[] selected=selection(population);
+            followTrend(population[0], population[selected[0]], population, x0);
+        }
         HeapSortV.sort(population);
         System.out.println(population[0].getFitness()+"  ");
-        // Run the algorithm
-        // for (int i = 0; i < 20; i++) {
-        //     int[] slcIndex=selection(population);
-        //     exploration(population[0],population[slcIndex[1]], population, x0);
-        //     if (this.goal) {
-        //         break;
-        //     }
-        //     HeapSortV.sort(population);
-        //     System.out.println(population[0].getFitness()+"  "+i);
-            
-        // }
-        // If the goal is not reached, set the solution to the best solution found
+        
         if (!this.goal) {
             double[] best=x0;
             best[2]=population[0].getChromosome()[0];
@@ -172,10 +159,12 @@ public class AiBotGAV {
        
         Random rand=new Random();
         int n=0;
+        double[] farest=getFarestPoint(x, shortestPath);
+        double powerMean=game.getDistance(x, farest)/5;
         for (int i = 0; i < 30; i++) {
             for (int j=0; j < 8; j++) {
-                double power=rand.nextDouble()*5;
-                pop[n]=new IndividualV(new double[]{power*Math.cos(2*i*Math.PI/20),power*Math.sin(2*i*Math.PI/20)});
+                double power=Math.min(rand.nextGaussian()+powerMean, 5);
+                pop[n]=new IndividualV(new double[]{power*Math.cos(2*i*Math.PI/30),power*Math.sin(2*i*Math.PI/30)});
                 pop[n].setFitness(calculateFitness(pop[n], x));
                 n++;
             }
@@ -261,7 +250,7 @@ public class AiBotGAV {
     
     private void exploration(IndividualV indiA, IndividualV indiB, IndividualV[] pop,double[] x){
         Random rnd=new Random();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             pop[pop.length-1-i]=new IndividualV(new double[]{indiA.getChromosome()[0]+rnd.nextGaussian(),indiA.getChromosome()[1]+rnd.nextGaussian()});
             pop[pop.length-1-i].setFitness(calculateFitness(pop[pop.length-1-i], x));
         }
@@ -269,6 +258,15 @@ public class AiBotGAV {
         //     pop[pop.length-1-i]=new IndividualV(new double[]{indiB.getChromosome()[0]+rnd.nextGaussian(),indiB.getChromosome()[1]+rnd.nextGaussian()});
         //     pop[pop.length-1-i].setFitness(calculateFitness(pop[pop.length-1-i], x));
         // }
+    }
+    private double[] getFarestPoint(double[] point, List<double[]> path){
+        double[] outPoint=new double[2];
+        for (int i =0; i<shortestPath.size();i++) {
+            if (!mapSearcher.isObstacled(point,path.get(i))) {
+                outPoint=shortestPath.get(i).clone();
+            }
+        }
+        return outPoint;
     }
     private void followTrend(IndividualV indiA, IndividualV indiB, IndividualV[] pop,double[] x){
         double[] eP;
@@ -284,8 +282,9 @@ public class AiBotGAV {
         double[] newPoint=new double[]{eP[0]+(eP[0]-sP[0])*0.1,eP[1]+(eP[1]-sP[1])*0.1};
         IndividualV temp=new IndividualV(newPoint);
         double newFit=calculateFitness(temp, x);
-        if (newFit>indiA.getFitness()) {
-            
+        System.out.println(newFit);
+        if (newFit>Math.max(indiA.getFitness(), indiB.getFitness())) {
+            pop[pop.length-1]=temp;
         }
     }
 
@@ -305,7 +304,7 @@ public class AiBotGAV {
         }else{
             stuckCount=0;
         }
-        if (stuckCount>=3) {
+        if (stuckCount>=2) {
             this.stuckCkecker= true;
         }else{
             this.stuckCkecker= false;

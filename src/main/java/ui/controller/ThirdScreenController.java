@@ -1,6 +1,7 @@
 package ui.controller;
 
 import engine.bot.AiBotGAV.AiBotGAV;
+import engine.bot.AibotGA.AiBotGA;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
 import engine.bot.newtonRaphsonBot.NewtonRaphsonBot;
@@ -8,6 +9,7 @@ import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
 import engine.solvers.Utility;
 import engine.solvers.odeSolvers.RK4;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -19,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import ui.Main;
 import ui.helpers.CircularSlider;
@@ -285,7 +288,7 @@ public class ThirdScreenController implements ScreenInterface {
      * @param currentIndex the current index in the trajectory
      */
     private void drawTrajectory(GraphicsContext gc, int currentIndex) {
-        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.setFill(Color.RED);
 
         for (int i = 0; i <= currentIndex; i++) {
             double[] point = fullTrajectory.get(i);
@@ -309,7 +312,7 @@ public class ThirdScreenController implements ScreenInterface {
             double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
             double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-            gc.setFill(javafx.scene.paint.Color.WHITE);
+            gc.setFill(Color.WHITE);
             gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
 
             double[] directionVector = circularSlider.getDirectionVector();
@@ -317,7 +320,7 @@ public class ThirdScreenController implements ScreenInterface {
             double arrowX = ballX + ballRadius + directionVector[0] * arrowLength;
             double arrowY = ballY + ballRadius - directionVector[1] * arrowLength;
 
-            gc.setStroke(javafx.scene.paint.Color.RED);
+            gc.setStroke(Color.RED);
             gc.setLineWidth(1);
 
             // Draw the arrow shaft
@@ -350,7 +353,7 @@ public class ThirdScreenController implements ScreenInterface {
         double x2 = x - arrowHeadSize * Math.cos(angle + Math.PI / 6);
         double y2 = y - arrowHeadSize * Math.sin(angle + Math.PI / 6);
 
-        gc.setFill(javafx.scene.paint.Color.RED);
+        gc.setFill(Color.RED);
         gc.fillPolygon(new double[]{x, x1, x2}, new double[]{y, y1, y2}, 3);
     }
 
@@ -482,7 +485,7 @@ public class ThirdScreenController implements ScreenInterface {
      * Animates the ball movement along the trajectory.
      *
      * @param trajectory the trajectory of the ball
-     * @param power      the power of the hit
+     * @param step      the power of the hit
      */
     public void animateBallMovement(ArrayList<double[]> trajectory, int step) {
         timeline = new Timeline();
@@ -574,7 +577,7 @@ public class ThirdScreenController implements ScreenInterface {
         double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
         double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFill(Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 
@@ -599,7 +602,7 @@ public class ThirdScreenController implements ScreenInterface {
         double ballX = Utility.coordinateToPixel_X(BallPosition[0]) - ballRadius;
         double ballY = Utility.coordinateToPixel_Y(BallPosition[1]) - ballRadius;
 
-        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.setFill(Color.WHITE);
         gc.fillOval(ballX, ballY, ballDiameter, ballDiameter);
     }
 

@@ -1,15 +1,19 @@
 package engine.bot.ml_bot.agent;
 
-import org.apache.commons.math3.linear.RealVector;
 import engine.solvers.GolfGameEngine;
+import org.apache.commons.math3.linear.RealVector;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Reward {
     // TODO: Shot counter?
 
+    public static final double CLOSENESS_REWARD = 0.1;
     private static final double WATER_PENALTY = -1000;
     private static final double GOAL_REWARD = 1000;
-    public static final double CLOSENESS_REWARD = 0.1;
     private static final double DISTANCE_REWARD = 0.001;
+    private static final Logger logger = Logger.getLogger(Reward.class.getName());
     private final GolfGameEngine golfGameEngine;
     //private final MapHandler mapHandler;
     //private static final double SAND_PENALTY = -0.01;
@@ -18,6 +22,14 @@ public class Reward {
         this.golfGameEngine = golfGameEngine;
     }
 
+    /**
+     * Calculates reward for the Agent based on the following inputs:
+     *
+     * @param resultingState The state that results from the action.
+     * @param initialState   The initial state.
+     * @param holePosition   The position of the hole.
+     * @return The calculated reward for that action.
+     */
     public double calculateReward(State resultingState, State initialState, RealVector holePosition) {
         RealVector resultState = resultingState.getCurrentPosition();
         RealVector initState = initialState.getCurrentPosition();
@@ -28,12 +40,14 @@ public class Reward {
             case Goal -> reward += GOAL_REWARD;
             default -> reward = 0;
         }
+        // Reward distance between the initial point and the resulting point.
         double distanceInitialState = resultState.getDistance(initState);
         reward += distanceInitialState * DISTANCE_REWARD;
 
         double distanceHole = resultState.getDistance(holePosition);
-        reward += distanceHole * CLOSENESS_REWARD;
-
+        // TODO: Look how this behaves
+        reward += (1 - distanceHole) * CLOSENESS_REWARD;
+        logger.log(Level.INFO, "Reward for action calculated: {}", reward);
         return reward;
     }
 

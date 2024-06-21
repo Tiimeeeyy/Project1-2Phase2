@@ -1,6 +1,6 @@
 package engine.bot.ml_bot.test;
 
-import engine.bot.AibotGA.AiBotGA;
+import engine.bot.AibotGA.AiBotGAOneShot;
 import engine.solvers.GolfGameEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,13 +10,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AiBotGATest {
-    private AiBotGA aiBotGA;
+    private AiBotGAOneShot aiBotGA;
     private GolfGameEngine mockGameEngine;
 
     @BeforeEach
     public void setup() {
         mockGameEngine = mock(GolfGameEngine.class);
-        aiBotGA = new AiBotGA(mockGameEngine);
+        aiBotGA = new AiBotGAOneShot(mockGameEngine);
     }
 
     @Test
