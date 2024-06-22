@@ -1,5 +1,6 @@
 package engine.bot.ml_bot.agent;
 
+import engine.bot.ml_bot.math.activation_functions.ReLUFunction;
 import engine.bot.ml_bot.math.q_calculations.QCalculations;
 import engine.bot.ml_bot.network.NeuralNetwork;
 import engine.bot.ml_bot.network.ReplayBuffer;
@@ -9,6 +10,7 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -20,8 +22,9 @@ public class QLearningAgent implements Serializable {
     private static final int NUM_ANGLES = 100; // The amount of angles we let the agent explore.
     private static final int NUM_POWERS = 5; // The amount of shot powers the agent can use (In our case 0-5 m/s).
     private static final double EPSILON_DECAY = 0.995;
-    private static final double MIN_EPSILON = 0.01;
+    private static final double MIN_EPSILON = 0.10;
     private final transient Logger logger = Logger.getLogger(QLearningAgent.class.getName());
+    public boolean isTrained = false;
     private NeuralNetwork qNetwork;
     private ReplayBuffer replayBuffer;
     private double epsilon;
@@ -31,18 +34,18 @@ public class QLearningAgent implements Serializable {
     private State initialState;
     private Reward reward;
     private transient RealVector holePosition;
-    private boolean isTrained = false;
 
-    public QLearningAgent(NeuralNetwork qNetwork, ReplayBuffer replayBuffer, double epsilon, QCalculations qCalculations, GolfGameEngine golfGameEngine, State initialState, Reward reward, RealVector holePosition) {
+    public QLearningAgent(double epsilon, GolfGameEngine golfGameEngine, State initialState, RealVector holePosition) {
 
-        this.qNetwork = qNetwork;
-        this.replayBuffer = replayBuffer;
+        this.qNetwork = new NeuralNetwork(8, new ReLUFunction());
+        this.replayBuffer = new ReplayBuffer();
         this.epsilon = epsilon;
-        this.qCalculations = qCalculations;
+        this.qCalculations = new QCalculations(qNetwork, 0.9);
         this.golfGameEngine = golfGameEngine;
         this.initialState = initialState;
-        this.reward = reward;
+        this.reward = new Reward(golfGameEngine);
         this.holePosition = holePosition;
+        this.random = new Random();
     }
 
     /**
@@ -53,13 +56,13 @@ public class QLearningAgent implements Serializable {
      */
     public RealVector chooseAction(State state) {
         int i = 1;
+        double[] coords = state.getCoordinates();
         if (random.nextDouble() < epsilon) {
             logger.log(Level.INFO, "Random shot!");
             if (random.nextDouble() < 0.5) {
                 i = -1;
             }
-            double randomPower = 1 + random.nextDouble() * 4;
-            return new ArrayRealVector(new double[]{random.nextDouble() * i, random.nextDouble() * i, random.nextDouble(), randomPower});
+            return new ArrayRealVector(new double[]{coords[0], coords[1], random.nextDouble() * i, random.nextDouble() * i});
         } else {
             logger.log(Level.INFO, "Best shot!");
             return getBestAction(state);
@@ -75,28 +78,35 @@ public class QLearningAgent implements Serializable {
     private RealVector getBestAction(State state) {
         double maxQValue = Double.NEGATIVE_INFINITY;
         RealVector bestAction = null;
-
+        double[] coords = state.getCoordinates();
+        List<RealVector> actions = new ArrayList<>();
         for (int angle = 0; angle < NUM_ANGLES; angle++) {
-            for (double power = 0; power <= NUM_POWERS; power += 0.2) {
+            for (int power = 0; power < NUM_POWERS; power++) {
+
+
                 double rad = Math.toRadians(angle);
                 double xDir = Math.cos(rad);
                 double yDir = Math.sin(rad);
+                double pow = random.nextDouble() * 5;
+                RealVector action = new ArrayRealVector(new double[]{coords[0], coords[1], xDir * pow, yDir * pow});
+                actions.add(action);
 
-                RealVector action = new ArrayRealVector(new double[]{xDir, yDir, power});
-                double qValue = qCalculations.calculateQValue(state, new Action(action), 0, new State(calculateNextState(action)));
-
-                if (qValue > maxQValue) {
-                    maxQValue = qValue;
-                    bestAction = action;
-                }
             }
 
         }
-        return bestAction;
+        return actions.parallelStream()
+                .max(Comparator.comparingDouble(action -> qCalculations.calculateQValue(
+                        state,
+                        new Action(action),
+                        reward.calculateReward(new State(calculateNextState(action)), state, holePosition),
+                        new State(calculateNextState(action))
+                )))
+                .orElseThrow(() -> new RuntimeException("No actions available"));
     }
 
     /**
      * Calculates the next state the system will be in by simulating the game.
+     *
      * @param currentAction The action to be simulated.
      * @return The resulting state, as a Vector.
      */
@@ -105,19 +115,23 @@ public class QLearningAgent implements Serializable {
         double[] arrayAction = currentAction.toArray();
 
         ArrayList<double[]> result = golfGameEngine.shoot(arrayAction, false);
+        double[] resultVec = result.getLast();
 
-        return new ArrayRealVector(result.getLast());
+
+        return new ArrayRealVector(new double[]{resultVec[0], resultVec[1]});
 
     }
 
     /**
      * Trains the model.
+     *
      * @param numEpisodes The number of training loops to be done.
      */
     public void train(int numEpisodes) {
         for (int episode = 0; episode < numEpisodes; episode++) {
-
-            logger.log(Level.INFO, "Episode: {}", episode);
+//            int episode = 0;
+//            while (epsilon > MIN_EPSILON) {
+            logger.log(Level.INFO, "Episode: {0}", episode + 1);
 
             State state = initialState;
 
@@ -136,8 +150,8 @@ public class QLearningAgent implements Serializable {
 
             decayEpsilon();
 
-            logger.log(Level.INFO, "Episode {} completed!", episode);
-            logger.log(Level.INFO, "Epsilon Value: {}", epsilon);
+            logger.log(Level.INFO, "Episode {0} completed!", episode + 1);
+            logger.log(Level.INFO, "Epsilon Value: {0}", epsilon);
         }
         logger.log(Level.INFO, "Training is finished!");
         isTrained = true; // Flag check for the play method.
@@ -145,6 +159,7 @@ public class QLearningAgent implements Serializable {
 
     /**
      * Updates the Q values for each experience of a random batch, and retrains the model.
+     *
      * @param batchSize The number of experiences to be pulled.
      */
     public void updateQValues(int batchSize) {
@@ -158,13 +173,14 @@ public class QLearningAgent implements Serializable {
                     experience.getNextState()
             );
             qNetwork.train(
-                    experience.getState().getCurrentPosition().append(experience.getAction().getAction()), new ArrayRealVector(new double[]{targetQ}), 0.01
+                    experience.getState().getCurrentPosition().append(experience.getAction().getAction()), targetQ, 0.01
             );
         });
     }
 
     /**
      * Method, that gets one play from the agent.
+     *
      * @param currentState The state the system is in currently.
      * @return The vector containing the play the agent believes to be the best.
      */
@@ -178,9 +194,10 @@ public class QLearningAgent implements Serializable {
 
     /**
      * Adds an experience to the Memory buffer.
-     * @param state The state before the action was taken.
-     * @param action The action that was taken.
-     * @param reward The reward for that action.
+     *
+     * @param state     The state before the action was taken.
+     * @param action    The action that was taken.
+     * @param reward    The reward for that action.
      * @param nextState The state the system is in after taking the action.
      */
     public void addExperienceToBuffer(State state, Action action, double reward, State nextState) {
@@ -196,8 +213,9 @@ public class QLearningAgent implements Serializable {
 
     /**
      * Saves the model.
-     * @param model The model to be saved.
-     * @param fileName The name of the model.
+     *
+     * @param model     The model to be saved.
+     * @param fileName  The name of the model.
      * @param directory The file directory.
      */
     public void saveModel(NeuralNetwork model, String fileName, String directory) {
@@ -219,6 +237,7 @@ public class QLearningAgent implements Serializable {
 
     /**
      * Loads the saved model.
+     *
      * @param fileName The name of the saved model.
      * @return The saved model.
      */

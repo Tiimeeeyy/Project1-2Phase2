@@ -53,4 +53,8 @@ public class State implements Serializable {
     public State toStateArray(double[] position) {
         return new State(new ArrayRealVector(position));
     }
+
+    public double[] getCoordinates() {
+        return currentPosition.toArray();
+    }
 }

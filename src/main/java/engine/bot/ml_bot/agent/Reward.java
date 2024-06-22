@@ -9,10 +9,10 @@ import java.util.logging.Logger;
 public class Reward {
     // TODO: Shot counter?
 
-    public static final double CLOSENESS_REWARD = 0.1;
+    public static final double CLOSENESS_REWARD = 10;
     private static final double WATER_PENALTY = -1000;
     private static final double GOAL_REWARD = 1000;
-    private static final double DISTANCE_REWARD = 0.001;
+    private static final double DISTANCE_REWARD = 1;
     private static final Logger logger = Logger.getLogger(Reward.class.getName());
     private final GolfGameEngine golfGameEngine;
     //private final MapHandler mapHandler;
@@ -47,7 +47,7 @@ public class Reward {
         double distanceHole = resultState.getDistance(holePosition);
         // TODO: Look how this behaves
         reward += (1 - distanceHole) * CLOSENESS_REWARD;
-        logger.log(Level.INFO, "Reward for action calculated: {}", reward);
+
         return reward;
     }
 
