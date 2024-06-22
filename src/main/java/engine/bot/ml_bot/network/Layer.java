@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Layer implements Serializable {
-    private List<Perceptron> perceptrons;
+    private transient List<Perceptron> perceptrons;
 
     /**
      * Creates a Layer for the Neural Network.
@@ -37,16 +37,12 @@ public class Layer implements Serializable {
      * @param input The input.
      * @return A list of Vectors containing the predicted outputs.
      */
-    public RealVector predict(RealVector input) {
-        RealVector outputs = new ArrayRealVector(3);
-        for (Perceptron perceptron : perceptrons) {
-            RealVector prediction = perceptron.predict(input);
-            if (prediction.getDimension() != outputs.getDimension()) {
-                throw new IllegalArgumentException("Dimension Mismatch: Prediction size: " + prediction.getDimension() + " output size: " + outputs.getDimension());
-            }
-            outputs.add(perceptron.predict(input));
-        }
-        return outputs;
+    public List<Double> predict(RealVector input) {
+       List<Double> layerPredictions = new ArrayList<>();
+       for (Perceptron perceptron : perceptrons) {
+           layerPredictions.add(perceptron.predict(input));
+       }
+       return layerPredictions;
     }
 
 

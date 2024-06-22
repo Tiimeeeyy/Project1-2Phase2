@@ -23,34 +23,47 @@ public class Predictor implements Perceptron, Serializable {
         this.params = params;
     }
 
-    /**
-     * Predicts an output (in our case, a hit to the golf ball) based on the Input given.
-     *
-     * @param input The current state of the Game (Ball position)
-     * @return An Array that contains the prediction.
-     */
-    public RealVector predict(RealVector input) {
-        double[] weights = params.getWeights();
-        ActivationFunction function = params.getFunction();
-        double bias = params.getBias();
-        if (weights.length == 2 || input.getDimension() == 2) { // Handling the input layer.
-            double veloWeight = weights[params.getSize() - 1];
-            RealVector directionWeights = new ArrayRealVector(weights, 0, params.getSize());
-            double dot = directionWeights.dotProduct(input);
-            double velo = function.activation(input.getEntry(0) * veloWeight + bias);
+//    /**
+//     * Predicts an output (in our case, a hit to the golf ball) based on the Input given.
+//     *
+//     * @param input The current state of the Game (Ball position)
+//     * @return An Array that contains the prediction.
+//     */
+//    public double predict(RealVector input) {
+//        double[] weights = params.getWeights();
+//        ActivationFunction function = params.getFunction();
+//        double bias = params.getBias();
+//        if (weights.length == 2 || input.getDimension() == 2) { // Handling the input layer.
+//            double veloWeight = weights[params.getSize() - 1];
+//            RealVector directionWeights = new ArrayRealVector(weights, 0, params.getSize());
+//            double dot = directionWeights.dotProduct(input);
+//            double velo = function.activation(input.getEntry(0) * veloWeight + bias);
+//
+//
+//            return new ArrayRealVector(new double[]{function.activation(dot + bias), function.activation(dot + bias), velo});
+//        } else { // Handling consecutive Layers.
+//            RealVector directionWeights = new ArrayRealVector(weights);
+//            double veloWeight = weights[1]; // Random number in the Weights array
+//            double dot = directionWeights.dotProduct(input);
+//            return new ArrayRealVector(new double[]{function.activation(dot + bias * 0.001), function.activation(dot + bias * 0.0012), function.activation(veloWeight + bias * 0.324)});
+//        }
+//    }
 
-
-            return new ArrayRealVector(new double[]{function.activation(dot + bias), function.activation(dot + bias), velo});
-        } else { // Handling consecutive Layers.
-            RealVector directionWeights = new ArrayRealVector(weights);
-            double veloWeight = weights[1]; // Random number in the Weights array
-            double dot = directionWeights.dotProduct(input);
-            return new ArrayRealVector(new double[]{function.activation(dot + bias * 0.001), function.activation(dot + bias * 0.0012), function.activation(veloWeight + bias * 0.324)});
-        }
-    }
 
     @Override
-    public void train(RealVector input, RealVector target, double learningRate) { /* Empty method to allow polymorphism */ }
+    public double predict(RealVector input) {
+        double weightSum = 0.0;
+        double inputSum = 0.0;
+        double[] weights = params.getWeights();
+        ActivationFunction func = params.getFunction();
+        for (int i = 0; i < weights.length -1; i++) {
+            weightSum += weights[i];
+        }
+        for (int i = 0; i < input.getDimension(); i++) {
+            inputSum += input.getEntry(i);
+        }
+        return func.activation(weightSum * inputSum);
+    }
 
     public PerceptronParams getParams() {
         return params;

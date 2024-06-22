@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+
 import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 
@@ -73,6 +74,7 @@ public class AiBotGA {
             allSteps.add(solution);
         }
         long endTime = System.currentTimeMillis();
+        this.duration = (endTime - startTime)/1000.0;
         System.out.println("Algorithm completed in " + (endTime - startTime)/1000.0 + " seconds");
         return allSteps;
     }
@@ -306,6 +308,7 @@ public class AiBotGA {
     public boolean isGoal(){
         return this.goal;
     }
+    
 
     private enum TargetType{
         HOLE,

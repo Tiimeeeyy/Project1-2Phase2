@@ -4,6 +4,8 @@ import engine.bot.AiBotGAV.AiBotGAV;
 import engine.bot.AibotGA.AiBotGA;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
+import engine.bot.ml_bot.agent.QLearningAgent;
+import engine.bot.ml_bot.agent.State;
 import engine.bot.newtonRaphsonBot.NewtonRaphsonBot;
 import engine.bot.rule_based_new.DistanceMeasure;
 import engine.solvers.GolfGameEngine;
@@ -23,6 +25,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 import ui.Main;
 import ui.helpers.CircularSlider;
 import ui.screenFactory.ScreenInterface;
@@ -32,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -102,6 +107,7 @@ public class ThirdScreenController implements ScreenInterface {
 
     private DistanceMeasure distanceMeasure;
     private CircularSlider circularSlider; // Custom circular slider for direction
+    private QLearningAgent agent;
     private double[] BallPosition; // Starting position of the ball
     private double[] HolePostion; // Position of the hole
     private GolfGameEngine golfGame; // Golf game engine
@@ -168,6 +174,7 @@ public class ThirdScreenController implements ScreenInterface {
         this.a = new double[]{grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
+        this.agent = new QLearningAgent(1, golfGame, new State(new ArrayRealVector(BallPosition)), new ArrayRealVector(HolePostion));
 
         initialize();
     }
@@ -428,7 +435,6 @@ public class ThirdScreenController implements ScreenInterface {
 
     private void ballHitMultiple(int step) {
         if (!REACHED_THE_HOLE) {
-            shotCount = 0;
             double[] currentShot=shots.get(step).clone();
             // Clear the trajectory before each new hit
             fullTrajectory.clear();
@@ -744,6 +750,7 @@ public class ThirdScreenController implements ScreenInterface {
     //     this.ruleBasedBot = true;
     //     double[] ballP = BallPosition.clone();
     //     plays = distanceMeasure.playGame(ballP, HolePostion, REACHED_THE_HOLE);
+    //     System.out.println(plays.size());
     //     if (!plays.isEmpty()) {
     //         playBotShot(plays, 0);
     //     } 
@@ -760,25 +767,27 @@ public class ThirdScreenController implements ScreenInterface {
         int totalShots = 0;
         double currentDuration = 0;
         double totalDuration = 0;
-        int succes = 0;
+        int success = 0;
         // this.shots = new ArrayList<>();
         while(i<10){
-            System.out.println(initPosit[0]+" "+initPosit[1]);
+            BallPosition = initPosit.clone();
+            System.out.println(BallPosition[0]+" "+BallPosition[1]);
             System.out.println("Iteration: "+i);
-            DistanceMeasure distanceMeasureT = new DistanceMeasure(initPosit, a, HolePostion, radiusHole, REACHED_THE_HOLE);
-            plays = distanceMeasureT.playGame(initPosit, HolePostion, REACHED_THE_HOLE);
+            DistanceMeasure distanceMeasureT = new DistanceMeasure(BallPosition, a, HolePostion, radiusHole, REACHED_THE_HOLE);
+            ArrayList<double[]> plays = distanceMeasureT.playGame(BallPosition, HolePostion, REACHED_THE_HOLE);
             currentShots = plays.size();
+            System.out.println("Number of shots: "+currentShots);
             currentDuration = distanceMeasureT.getDuration();
             totalDuration += currentDuration;
             totalShots += currentShots;
             if (distanceMeasureT.isGoal()) {
-                succes++;
+                success++;
             }
             i++;
         }
         double averageShots = (double) totalShots / 10;
         double averageDuration = (double) totalDuration / 10;
-        double successRate = (double) succes / 10 *100;
+        double successRate = (double) success / 10 *100;
         System.out.println("-------------------------------");
         System.out.println("\nTotal shots: " + totalShots);
         System.out.println("Average shots per game: " + averageShots);
@@ -863,7 +872,7 @@ public class ThirdScreenController implements ScreenInterface {
     //         @Override
     //         protected ArrayList<double[]> call() {
     //             // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
-    //             AiBotGAV gaBot = new AiBotGAV(golfGame);
+    //             AiBotGA gaBot = new AiBotGA(golfGame);
     //             double[] x = {BallPosition[0], BallPosition[1], 0, 0};
     //             return gaBot.golfBot(x);
     //         }
@@ -957,13 +966,13 @@ public class ThirdScreenController implements ScreenInterface {
 
     // @FXML
     // private void hcBotPlay() {
-        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
     //     logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
 
     //         Task<ArrayList<double[]>> task = new Task<>() {
     //             @Override
     //             protected ArrayList<double[]> call() {
-    //                 HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+    //                 HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
     //                 return chBot.hillClimbingAlgorithm();
     //             }
     
@@ -1043,7 +1052,16 @@ public class ThirdScreenController implements ScreenInterface {
 
     @FXML
     private void mlBotPlay(){
-        return;
+        this.shots = new ArrayList<>();
+        if (!agent.isTrained) {
+            agent.train(100);
+        }
+        RealVector hi = agent.getOnePlay(new State(new ArrayRealVector(BallPosition)));
+        double [] action = hi.toArray();
+        double[] velos = new double[]{action[2], action[3]};
+        System.out.println("Action: " + Arrays.toString(action));
+        shots.add(action);
+        ballHitMultiple(0);
     }
 
     private void playMusic(String path) {
