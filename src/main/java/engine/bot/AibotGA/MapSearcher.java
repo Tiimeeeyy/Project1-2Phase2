@@ -33,7 +33,7 @@ public class MapSearcher {
     }
 
     public ArrayList<double[]> findShortestPath() {
-        // createImage();
+        
         Set<int[]> visited = new HashSet<>();
         visited.add(startBallPostion.clone());
 
@@ -197,13 +197,13 @@ public class MapSearcher {
     }
 
     public static void main(String[] args) {
-        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-3, 0}, new double[]{4, 1}, 0.1);
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", new double[]{-24, 0}, new double[]{4, 1}, 0.1);
         ArrayList<double[]> test = mapSearcher.findShortestPath();
         
 
         MapHandler aa=new MapHandler();
         aa.plotTrajectory("src/main/resources/userInputMap.png", "src/main/resources/outtest.png", test);
-        System.out.println(mapSearcher.isObstacled(new double[]{-3,0}, new double[]{4,1}));
+        
         ArrayList<double[]> turningPoints = mapSearcher.getTurningPoints(test);
         for (double[] point : turningPoints) {
             System.out.println("Turning point: " + Arrays.toString(point));
