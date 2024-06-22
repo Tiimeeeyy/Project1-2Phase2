@@ -25,6 +25,7 @@ public class AiBotGA {
     private double stuckMemory=0;
 
     private GolfGameEngine game;
+    private double duration;
 
     public AiBotGA(GolfGameEngine game){
         this.game=game;
@@ -298,7 +299,13 @@ public class AiBotGA {
     public double[] getBest(){
         return this.solution;
     }
-    
+    public double getDuration(){
+        return this.duration;
+    }
+
+    public boolean isGoal(){
+        return this.goal;
+    }
 
     private enum TargetType{
         HOLE,
