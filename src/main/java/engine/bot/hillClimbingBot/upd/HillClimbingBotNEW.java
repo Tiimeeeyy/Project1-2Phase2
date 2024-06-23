@@ -24,7 +24,7 @@ public class HillClimbingBotNEW {
     private boolean useAnotherAlgorithm = false;
 
     private static final int MAX_ITERATIONS = 5;
-    private static final int MAX_ITERATIONS_FINAL = 15;
+    private static final int MAX_ITERATIONS_FINAL = 8;
 
     private static final double INITIAL_STEP_SIZE = 1.0;
     private static final double TOLERANCE = 0.02;
@@ -125,7 +125,7 @@ public class HillClimbingBotNEW {
         double[] bestVelocity = new double[2];
 
         //MutiThreads componets
-        ExecutorService executor=Executors.newFixedThreadPool(10);
+        ExecutorService executor=Executors.newFixedThreadPool(100);
         Map<double[], Double> neighborResults=new HashMap<>();
         
         for (int restart = 0; restart < RANDOM_RESTARTS; restart++) {
@@ -181,7 +181,7 @@ public class HillClimbingBotNEW {
                     break;
                 }
 
-                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
+                // System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
             }
 
 
@@ -234,7 +234,7 @@ public class HillClimbingBotNEW {
                     break;
                 }
 
-                System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + "," +velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
+                // System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + "," +velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
             }
             if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
