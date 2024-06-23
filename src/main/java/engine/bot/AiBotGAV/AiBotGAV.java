@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import engine.bot.AibotGA.MapSearcher;
 import engine.solvers.BallStatus;
@@ -319,10 +322,51 @@ public class AiBotGAV {
     }
 
     public static void main(String[] args) {
-        Random r=new Random();
-        for (int i = 0; i < 10; i++) {
-            // System.out.println(r.nextDouble()*5);
-            System.out.println(Math.sin(15*Math.PI/30));
+        ExecutorService executor = Executors.newFixedThreadPool(10); // Create a thread pool
+        int[]a=new int[20];
+        for (int i = 0; i < 20; i++) {
+            final int k=i;
+            executor.submit(() -> {
+            // Your task logic here
+            
+            a[k]=onethread(k);
+        });
         }
+        executor.shutdown();
+        try {
+            // Wait for all tasks to finish
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                System.err.println("Tasks did not finish in 60 seconds!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Arrays.toString(a));
+
+        executor = Executors.newFixedThreadPool(10); // Create a thread pool
+        
+        for (int i = 0; i < 20; i++) {
+            final int k=i;
+            executor.submit(() -> {
+            // Your task logic here
+            
+            a[k]=onethread(k);
+        });
+        }
+        executor.shutdown();
+        try {
+            // Wait for all tasks to finish
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                System.err.println("Tasks did not finish in 60 seconds!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(Arrays.toString(a));
+    }
+
+    public static int onethread(int i){
+
+        return i;
     }
 }
