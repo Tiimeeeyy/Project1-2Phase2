@@ -139,19 +139,19 @@ public class HillClimbingBotNEW {
             for (int i = 0; i < MAX_ITERATIONS; i++) {
                 double[][] neighbors = generateNeighbors(velocity, stepSize);
                 boolean foundBetter = false;
-                //MutiThreads componets
+                //MutiThreads components
                 neighborResults.clear();
                 List<Future<?>> futures = new ArrayList<>();
 
                 for (double[] neighbor : neighbors) {
-                    //MutiThreads componets
+                    //MutiThreads components
                     futures.add(executor.submit(() -> {
                         double fitness = evaluateFitness(startBallPosition, neighbor);
                         neighborResults.put(neighbor, fitness);
                     }));
                     
                 }
-                //MutiThreads componets
+                //MutiThreads components
                 for (Future<?> future : futures) {
                     try {
                         future.get(); // This will block until the task completes
@@ -159,7 +159,7 @@ public class HillClimbingBotNEW {
                         e.printStackTrace();
                     }
                 }
-                
+
                 for (Map.Entry<double[],Double> entry : neighborResults.entrySet()) {
                     if (entry.getValue() > currentFitness) {
                         currentFitness = entry.getValue();
