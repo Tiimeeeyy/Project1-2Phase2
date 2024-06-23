@@ -1,6 +1,5 @@
 package ui.controller;
 
-import engine.bot.AiBotGAV.AiBotGAV;
 import engine.bot.AibotGA.AiBotGA;
 // import engine.bot.hillClimbingBot.old.HillClimbingBot;
 import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
