@@ -2,8 +2,7 @@ package ui.controller;
 
 import engine.bot.AiBotGAV.AiBotGAV;
 import engine.bot.AibotGA.AiBotGA;
-// import engine.bot.hillClimbingBot.old.HillClimbingBot;
-import engine.bot.hillClimbingBot.upd.HillClimbingBotNEW;
+import engine.bot.hillClimbingBot.upd.HillClimbingBot;
 import engine.bot.ml_bot.agent.QLearningAgent;
 import engine.bot.ml_bot.agent.State;
 import engine.bot.rule_based_new.DistanceMeasure;
@@ -963,79 +962,79 @@ public class ThirdScreenController implements ScreenInterface {
         }
     }
 
-    @FXML
-    private void hcBotPlay() {
-        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
-        logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-
-            Task<ArrayList<double[]>> task = new Task<>() {
-                @Override
-                protected ArrayList<double[]> call() {
-                    HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-                    return chBot.hillClimbingAlgorithm();
-                }
-    
-                @Override
-                protected void succeeded() {
-                    stopMusic();
-                    ArrayList<double[]> velocities = getValue();
-                    shots = velocities;
-                    ballHitMultiple(0);
-                }
-    
-                @Override
-                protected void failed() {
-                    stopMusic();
-                    Throwable exception = getException();
-                    exception.printStackTrace();
-                }
-            };
-    
-            new Thread(task).start();
-
-    }
-
-
-
     // @FXML
     // private void hcBotPlay() {
-    //     // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
     //     logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-    //     initPosit = BallPosition.clone();
-    //     int i = 0;
-    //     int currentShots = 0;
-    //     int totalShots = 0;
-    //     double currentDuration = 0;
-    //     double totalDuration = 0;
-    //     int succes = 0;
-    //     while(i<10){
-    //         System.out.println(initPosit[0]+" "+initPosit[1]);
-    //         System.out.println("Iteration: "+i);
-    //         HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-    //         ArrayList<double[]> velocities =chBot.hillClimbingAlgorithm(); 
-    //         currentDuration = chBot.getDuration();
-            
-    //         // shots = velocities;
-    //         currentShots = velocities.size();
-    //         // ballHitMultiple(0);
-    //         totalShots += currentShots;
-    //         totalDuration += currentDuration;
-    //         if (chBot.isGoal()) {
-    //             succes++;
-    //         }
 
-    //         i++;
-    //     }
-    //     double averageShots = (double) totalShots / 10;
-    //     double averageDuration = (double) totalDuration / 10;
-    //     double successRate = (double) succes / 10 *100;
-    //     System.out.println("-------------------------------");
-    //     System.out.println("\nTotal shots: " + totalShots);
-    //     System.out.println("Average shots per game: " + averageShots);
-    //     System.out.println("Total duration: " + totalDuration+" seconds");
-    //     System.out.println("Average duration per game: " + averageDuration+" seconds");
-    //     System.out.println("Success rate: " + successRate+"%");
+    //         Task<ArrayList<double[]>> task = new Task<>() {
+    //             @Override
+    //             protected ArrayList<double[]> call() {
+    //                 HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+    //                 return chBot.hillClimbingAlgorithm();
+    //             }
+    
+    //             @Override
+    //             protected void succeeded() {
+    //                 stopMusic();
+    //                 ArrayList<double[]> velocities = getValue();
+    //                 shots = velocities;
+    //                 ballHitMultiple(0);
+    //             }
+    
+    //             @Override
+    //             protected void failed() {
+    //                 stopMusic();
+    //                 Throwable exception = getException();
+    //                 exception.printStackTrace();
+    //             }
+    //         };
+    
+    //         new Thread(task).start();
+
     // }
+
+
+
+    @FXML
+    private void hcBotPlay() {
+        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+        logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
+        initPosit = BallPosition.clone();
+        int i = 0;
+        int currentShots = 0;
+        int totalShots = 0;
+        double currentDuration = 0;
+        double totalDuration = 0;
+        int succes = 0;
+        while(i<10){
+            System.out.println(initPosit[0]+" "+initPosit[1]);
+            System.out.println("Iteration: "+i);
+            HillClimbingBot chBot = new HillClimbingBot(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+            ArrayList<double[]> velocities =chBot.hillClimbingAlgorithm(); 
+            currentDuration = chBot.getDuration();
+            
+            // shots = velocities;
+            currentShots = velocities.size();
+            // ballHitMultiple(0);
+            totalShots += currentShots;
+            totalDuration += currentDuration;
+            if (chBot.isGoal()) {
+                succes++;
+            }
+
+            i++;
+        }
+        double averageShots = (double) totalShots / 10;
+        double averageDuration = (double) totalDuration / 10;
+        double successRate = (double) succes / 10 *100;
+        System.out.println("-------------------------------");
+        System.out.println("\nTotal shots: " + totalShots);
+        System.out.println("Average shots per game: " + averageShots);
+        System.out.println("Total duration: " + totalDuration+" seconds");
+        System.out.println("Average duration per game: " + averageDuration+" seconds");
+        System.out.println("Success rate: " + successRate+"%");
+    }
 
     @FXML
     private void replay(){
