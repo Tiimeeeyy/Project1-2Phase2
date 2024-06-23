@@ -13,7 +13,7 @@ import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 
 public class AiBotGA {
-    private int popSize=50;
+    private int popSize=100;
     private char[] vocab={'0','1'};
     private double mutationRate=0.10;
     private double[] solution=new double[4];
@@ -83,7 +83,7 @@ public class AiBotGA {
     }
 
     public void oneShot(double[] x, TargetType targetType, double[] target){
-        long startTime = System.currentTimeMillis();
+        // long startTime = System.currentTimeMillis();
         Individual[] population=new Individual[popSize];
         int generations=300;
         switch (targetType) {
@@ -114,7 +114,7 @@ public class AiBotGA {
 
         double[] x0=x.clone();
         initialPopulation(population, x0);
-        long endTime1 = System.currentTimeMillis();
+        // long endTime1 = System.currentTimeMillis();
         
         ExecutorService executor=Executors.newFixedThreadPool(2);
         for (int i = 0; i < generations; i++) {
@@ -158,9 +158,9 @@ public class AiBotGA {
             best[3]=population[0].genoToPhenotype()[1];
             this.solution=best.clone();
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("Algorithm completed in " + (endTime1 - startTime)/1000.0 + " seconds");
-        System.out.println("Algorithm completed in " + (endTime - endTime1)/1000.0 + " seconds");
+        // long endTime = System.currentTimeMillis();
+        // System.out.println("Algorithm completed in " + (endTime1 - startTime)/1000.0 + " seconds");
+        // System.out.println("Algorithm completed in " + (endTime - endTime1)/1000.0 + " seconds");
         System.out.println(population[0].getFitness());
     }
 

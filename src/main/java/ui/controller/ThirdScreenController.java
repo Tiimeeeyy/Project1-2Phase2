@@ -863,76 +863,76 @@ public class ThirdScreenController implements ScreenInterface {
     //     // ballHit(0);
     // }
 
-    @FXML
-    private void gaBotFunc() {
-        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
-        logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-
-        Task<ArrayList<double[]>> task = new Task<>() {
-            @Override
-            protected ArrayList<double[]> call() {
-                // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
-                AiBotGA gaBot = new AiBotGA(golfGame);
-                double[] x = {BallPosition[0], BallPosition[1], 0, 0};
-                return gaBot.golfBot(x);
-            }
-
-            @Override
-            protected void succeeded() {
-                stopMusic();
-                ArrayList<double[]> velocities = getValue();
-                shots = velocities;
-                ballHitMultiple(0);
-            }
-
-            @Override
-            protected void failed() {
-                stopMusic();
-                Throwable exception = getException();
-                exception.printStackTrace();
-            }
-        };
-
-        new Thread(task).start();
-    }
-
     // @FXML
     // private void gaBotFunc() {
-    //     // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
     //     logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
-    //     initPosit = BallPosition.clone();
-    //     int i = 0;
-    //     int currentShots = 0;
-    //     int totalShots = 0;
-    //     double currentDuration = 0;
-    //     double totalDuration = 0;
-    //     int succes = 0;
-    //     while(i<10){
-    //         System.out.println(initPosit[0]+" "+initPosit[1]);
-    //         System.out.println("Iteration: "+i);
-    //         AiBotGA gaBot = new AiBotGA(golfGame);
-    //         double[] x = {initPosit[0], initPosit[1], 0, 0};
-    //         ArrayList<double[]> velocities =gaBot.golfBot(x);
-    //         currentShots = velocities.size();
-    //         currentDuration = gaBot.getDuration();
-    //         totalShots += currentShots;
-    //         totalDuration += currentDuration;
-    //         if (gaBot.isGoal()) {
-    //             succes++;
+
+    //     Task<ArrayList<double[]>> task = new Task<>() {
+    //         @Override
+    //         protected ArrayList<double[]> call() {
+    //             // AiBotMultiShots gaBot = new AiBotMultiShots(golfGame);
+    //             AiBotGA gaBot = new AiBotGA(golfGame);
+    //             double[] x = {BallPosition[0], BallPosition[1], 0, 0};
+    //             return gaBot.golfBot(x);
     //         }
-    //         i++;
-    //     }
-    //     double averageShots = (double) totalShots / 10;
-    //     double averageDuration = (double) totalDuration / 10;
-    //     double successRate = (double) succes / 10 *100;
-    //     System.out.println("-------------------------------");
-    //     System.out.println("\nTotal shots: " + totalShots);
-    //     System.out.println("Average shots per game: " + averageShots);
-    //     System.out.println("Total duration: " + totalDuration+" seconds");
-    //     System.out.println("Average duration per game: " + averageDuration+" seconds");
-    //     System.out.println("Success rate: " + successRate+"%");
-    
+
+    //         @Override
+    //         protected void succeeded() {
+    //             stopMusic();
+    //             ArrayList<double[]> velocities = getValue();
+    //             shots = velocities;
+    //             ballHitMultiple(0);
+    //         }
+
+    //         @Override
+    //         protected void failed() {
+    //             stopMusic();
+    //             Throwable exception = getException();
+    //             exception.printStackTrace();
+    //         }
+    //     };
+
+    //     new Thread(task).start();
     // }
+
+    @FXML
+    private void gaBotFunc() {
+        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+        logEvent("!!--GA bot entered the party (it is slow, be patient)--!!");
+        initPosit = BallPosition.clone();
+        int i = 0;
+        int currentShots = 0;
+        int totalShots = 0;
+        double currentDuration = 0;
+        double totalDuration = 0;
+        int succes = 0;
+        while(i<10){
+            System.out.println(initPosit[0]+" "+initPosit[1]);
+            System.out.println("Iteration: "+i);
+            AiBotGA gaBot = new AiBotGA(golfGame);
+            double[] x = {initPosit[0], initPosit[1], 0, 0};
+            ArrayList<double[]> velocities =gaBot.golfBot(x);
+            currentShots = velocities.size();
+            currentDuration = gaBot.getDuration();
+            totalShots += currentShots;
+            totalDuration += currentDuration;
+            if (gaBot.isGoal()) {
+                succes++;
+            }
+            i++;
+        }
+        double averageShots = (double) totalShots / 10;
+        double averageDuration = (double) totalDuration / 10;
+        double successRate = (double) succes / 10 *100;
+        System.out.println("-------------------------------");
+        System.out.println("\nTotal shots: " + totalShots);
+        System.out.println("Average shots per game: " + averageShots);
+        System.out.println("Total duration: " + totalDuration+" seconds");
+        System.out.println("Average duration per game: " + averageDuration+" seconds");
+        System.out.println("Success rate: " + successRate+"%");
+    
+    }
 
 
     /**
