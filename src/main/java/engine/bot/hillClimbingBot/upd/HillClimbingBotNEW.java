@@ -1,8 +1,17 @@
 package engine.bot.hillClimbingBot.upd;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import engine.solvers.GolfGameEngine;
 import engine.bot.AibotGA.MapSearcher;
 
@@ -115,6 +124,10 @@ public class HillClimbingBotNEW {
         double bestFitness = Double.NEGATIVE_INFINITY;
         double[] bestVelocity = new double[2];
 
+        //MutiThreads componets
+        ExecutorService executor=Executors.newFixedThreadPool(10);
+        Map<double[], Double> neighborResults=new HashMap<>();
+        
         for (int restart = 0; restart < RANDOM_RESTARTS; restart++) {
             this.velocity = initializeVelocity();
             double currentFitness;
@@ -122,21 +135,41 @@ public class HillClimbingBotNEW {
 
             double stepSize = INITIAL_STEP_SIZE;
             int iterationsWithoutImprovement = 0;
-
+            
             for (int i = 0; i < MAX_ITERATIONS; i++) {
                 double[][] neighbors = generateNeighbors(velocity, stepSize);
                 boolean foundBetter = false;
-                for (double[] neighbor : neighbors) {
-                    double fitness;
-                    fitness = evaluateFitness(startBallPosition, neighbor);
+                //MutiThreads components
+                neighborResults.clear();
+                List<Future<?>> futures = new ArrayList<>();
 
-                    if (fitness > currentFitness) {
-                        currentFitness = fitness;
-                        velocity = neighbor;
+                for (double[] neighbor : neighbors) {
+                    //MutiThreads components
+                    futures.add(executor.submit(() -> {
+                        double fitness = evaluateFitness(startBallPosition, neighbor);
+                        neighborResults.put(neighbor, fitness);
+                    }));
+                    
+                }
+                //MutiThreads components
+                for (Future<?> future : futures) {
+                    try {
+                        future.get(); // This will block until the task completes
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                for (Map.Entry<double[],Double> entry : neighborResults.entrySet()) {
+                    if (entry.getValue() > currentFitness) {
+                        currentFitness = entry.getValue();
+                        velocity = entry.getKey();
                         foundBetter = true;
                         iterationsWithoutImprovement = 0;
                     }
                 }
+                
+
                 if (!foundBetter) {
                     stepSize /= 2;
                     iterationsWithoutImprovement++;
@@ -150,10 +183,22 @@ public class HillClimbingBotNEW {
 
                 System.out.println("Restart " + restart + ", Iteration " + i + ": Velocity = [" + velocity[0] + ", " + velocity[1] + "], Fitness = " + currentFitness + " Best Fitness: " + bestFitness);
             }
+
+
             if (currentFitness > bestFitness) {
                 bestFitness = currentFitness;
                 bestVelocity = velocity.clone();
             }
+        }
+
+        executor.shutdown();
+        try {
+            // Wait for all tasks to finish
+            if (!executor.awaitTermination(20, TimeUnit.SECONDS)) {
+                System.err.println("Tasks did not finish in 20 seconds!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         return bestVelocity;

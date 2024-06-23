@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import engine.solvers.BallStatus;
 import engine.solvers.GolfGameEngine;
 
 public class AiBotGA {
-    private int popSize=50;
+    private int popSize=100;
     private char[] vocab={'0','1'};
     private double mutationRate=0.10;
     private double[] solution=new double[4];
@@ -80,6 +83,7 @@ public class AiBotGA {
     }
 
     public void oneShot(double[] x, TargetType targetType, double[] target){
+        // long startTime = System.currentTimeMillis();
         Individual[] population=new Individual[popSize];
         int generations=300;
         switch (targetType) {
@@ -107,61 +111,117 @@ public class AiBotGA {
         this.solution=new double[4];
         this.goal=false;
 
+
         double[] x0=x.clone();
         initialPopulation(population, x0);
+        // long endTime1 = System.currentTimeMillis();
+        
+        ExecutorService executor=Executors.newFixedThreadPool(2);
         for (int i = 0; i < generations; i++) {
             int[] slcIndex=selection(population);
+            List<Future<?>> futures = new ArrayList<>();
             crossover(population[slcIndex[0]], population[slcIndex[1]], population);
-            population[popSize-1].setFitness(calculateFitness(population[popSize-1], x.clone()));
-            population[popSize-2].setFitness(calculateFitness(population[popSize-2], x.clone()));
+            futures.add(executor.submit(() -> {
+                population[popSize - 1].setFitness(calculateFitness(population[popSize - 1], x.clone()));
+            }));
+            futures.add(executor.submit(() -> {
+                population[popSize - 2].setFitness(calculateFitness(population[popSize - 2], x.clone()));
+            }));
+            
+            for (Future<?> future : futures) {
+                try {
+                    future.get(); // This will block until the task completes
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             if (this.goal) {
                 break;
             }
             HeapSort.sort(population);
         }
+
+        executor.shutdown();
+        try {
+            // Wait for all tasks to finish
+            if (!executor.awaitTermination(20, TimeUnit.SECONDS)) {
+                System.err.println("Tasks did not finish in 20 seconds!");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
         if (!this.goal) {
             double[] best=x0;
             best[2]=population[0].genoToPhenotype()[0];
             best[3]=population[0].genoToPhenotype()[1];
             this.solution=best.clone();
         }
-
+        // long endTime = System.currentTimeMillis();
+        // System.out.println("Algorithm completed in " + (endTime1 - startTime)/1000.0 + " seconds");
+        // System.out.println("Algorithm completed in " + (endTime - endTime1)/1000.0 + " seconds");
         System.out.println(population[0].getFitness());
     }
 
     private void initialPopulation(Individual[] pop, double[] x){
         Random rand=new Random();
-        char[][] indi=new char[2][10];
+        // char[][] indi=new char[2][10];
         double cos=(target[0]-x[0])/game.getDistance(x,target);
         double sin=(target[1]-x[1])/game.getDistance(x,target);
 
         double[] farest=getFarestPoint(x, shortestPath);
         double powerMean=game.getDistance(x, farest)/5;
+
+        ExecutorService executor = Executors.newFixedThreadPool(10); // Create a thread pool
         
         int n=0;
         for (int k = -2; k<3; k++) {
+            int kf=k;
             for (int i = 0; i < 5; i++) {
-                double power=Math.min(rand.nextGaussian()+powerMean, 5);
-                char[] vxChrom=Integer.toBinaryString((int)(power*(cos*Math.cos(0.17*k)-sin*Math.sin(0.17*k))*100+500)).toCharArray();
-                char[] vyChrom=Integer.toBinaryString((int)(power*(sin*Math.cos(0.17*k)+cos*Math.sin(0.17*k))*100+500)).toCharArray();
+                final int index=n;
+                executor.submit(() -> {
+                    // Your task logic here
+                    double power=Math.min(rand.nextGaussian()+powerMean, 5);
+                    char[] vxChrom=Integer.toBinaryString((int)(power*(cos*Math.cos(0.17*kf)-sin*Math.sin(0.17*kf))*100+500)).toCharArray();
+                    char[] vyChrom=Integer.toBinaryString((int)(power*(sin*Math.cos(0.17*kf)+cos*Math.sin(0.17*kf))*100+500)).toCharArray();
 
-                indi=covertToChromosome(vxChrom, vyChrom);
+                    char[][] indi=covertToChromosome(vxChrom, vyChrom);
+                    
+                    pop[index]=new Individual(indi);
+                    pop[index].setFitness(calculateFitness(pop[index], x.clone()));
+                });
+
                 
-                pop[n]=new Individual(indi);
-                pop[n].setFitness(calculateFitness(pop[k+2], x.clone()));
                 n++;
             }
             
         }
+        
 
         for (int i = 25; i < popSize; i++) {
-            for (int j = 0; j < 2; j++) {
-                for(int k=0;k<10;k++){
-                    indi[j][k]=vocab[rand.nextInt(2)];
+            int fi=i;
+            executor.submit(() -> {
+                // Your task logic here
+                char[][] indi=new char[2][10];
+                for (int j = 0; j < 2; j++) {
+                
+                    for(int k=0;k<10;k++){
+                        indi[j][k]=vocab[rand.nextInt(2)];
+                    }
                 }
+                pop[fi]=new Individual(indi);
+                pop[fi].setFitness(calculateFitness(pop[fi], x.clone()));
+            });
+        }
+        executor.shutdown();
+        try {
+            // Wait for all tasks to finish
+            if (!executor.awaitTermination(20, TimeUnit.SECONDS)) {
+                System.err.println("Tasks did not finish in 20 seconds!");
             }
-            pop[i]=new Individual(indi);
-            pop[i].setFitness(calculateFitness(pop[i], x.clone()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         HeapSort.sort(pop);
     }
