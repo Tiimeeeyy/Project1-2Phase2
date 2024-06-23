@@ -1,7 +1,5 @@
 package ui.controller;
 
-import engine.bot.AiBotGAV.AiBotGAV;
-import engine.bot.AibotGA.AiBotGA;
 import engine.bot.hillClimbingBot.upd.HillClimbingBot;
 import engine.bot.ml_bot.agent.QLearningAgent;
 import engine.bot.ml_bot.agent.State;
