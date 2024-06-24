@@ -1,6 +1,7 @@
 package ui.controller;
 import engine.bot.AibotGA.AiBotGA;
 
+import engine.bot.AibotGA.MapSearcher;
 import engine.bot.hillClimbingBot.upd.HillClimbingBot;
 import engine.bot.ml_bot.agent.QLearningAgent;
 import engine.bot.ml_bot.agent.State;
@@ -171,7 +172,9 @@ public class ThirdScreenController implements ScreenInterface {
         this.a = new double[]{grassFrictionKINETIC, grassFrictionSTATIC};
         this.distanceMeasure = new DistanceMeasure(startBallPostion, a, HolePostion, radiusHole, REACHED_THE_HOLE);
         this.golfGame = new GolfGameEngine(new RK4(), a, 0.01, HolePostion, radiusHole, "src/main/resources/userInputMap.png");
-        this.agent = new QLearningAgent(1, golfGame, new State(new ArrayRealVector(BallPosition)), new ArrayRealVector(HolePostion));
+
+        MapSearcher mapSearcher = new MapSearcher("src/main/resources/userInputMap.png", startBallPostion, HolePostion, 0.0);
+        this.agent = new QLearningAgent(1, golfGame, new State(new ArrayRealVector(BallPosition.clone())), new ArrayRealVector(HolePostion.clone()),mapSearcher);
 
         initialize();
     }
@@ -1051,7 +1054,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void mlBotPlay(){
         this.shots = new ArrayList<>();
         if (!agent.isTrained) {
-            agent.train(100);
+            agent.train(30);
         }
         RealVector hi = agent.getOnePlay(new State(new ArrayRealVector(BallPosition)));
         double [] action = hi.toArray();
