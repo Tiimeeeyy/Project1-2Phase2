@@ -1,5 +1,8 @@
 package engine.bot.ml_bot.math.activation_functions;
 
+/**
+ * Implementation of the Log Sig activation function.
+ */
 public class LogSigFunction implements ActivationFunction {
     public double activation(double parameter) {
 

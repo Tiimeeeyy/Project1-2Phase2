@@ -1,5 +1,8 @@
 package engine.bot.ml_bot.math.activation_functions;
 
+/**
+ * The interface for the activation functions.
+ */
 public interface ActivationFunction {
     /**
      * The activation function at position x.

@@ -385,6 +385,11 @@ public class QLearningAgent implements Serializable {
         logger.log(Level.INFO, "Actions size: {0}", actions.size());
         return actions;
     }
+
+    /**
+     * "Soft" updates the network with a mix of the two networks' parameters.
+     * @param tau The mixing parameter.
+     */
     private void softUpdateTarget(double tau) {
         List<Layer> layers = targetNetwork.getLayers();
             for (int i = 0; i < layers.size(); i++) {

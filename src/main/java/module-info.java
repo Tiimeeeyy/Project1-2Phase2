@@ -25,4 +25,8 @@ module ui {
     exports engine.solvers.odeFunctions;
     exports engine.parser;
     exports engine.bot.ml_bot.agent;
+    exports engine.bot.ml_bot.perceptron;
+    exports engine.bot.ml_bot.math.activation_functions;
+    exports engine.bot.ml_bot.math.q_calculations;
+    exports engine.bot.ml_bot.network;
 }

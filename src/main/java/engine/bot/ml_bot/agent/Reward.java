@@ -6,6 +6,9 @@ import org.apache.commons.math3.linear.RealVector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class Calculates the reward for an action.
+ */
 public class Reward {
     // TODO: Shot counter?
 

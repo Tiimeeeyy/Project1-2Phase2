@@ -50,7 +50,9 @@ public class ReplayBuffer implements Serializable {
         return new ArrayList<>(experiences);
     }
 
-    // Nested static class to make sure the objects are immutable.
+    /**
+     * This class represents one experience from the agent
+     */
     public static class Experience implements Serializable {
         public State state;
         public Action action;

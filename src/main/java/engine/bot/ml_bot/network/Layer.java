@@ -11,6 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a layer in the Neural network.
+ */
 public class Layer implements Serializable {
     private transient List<Perceptron> perceptrons;
 

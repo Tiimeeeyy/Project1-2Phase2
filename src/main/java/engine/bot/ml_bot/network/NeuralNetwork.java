@@ -19,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a neural network, the main component for Q learning.
+ */
 public class NeuralNetwork implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(NeuralNetwork.class.getName());
@@ -85,6 +88,16 @@ public class NeuralNetwork implements Serializable {
 
     }
 
+    /**
+     * Training loop for the neural network
+     * @param state The state of the system.
+     * @param action The action taken.
+     * @param nextState The next state after the action was taken.
+     * @param targetQ The target value.
+     * @param discountFactor The discount factor.
+     * @param learningRate The learning rate
+     * @param target The network to be trained (DeepQ learning)
+     */
     public void train(RealVector state, RealVector action, RealVector nextState,  double targetQ, double discountFactor,double learningRate, NeuralNetwork target) {
         LOGGER.log(Level.INFO, "train called!");
         if (nextState != null) {
@@ -112,6 +125,11 @@ public class NeuralNetwork implements Serializable {
         }
     }
 
+    /**
+     * Predicts the biggest Q value based on the next state.
+     * @param nextState The next state.
+     * @return The predicted maximum Q value.
+     */
     public double predictMaxQValue(RealVector nextState) {
         List<RealVector> possibleActions = generatePossibleActions(new State(nextState));
 
@@ -122,6 +140,12 @@ public class NeuralNetwork implements Serializable {
 
 
     }
+
+    /**
+     * Generates all possible actions from a finite set of actions based on a state.
+     * @param state The state.
+     * @return List of all possible actions.
+     */
     private List<RealVector> generatePossibleActions(State state) {
 
         double[] coords = state.getCoordinates();
@@ -140,6 +164,12 @@ public class NeuralNetwork implements Serializable {
         return actions;
     }
 
+    /**
+     * Backpropagates through the network (See report).
+     * @param input The input into the system.
+     * @param outputError The error of the output.
+     * @param learningRate The learning rate.
+     */
     public void backpropagate(RealVector input, double outputError, double learningRate) {
         List<Double> layerErrors = new ArrayList<>();
         layerErrors.add(outputError);
@@ -168,6 +198,12 @@ public class NeuralNetwork implements Serializable {
         }
     }
 
+    /**
+     * Predicts the Q value based on a state action pair
+     * @param state The state.
+     * @param action The action.
+     * @return The Q value for the pair.
+     */
     public double predictQValue(RealVector state, RealVector action) {
         RealVector stateAction = new ArrayRealVector(state.getDimension() + action.getDimension());
         stateAction.setSubVector(0, state);

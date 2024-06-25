@@ -4,6 +4,9 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.io.Serializable;
 
+/**
+ * This class represents an action as an Object.
+ */
 public class Action implements Serializable {
     private RealVector action;
 

@@ -2,6 +2,11 @@ package engine.bot.ml_bot.math.activation_functions;
 
 import java.io.Serializable;
 
+/**
+ * Implementation of the ReLU function.
+ * This specific function uses the Leaky ReLU function
+ * https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
+ */
 public class ReLUFunction implements ActivationFunction, Serializable {
     // This specific function uses the Leaky ReLU function
     // https://en.wikipedia.org/wiki/Rectifier_(neural_networks)

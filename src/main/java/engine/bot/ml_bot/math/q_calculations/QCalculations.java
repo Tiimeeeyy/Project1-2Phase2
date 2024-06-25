@@ -5,6 +5,9 @@ import engine.bot.ml_bot.agent.State;
 import engine.bot.ml_bot.network.NeuralNetwork;
 import org.apache.commons.math3.linear.RealVector;
 
+/**
+ * Responsible for calculating Q values.
+ */
 public class QCalculations {
     private NeuralNetwork qNetwork;
     private double discountFactor;
