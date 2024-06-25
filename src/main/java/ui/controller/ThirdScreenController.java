@@ -1080,7 +1080,7 @@ public class ThirdScreenController implements ScreenInterface {
     private void mlBotPlay(){
         this.shots = new ArrayList<>();
         if (!agent.isTrained) {
-            agent.train(100);
+            agent.train(20);
         }
         RealVector hi = agent.getOnePlay(new State(new ArrayRealVector(BallPosition)));
         double [] action = hi.toArray();

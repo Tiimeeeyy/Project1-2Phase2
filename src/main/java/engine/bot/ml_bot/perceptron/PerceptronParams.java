@@ -18,8 +18,6 @@ public class PerceptronParams implements Serializable {
 
     /**
      * Class constructor.
-     * Initialises the weights array randomly based on the "He function" for ReLU activation function.
-     *
      * @param function The Activation function to be used for the perceptron.
      */
     public PerceptronParams(ActivationFunction function, int size) {

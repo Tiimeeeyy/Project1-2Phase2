@@ -22,9 +22,8 @@ public class QCalculations {
      * @param nextState The state after taking that action.
      * @return The Q Value for that Action.
      */
-    public double calculateQValue(State state, Action action, double reward, State nextState) {
-        RealVector nextStateAction = nextState.getCurrentPosition().append(action.getAction());
-        double nextQValue = qNetwork.predictQValue(state.getCurrentPosition(), nextStateAction);
+    public double calculateQValue(State state, Action action, double reward, State nextState, NeuralNetwork targetNet) {
+        double nextQValue = qNetwork.predictMaxQValue(nextState.getCurrentPosition());
         return reward + discountFactor * nextQValue;
     }
 }

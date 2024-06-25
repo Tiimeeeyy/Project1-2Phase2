@@ -12,7 +12,7 @@ import java.util.List;
  * This class is used to save the Experiences of the Artificial neural network.
  */
 public class ReplayBuffer implements Serializable {
-    private static final int MAX_SIZE = 10000;
+    private static final int MAX_SIZE = 60;
     private static List<Experience> experiences = new ArrayList<>();
 
     /**

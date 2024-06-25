@@ -26,6 +26,7 @@ import java.util.logging.Logger;
  * The class uses 2-different Neural networks to perform so-called Deep Q Learning, where the separate networks are used for different parts
  * of the learning process. One network is used to solve the Bellman equation, and the other one is used to predict an action based on
  * the current Q Values.
+ * !The implementation is still very buggy! Please try it on simple problems (relatively close to the hole)
  */
 public class QLearningAgent implements Serializable {
     private static final int NUM_ANGLES = 100; // The amount of angles we let the agent explore.
@@ -56,8 +57,8 @@ public class QLearningAgent implements Serializable {
      */
     public QLearningAgent(double epsilon, GolfGameEngine golfGameEngine, State initialState, RealVector holePosition, MapSearcher mapSearcher) {
         this.mapSearcher = mapSearcher;
-        this.qNetwork = new NeuralNetwork(2, new int[]{64, 32}, new ReLUFunction());
-        this.targetNetwork = new NeuralNetwork(2,new int[]{64, 32}, new ReLUFunction());
+        this.qNetwork = new NeuralNetwork(2, new int[]{64, 32, 16, 4, 2}, new ReLUFunction());
+        this.targetNetwork = new NeuralNetwork(2,new int[]{64, 32, 16, 4, 2}, new ReLUFunction());
         this.replayBuffer = new ReplayBuffer();
         this.epsilon = epsilon;
         this.qCalculations = new QCalculations(qNetwork, 0.9);
@@ -119,7 +120,8 @@ public class QLearningAgent implements Serializable {
                         state,
                         new Action(action),
                         reward.calculateReward(new State(calculateNextState(action)), state, holePosition),
-                        new State(calculateNextState(action))
+                        new State(calculateNextState(action)),
+                        targetNetwork
                 )))
                 .orElseThrow(() -> new RuntimeException("No actions available"));
     }
@@ -176,6 +178,9 @@ public class QLearningAgent implements Serializable {
         }
         logger.log(Level.INFO, "Training is finished!");
         isTrained = true; // Flag check for the play method.
+        saveModel(qNetwork, "Map1Q", "src/main/java/engine/bot/ml_bot/models");
+
+        saveModel(targetNetwork, "Map1Target", "src/main/java/engine/bot/ml_bot/models");
     }
 
     /**
@@ -186,25 +191,29 @@ public class QLearningAgent implements Serializable {
     public void updateQValues(int batchSize) {
 
         List<ReplayBuffer.Experience> batch = ReplayBuffer.sampleBatch(batchSize);
+        List<Double> qVals = new ArrayList<>();
         logger.log(Level.INFO, "Batch size: {0}", batch.size());
-        batch.parallelStream().forEach(experience -> {
-            double targetQ = qCalculations.calculateQValue(
+        for (ReplayBuffer.Experience experience : batch) {
+            double Qval = qCalculations.calculateQValue(
                     experience.getState(),
                     experience.getAction(),
                     experience.getReward(),
-                    experience.getNextState()
-            );
-            qNetwork.train(
-                    experience.getState().getCurrentPosition(),
-                    experience.action.getAction(),
-                    experience.getNextState().getCurrentPosition(),
-                    targetQ,
-                    0.9,
-                    0.1,
+                    experience.getNextState(),
                     targetNetwork
-
             );
-        });
+            qVals.add(Qval);
+            for (Double qVal : qVals) {
+                qNetwork.train(
+                        experience.getState().getCurrentPosition(),
+                        experience.getAction().getAction(),
+                        experience.getNextState().getCurrentPosition(),
+                        qVal,
+                        0.9,
+                        0.1,
+                        targetNetwork
+                );
+            }
+        }
     }
 
     /**
@@ -264,7 +273,7 @@ public class QLearningAgent implements Serializable {
     private void learnFromInstructor(State state) {
         List<RealVector> optimalActions = getOptimalPath(state);
         logger.log(Level.INFO, "Actions size: {0}", optimalActions.size());
-        for (RealVector action: optimalActions) {
+        for (RealVector action : optimalActions) {
             State nextState = new State(calculateNextState(action));
 
             double rewardVal = reward.calculateReward(nextState, state, holePosition);
@@ -273,30 +282,33 @@ public class QLearningAgent implements Serializable {
             state = nextState;
         }
         List<ReplayBuffer.Experience> experiences = ReplayBuffer.sampleBatch(8);
+        List<Double> qVals = new ArrayList<>();
         logger.log(Level.INFO, "Size of experiences {0}", experiences.size());
-        experiences.parallelStream().forEach(experience -> {
-            double targetQ = qCalculations.calculateQValue(
+        for (ReplayBuffer.Experience experience : experiences) {
+            double Qval = qCalculations.calculateQValue(
                     experience.getState(),
                     experience.getAction(),
                     experience.getReward(),
-                    experience.getNextState()
-            );
-            targetNetwork.train(
-                    experience.getState().getCurrentPosition(),
-                    experience.action.getAction(),
-                    experience.getNextState().getCurrentPosition(),
-                    experience.getReward(),
-                    0.9,
-                    0.1,
+                    experience.getNextState(),
                     targetNetwork
             );
-        });
+            qVals.add(Qval);
+            for (Double qVal : qVals) {
+                qNetwork.train(
+                        experience.getState().getCurrentPosition(),
+                        experience.getAction().getAction(),
+                        experience.getNextState().getCurrentPosition(),
+                        qVal,
+                        0.9,
+                        0.1,
+                        targetNetwork
+                );
+            }
+            softUpdateTarget(0.8);
+            logger.log(Level.INFO, "Learned from the master (BFS)");
 
-        softUpdateTarget(0.8);
-        logger.log(Level.INFO, "Learned from the master (BFS)");
 
-
-
+        }
     }
 
     /**
@@ -308,8 +320,14 @@ public class QLearningAgent implements Serializable {
     private RealVector getSoftMaxAction(State state) {
         List<RealVector> actions = generatePossibleActions(state);
         List<Double> qVals = actions.stream()
-                .map(action -> qCalculations.calculateQValue(state, new Action(action), reward.calculateReward(new State(calculateNextState(action)), state, holePosition), new State(calculateNextState(action))))
+                .map(action -> qCalculations.calculateQValue(
+                        state,
+                        new Action(action),
+                        reward.calculateReward(new State(calculateNextState(action)),state, holePosition),
+                        new State(calculateNextState(action)),
+                        targetNetwork))
                 .toList();
+
 
         double maxQValue = Collections.max(qVals);
         List<Double> expQVals = qVals.stream()

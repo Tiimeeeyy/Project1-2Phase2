@@ -88,9 +88,10 @@ public class NeuralNetwork implements Serializable {
     public void train(RealVector state, RealVector action, RealVector nextState,  double targetQ, double discountFactor,double learningRate, NeuralNetwork target) {
         LOGGER.log(Level.INFO, "train called!");
         if (nextState != null) {
-            double maxNextQ = target.predictMaxQValue(nextState, action, target);
+            double maxNextQ = target.predictMaxQValue(nextState);
             targetQ += discountFactor * maxNextQ;
         }
+        LOGGER.log(Level.INFO, "Target Q: {0}", targetQ);
         double output;
         double error;
         int maxIter = 10000;
@@ -103,7 +104,7 @@ public class NeuralNetwork implements Serializable {
             iter++;
             learningRate *= LEARNING_RATE_DECAY;
 
-        }while(Math.abs(error) > 0.1);
+        }while(Math.abs(error) > 0.1 && iter < maxIter);
         if (iter == maxIter) {
             LOGGER.log(Level.WARNING, "Training could not be finished after {0} iterations!", iter);
         } else {
@@ -111,14 +112,15 @@ public class NeuralNetwork implements Serializable {
         }
     }
 
-    public double predictMaxQValue(RealVector nextState, RealVector action, NeuralNetwork target) {
+    public double predictMaxQValue(RealVector nextState) {
         List<RealVector> possibleActions = generatePossibleActions(new State(nextState));
 
-        List<Double> qVals= possibleActions.stream()
-                .map(a -> target.predict(nextState))
-                .toList();
+        return possibleActions.stream()
+                .mapToDouble(a -> predictQValue(nextState, a))
+                .max()
+                .orElse(0.0);
 
-        return Collections.max(qVals);
+
     }
     private List<RealVector> generatePossibleActions(State state) {
 
@@ -154,7 +156,7 @@ public class NeuralNetwork implements Serializable {
             }
             layerErrors.addFirst(currentLayerError);
         }
-        for (int i = 0; i < layers.size(); i++) {
+        for (int i = 0; i < layers.size() - 1; i++) {
             Layer currentLayer = layers.get(i);
             for (int j = 0; j < currentLayer.getPerceptrons().size() - 1; j++) {
                 Perceptron perceptron = currentLayer.getPerceptrons().get(j);
