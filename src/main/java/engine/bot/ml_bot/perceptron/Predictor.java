@@ -52,17 +52,12 @@ public class Predictor implements Perceptron, Serializable {
 
     @Override
     public double predict(RealVector input) {
-        double weightSum = 0.0;
-        double inputSum = 0.0;
-        double[] weights = params.getWeights();
-        ActivationFunction func = params.getFunction();
-        for (int i = 0; i < weights.length -1; i++) {
-            weightSum += weights[i];
-        }
-        for (int i = 0; i < input.getDimension(); i++) {
-            inputSum += input.getEntry(i);
-        }
-        return func.activation(weightSum * inputSum);
+       double weightedSum = params.getBias();
+       int numFeautures = Math.min(params.getSize(), input.getDimension());
+       for(int i = 0; i < numFeautures; i++) {
+           weightedSum += params.getWeights()[i] * input.getEntry(i);
+       }
+        return params.getFunction().activation(weightedSum);
     }
 
     public PerceptronParams getParams() {

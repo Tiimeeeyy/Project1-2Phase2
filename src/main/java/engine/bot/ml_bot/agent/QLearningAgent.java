@@ -4,8 +4,11 @@ import engine.bot.AibotGA.MapSearcher;
 import engine.bot.ml_bot.math.activation_functions.LogSigFunction;
 import engine.bot.ml_bot.math.activation_functions.ReLUFunction;
 import engine.bot.ml_bot.math.q_calculations.QCalculations;
+import engine.bot.ml_bot.network.Layer;
 import engine.bot.ml_bot.network.NeuralNetwork;
 import engine.bot.ml_bot.network.ReplayBuffer;
+import engine.bot.ml_bot.perceptron.Perceptron;
+import engine.bot.ml_bot.perceptron.Predictor;
 import engine.solvers.GolfGameEngine;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
@@ -17,6 +20,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * This class represents the Q learning agent. From the time the report was written, a few things changed here to fix the issues we were
+ * encountering. The changes will be highlighted with a CHANGED annotation in the Javadocs.
+ * The class uses 2-different Neural networks to perform so-called Deep Q Learning, where the separate networks are used for different parts
+ * of the learning process. One network is used to solve the Bellman equation, and the other one is used to predict an action based on
+ * the current Q Values.
+ */
 public class QLearningAgent implements Serializable {
     private static final int NUM_ANGLES = 100; // The amount of angles we let the agent explore.
     private static final int NUM_POWERS = 5; // The amount of shot powers the agent can use (In our case 0-5 m/s).
@@ -36,10 +46,18 @@ public class QLearningAgent implements Serializable {
     private transient RealVector holePosition;
     private transient MapSearcher mapSearcher;
 
+    /**
+     * Class Constructor.
+     * @param epsilon Decaying value used to select either a random action, or a SoftMax selected action.
+     * @param golfGameEngine The engine used to simulate the game.
+     * @param initialState The initial position / state of the ball.
+     * @param holePosition The position of the hole.
+     * @param mapSearcher The class performing Breadth-First search.
+     */
     public QLearningAgent(double epsilon, GolfGameEngine golfGameEngine, State initialState, RealVector holePosition, MapSearcher mapSearcher) {
         this.mapSearcher = mapSearcher;
-        this.qNetwork = new NeuralNetwork(2, new LogSigFunction());
-        this.targetNetwork = new NeuralNetwork(2, new LogSigFunction());
+        this.qNetwork = new NeuralNetwork(2, new int[]{64, 32}, new ReLUFunction());
+        this.targetNetwork = new NeuralNetwork(2,new int[]{64, 32}, new ReLUFunction());
         this.replayBuffer = new ReplayBuffer();
         this.epsilon = epsilon;
         this.qCalculations = new QCalculations(qNetwork, 0.9);
@@ -89,7 +107,7 @@ public class QLearningAgent implements Serializable {
                 double rad = Math.toRadians(angle);
                 double xDir = Math.cos(rad);
                 double yDir = Math.sin(rad);
-                double pow = random.nextDouble() * 5;
+                double pow = random.nextDouble() * 6;
                 RealVector action = new ArrayRealVector(new double[]{coords[0], coords[1], xDir * pow, yDir * pow});
                 actions.add(action);
 
@@ -135,8 +153,8 @@ public class QLearningAgent implements Serializable {
 //            int episode = 0;
 //            while (epsilon > MIN_EPSILON) {
             logger.log(Level.INFO, "Episode: {0}", episode);
-
-            State state = initialState;
+            double[] stateArr = initialState.getCoordinates().clone();
+            State state = new State(new ArrayRealVector(stateArr));
 
             RealVector action = chooseAction(state);
 
@@ -147,12 +165,14 @@ public class QLearningAgent implements Serializable {
 
             addExperienceToBuffer(state, action1, calcReward, nextState);
 
-            updateQValues(episode);
+            updateQValues(8);
 
             decayEpsilon();
 
             logger.log(Level.INFO, "Episode {0} completed!", episode);
             logger.log(Level.INFO, "Epsilon Value: {0}", epsilon);
+
+            softUpdateTarget(0.9);
         }
         logger.log(Level.INFO, "Training is finished!");
         isTrained = true; // Flag check for the play method.
@@ -178,7 +198,7 @@ public class QLearningAgent implements Serializable {
                     experience.getState().getCurrentPosition(),
                     experience.action.getAction(),
                     experience.getNextState().getCurrentPosition(),
-                    experience.getReward(),
+                    targetQ,
                     0.9,
                     0.1,
                     targetNetwork
@@ -214,7 +234,7 @@ public class QLearningAgent implements Serializable {
     }
 
     /**
-     * Performs epsilon decay on the Agent
+     * Performs epsilon decay on the Epsilon value.
      */
     public void decayEpsilon() {
         epsilon = Math.max(MIN_EPSILON, epsilon * EPSILON_DECAY);
@@ -237,6 +257,10 @@ public class QLearningAgent implements Serializable {
         return actions;
     }
 
+    /**
+     * Uses the BFS algorithm from the MapSearcher.java class to "teach" the perfect path to the Agent.
+     * @param state The state the Agent is in currently.
+     */
     private void learnFromInstructor(State state) {
         List<RealVector> optimalActions = getOptimalPath(state);
         logger.log(Level.INFO, "Actions size: {0}", optimalActions.size());
@@ -248,7 +272,7 @@ public class QLearningAgent implements Serializable {
 
             state = nextState;
         }
-        List<ReplayBuffer.Experience> experiences = ReplayBuffer.getAllExperiences();
+        List<ReplayBuffer.Experience> experiences = ReplayBuffer.sampleBatch(8);
         logger.log(Level.INFO, "Size of experiences {0}", experiences.size());
         experiences.parallelStream().forEach(experience -> {
             double targetQ = qCalculations.calculateQValue(
@@ -257,7 +281,7 @@ public class QLearningAgent implements Serializable {
                     experience.getReward(),
                     experience.getNextState()
             );
-            qNetwork.train(
+            targetNetwork.train(
                     experience.getState().getCurrentPosition(),
                     experience.action.getAction(),
                     experience.getNextState().getCurrentPosition(),
@@ -268,12 +292,19 @@ public class QLearningAgent implements Serializable {
             );
         });
 
+        softUpdateTarget(0.8);
         logger.log(Level.INFO, "Learned from the master (BFS)");
 
 
 
     }
 
+    /**
+     * Gets an action based on the SoftMax Selection process. It uses the softmax function to select
+     * an action.
+     * @param state The current state the system is in.
+     * @return The Action selected by the process.
+     */
     private RealVector getSoftMaxAction(State state) {
         List<RealVector> actions = generatePossibleActions(state);
         List<Double> qVals = actions.stream()
@@ -302,6 +333,12 @@ public class QLearningAgent implements Serializable {
         return actions.getLast();
     }
 
+    /**
+     * Gets the optimal path using the MapSearcher.java BFS algorithm. It returns a list containing all
+     * the points in the optimal path in an interval of 10.
+     * @param state The current state the system is in.
+     * @return A list containing the points of the perfect path.
+     */
     private List<RealVector> getOptimalPath(State state) {
         ArrayList<double[]> path = mapSearcher.findShortestPath();
         logger.log(Level.INFO, "Path size: {0}", path.size());
@@ -330,7 +367,22 @@ public class QLearningAgent implements Serializable {
         logger.log(Level.INFO, "Actions size: {0}", actions.size());
         return actions;
     }
-
+    private void softUpdateTarget(double tau) {
+        List<Layer> layers = targetNetwork.getLayers();
+            for (int i = 0; i < layers.size(); i++) {
+                Layer qNetLayer = layers.get(i);
+                Layer targetNetLayer = targetNetwork.getLayers().get(i);
+                for (int j = 0; j < qNetLayer.getPerceptrons().size(); j++) {
+                    Perceptron qnetPerceptron = qNetLayer.getPerceptrons().get(j);
+                    Perceptron targetPerceptron = targetNetLayer.getPerceptrons().get(j);
+                    double[] qNetWeights = ((Predictor) qnetPerceptron).getParams().getWeights();
+                    double[] targetNetWeights = ((Predictor) targetPerceptron).getParams().getWeights();
+                    for (int k = 0; k < qNetWeights.length; k++) {
+                        targetNetWeights[k] = tau * qNetWeights[k] + (1-tau) * targetNetWeights[k];
+                    }
+                }
+            }
+        }
     /**
      * Saves the model.
      *

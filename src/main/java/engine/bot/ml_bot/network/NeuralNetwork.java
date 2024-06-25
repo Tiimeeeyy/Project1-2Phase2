@@ -22,22 +22,25 @@ import java.util.stream.Collectors;
 public class NeuralNetwork implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(NeuralNetwork.class.getName());
-    private final int[] layerSizes;
     private transient List<Layer> layers;
+    private final int[] layerSizes;
     private transient ActivationFunction[] activationFunctions;
     private static final double LEARNING_RATE_DECAY = 0.2;
 
-    public NeuralNetwork(int layerSize, ActivationFunction activationFunction) {
+    public NeuralNetwork(int inputNeurons, int[] hiddenLayerSizes, ActivationFunction activationFunction) {
 
-        this.layerSizes = new int[]{layerSize, layerSize, 1};
-        this.activationFunctions = new ActivationFunction[]{activationFunction, activationFunction, activationFunction};
-
+        this.layerSizes = new int[]{2, 64, 32, 1};
+        this.activationFunctions = new ActivationFunction[]{activationFunction, activationFunction, activationFunction, activationFunction};
         layers = new ArrayList<>();
-        for (int i = 0; i < layerSizes.length; i++) {
-            layers.add(new Layer(layerSizes[i], activationFunctions[i]));
+        layers.add(new Layer(inputNeurons, hiddenLayerSizes[0], activationFunction));
+        for(int i = 1; i < hiddenLayerSizes.length; i++) {
+            layers.add(new Layer(hiddenLayerSizes[i-1], hiddenLayerSizes[i], activationFunction));
+        
         }
 
     }
+
+
 
     /**
      * This method predicts an outcome based on the input.
@@ -68,20 +71,22 @@ public class NeuralNetwork implements Serializable {
             throw new IllegalArgumentException("Node index is bigger than layerOutputs: " + nodeIndex + " " + layerOutputs.size());
         }
         double error = 0;
-
-        for (int i = 0; i < prevLayerPerceptron.size(); i++) {
-            RealVector perceptronWeights = new ArrayRealVector(((Predictor) prevLayerPerceptron.get(i)).getParams().getWeights());
-            double weight = perceptronWeights.getEntry(i);
-            error += weight;
+        if (prevLayerPerceptron.isEmpty()) {
+            error = nextLayerErrors * activationFunction.deriv(layerOutputs.get(nodeIndex));
+        }else {
+            for (int i = 0; i < prevLayerPerceptron.size(); i++) {
+                RealVector perceptronWeights = new ArrayRealVector(((Predictor) prevLayerPerceptron.get(i)).getParams().getWeights());
+                double weight = perceptronWeights.getEntry(i);
+                error += weight * nextLayerErrors;
+            }
+            error *= activationFunction.deriv(layerOutputs.get(nodeIndex));
         }
-        double temp = layerOutputs.get(nodeIndex);
-        double activated = activationFunction.deriv(temp);
-        return error * activated;
+        return error;
+
     }
 
-    public void train(RealVector state, RealVector action, RealVector nextState,  double reward, double discountFactor,double learningRate, NeuralNetwork target) {
+    public void train(RealVector state, RealVector action, RealVector nextState,  double targetQ, double discountFactor,double learningRate, NeuralNetwork target) {
         LOGGER.log(Level.INFO, "train called!");
-        double targetQ = reward;
         if (nextState != null) {
             double maxNextQ = target.predictMaxQValue(nextState, action, target);
             targetQ += discountFactor * maxNextQ;
@@ -90,7 +95,7 @@ public class NeuralNetwork implements Serializable {
         double error;
         int maxIter = 10000;
         int iter = 0;
-
+        double lastError;
         do {
             output = predictQValue(state, action);
             error = targetQ - output;
@@ -98,11 +103,12 @@ public class NeuralNetwork implements Serializable {
             iter++;
             learningRate *= LEARNING_RATE_DECAY;
 
-            if (iter % 1000 == 0) {
-                softUpdateTarget(0.2, target);
-            }
-
-        }while(Math.abs(error) > 0.1 && iter < maxIter);
+        }while(Math.abs(error) > 0.1);
+        if (iter == maxIter) {
+            LOGGER.log(Level.WARNING, "Training could not be finished after {0} iterations!", iter);
+        } else {
+            LOGGER.log(Level.INFO, "Training completed successfullly after {0} iterations", iter);
+        }
     }
 
     public double predictMaxQValue(RealVector nextState, RealVector action, NeuralNetwork target) {
@@ -166,23 +172,6 @@ public class NeuralNetwork implements Serializable {
         stateAction.setSubVector(state.getDimension(), action);
         return predict(stateAction);
     }
-
-    private void softUpdateTarget(double tau, NeuralNetwork target) {
-        for (int i = 0; i < layers.size(); i++) {
-            Layer qNetLayer = layers.get(i);
-            Layer targetNetLayer = target.getLayers().get(i);
-            for (int j = 0; j < qNetLayer.getPerceptrons().size(); j++) {
-                Perceptron qnetPerceptron = qNetLayer.getPerceptrons().get(j);
-                Perceptron targetPerceptron = targetNetLayer.getPerceptrons().get(j);
-                double[] qNetWeights = ((Predictor) qnetPerceptron).getParams().getWeights();
-                double[] targetNetWeights = ((Predictor) targetPerceptron).getParams().getWeights();
-                for (int k = 0; k < qNetWeights.length; k++) {
-                    targetNetWeights[k] = tau * qNetWeights[k] + (1-tau) * targetNetWeights[k];
-                }
-            }
-        }
-    }
-
     /**
      * Getters and setters.
      */

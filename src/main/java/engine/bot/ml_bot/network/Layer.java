@@ -20,11 +20,11 @@ public class Layer implements Serializable {
      * @param numPerceptrons     The number of perceptrons in the layer.
      * @param activationFunction The activation function used in the layer.
      */
-    public Layer(int numPerceptrons, ActivationFunction activationFunction) {
+    public Layer(int inputs, int numPerceptrons, ActivationFunction activationFunction) {
         perceptrons = new ArrayList<>();
         for (int i = 0; i < numPerceptrons; i++) {
 
-            PerceptronParams params = new PerceptronParams(activationFunction, numPerceptrons);
+            PerceptronParams params = new PerceptronParams(activationFunction, inputs);
             perceptrons.add(new Predictor(params));
 
         }
