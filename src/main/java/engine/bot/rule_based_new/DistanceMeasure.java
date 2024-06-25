@@ -233,11 +233,20 @@ public class DistanceMeasure {
         return gameplay;
     }
     
-
+    /**
+     * Gets the duration of the algorithm execution.
+     *
+     * @return the duration in seconds
+     */
     public double getDuration(){
         return this.duration;
     }
-
+    
+    /**
+     * Checks if the goal has been reached.
+     *
+     * @return true if the goal is reached, false otherwise
+     */
     public boolean isGoal(){
         return this.goal;
     }
