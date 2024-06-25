@@ -1,5 +1,7 @@
 package engine.bot.ml_bot.agent;
 
+import engine.bot.AibotGA.MapSearcher;
+import engine.bot.ml_bot.math.activation_functions.LogSigFunction;
 import engine.bot.ml_bot.math.activation_functions.ReLUFunction;
 import engine.bot.ml_bot.math.q_calculations.QCalculations;
 import engine.bot.ml_bot.network.NeuralNetwork;
@@ -7,18 +9,15 @@ import engine.bot.ml_bot.network.ReplayBuffer;
 import engine.solvers.GolfGameEngine;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.optim.linear.Relationship;
 
+import java.awt.datatransfer.FlavorEvent;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class QLearningAgent implements Serializable {
-    // TODO: Add tests.
-    // TODO: Hyperparameter (Report).
     private static final int NUM_ANGLES = 100; // The amount of angles we let the agent explore.
     private static final int NUM_POWERS = 5; // The amount of shot powers the agent can use (In our case 0-5 m/s).
     private static final double EPSILON_DECAY = 0.995;
@@ -26,6 +25,7 @@ public class QLearningAgent implements Serializable {
     private final transient Logger logger = Logger.getLogger(QLearningAgent.class.getName());
     public boolean isTrained = false;
     private NeuralNetwork qNetwork;
+    private NeuralNetwork targetNetwork;
     private ReplayBuffer replayBuffer;
     private double epsilon;
     private Random random;
@@ -34,10 +34,12 @@ public class QLearningAgent implements Serializable {
     private State initialState;
     private Reward reward;
     private transient RealVector holePosition;
+    private transient MapSearcher mapSearcher;
 
-    public QLearningAgent(double epsilon, GolfGameEngine golfGameEngine, State initialState, RealVector holePosition) {
-
-        this.qNetwork = new NeuralNetwork(8, new ReLUFunction());
+    public QLearningAgent(double epsilon, GolfGameEngine golfGameEngine, State initialState, RealVector holePosition, MapSearcher mapSearcher) {
+        this.mapSearcher = mapSearcher;
+        this.qNetwork = new NeuralNetwork(2, new LogSigFunction());
+        this.targetNetwork = new NeuralNetwork(2, new LogSigFunction());
         this.replayBuffer = new ReplayBuffer();
         this.epsilon = epsilon;
         this.qCalculations = new QCalculations(qNetwork, 0.9);
@@ -65,7 +67,7 @@ public class QLearningAgent implements Serializable {
             return new ArrayRealVector(new double[]{coords[0], coords[1], random.nextDouble() * i, random.nextDouble() * i});
         } else {
             logger.log(Level.INFO, "Best shot!");
-            return getBestAction(state);
+            return getSoftMaxAction(state);
         }
     }
 
@@ -114,7 +116,7 @@ public class QLearningAgent implements Serializable {
 
         double[] arrayAction = currentAction.toArray();
 
-        ArrayList<double[]> result = golfGameEngine.shoot(arrayAction, false);
+        ArrayList<double[]> result = golfGameEngine.shoot(arrayAction, true);
         double[] resultVec = result.getLast();
 
 
@@ -128,10 +130,11 @@ public class QLearningAgent implements Serializable {
      * @param numEpisodes The number of training loops to be done.
      */
     public void train(int numEpisodes) {
-        for (int episode = 0; episode < numEpisodes; episode++) {
+        learnFromInstructor(initialState);
+        for (int episode = 0; episode <= numEpisodes; episode++) {
 //            int episode = 0;
 //            while (epsilon > MIN_EPSILON) {
-            logger.log(Level.INFO, "Episode: {0}", episode + 1);
+            logger.log(Level.INFO, "Episode: {0}", episode);
 
             State state = initialState;
 
@@ -144,13 +147,11 @@ public class QLearningAgent implements Serializable {
 
             addExperienceToBuffer(state, action1, calcReward, nextState);
 
-            updateQValues(episode - 1);
-
-            state = nextState;
+            updateQValues(episode);
 
             decayEpsilon();
 
-            logger.log(Level.INFO, "Episode {0} completed!", episode + 1);
+            logger.log(Level.INFO, "Episode {0} completed!", episode);
             logger.log(Level.INFO, "Epsilon Value: {0}", epsilon);
         }
         logger.log(Level.INFO, "Training is finished!");
@@ -165,6 +166,7 @@ public class QLearningAgent implements Serializable {
     public void updateQValues(int batchSize) {
 
         List<ReplayBuffer.Experience> batch = ReplayBuffer.sampleBatch(batchSize);
+        logger.log(Level.INFO, "Batch size: {0}", batch.size());
         batch.parallelStream().forEach(experience -> {
             double targetQ = qCalculations.calculateQValue(
                     experience.getState(),
@@ -173,7 +175,14 @@ public class QLearningAgent implements Serializable {
                     experience.getNextState()
             );
             qNetwork.train(
-                    experience.getState().getCurrentPosition().append(experience.getAction().getAction()), targetQ, 0.01
+                    experience.getState().getCurrentPosition(),
+                    experience.action.getAction(),
+                    experience.getNextState().getCurrentPosition(),
+                    experience.getReward(),
+                    0.9,
+                    0.1,
+                    targetNetwork
+
             );
         });
     }
@@ -209,6 +218,117 @@ public class QLearningAgent implements Serializable {
      */
     public void decayEpsilon() {
         epsilon = Math.max(MIN_EPSILON, epsilon * EPSILON_DECAY);
+    }
+
+    private List<RealVector> generatePossibleActions(State state) {
+
+        double[] coords = state.getCoordinates();
+        List<RealVector> actions = new ArrayList<>();
+        for (int angle = 0; angle < NUM_ANGLES; angle++) {
+            for (int j = 0; j < NUM_POWERS; j++) {
+                double rad = Math.toRadians(angle);
+                double xDir = Math.cos(rad);
+                double yDir = Math.sin(rad);
+                double pow = random.nextDouble() * 5;
+                RealVector action = new ArrayRealVector(new double[]{coords[0], coords[1], xDir * pow, yDir * pow});
+                actions.add(action);
+            }
+        }
+        return actions;
+    }
+
+    private void learnFromInstructor(State state) {
+        List<RealVector> optimalActions = getOptimalPath(state);
+        logger.log(Level.INFO, "Actions size: {0}", optimalActions.size());
+        for (RealVector action: optimalActions) {
+            State nextState = new State(calculateNextState(action));
+
+            double rewardVal = reward.calculateReward(nextState, state, holePosition);
+            addExperienceToBuffer(state, new Action(action), rewardVal, nextState);
+
+            state = nextState;
+        }
+        List<ReplayBuffer.Experience> experiences = ReplayBuffer.getAllExperiences();
+        logger.log(Level.INFO, "Size of experiences {0}", experiences.size());
+        experiences.parallelStream().forEach(experience -> {
+            double targetQ = qCalculations.calculateQValue(
+                    experience.getState(),
+                    experience.getAction(),
+                    experience.getReward(),
+                    experience.getNextState()
+            );
+            qNetwork.train(
+                    experience.getState().getCurrentPosition(),
+                    experience.action.getAction(),
+                    experience.getNextState().getCurrentPosition(),
+                    experience.getReward(),
+                    0.9,
+                    0.1,
+                    targetNetwork
+            );
+        });
+
+        logger.log(Level.INFO, "Learned from the master (BFS)");
+
+
+
+    }
+
+    private RealVector getSoftMaxAction(State state) {
+        List<RealVector> actions = generatePossibleActions(state);
+        List<Double> qVals = actions.stream()
+                .map(action -> qCalculations.calculateQValue(state, new Action(action), reward.calculateReward(new State(calculateNextState(action)), state, holePosition), new State(calculateNextState(action))))
+                .toList();
+
+        double maxQValue = Collections.max(qVals);
+        List<Double> expQVals = qVals.stream()
+                .map(qVal -> Math.exp(qVal - maxQValue))
+                .toList();
+
+        double sumExpQValues = expQVals.stream().mapToDouble(Double::doubleValue).sum();
+        List<Double> probabilities = expQVals.stream()
+                .map(expQval -> expQval / sumExpQValues)
+                .toList();
+
+        double p = random.nextDouble();
+        double cumulativeProbability = 0.0;
+        for (int i = 0; i < actions.size(); i++) {
+            cumulativeProbability += probabilities.get(i);
+            if (p <= cumulativeProbability) {
+                return actions.get(i);
+            }
+        }
+
+        return actions.getLast();
+    }
+
+    private List<RealVector> getOptimalPath(State state) {
+        ArrayList<double[]> path = mapSearcher.findShortestPath();
+        logger.log(Level.INFO, "Path size: {0}", path.size());
+        List<double[]> turningPoints = mapSearcher.getTurningPoints(path);
+        logger.log(Level.INFO, "turning points: {0}", turningPoints.size());
+        List<RealVector> actions = new ArrayList<>();
+//        if (!turningPoints.isEmpty()) {
+//            for (int i = 0; i < turningPoints.size() - 1; i++) {
+//                double[] currentPos = turningPoints.get(i);
+//                double[] nextPos = turningPoints.get(i + 1);
+//
+//                double[] action = new double[]{currentPos[0], currentPos[1], nextPos[0] - currentPos[0], nextPos[1] - currentPos[1]};
+//
+//                actions.add(new ArrayRealVector(action));
+//            }
+//        }else {
+            for (int i = 0; i < path.size() - 10; i++) {
+                double[] currentPos = path.get(i);
+                double[] nextPos = path.get(i+10);
+
+                double[] action = new double[]{currentPos[0], currentPos[1], nextPos[0] - currentPos[0], nextPos[1] - currentPos[1]};
+
+                actions.add(new ArrayRealVector(action));
+            }
+
+        logger.log(Level.INFO, "Actions size: {0}", actions.size());
+        return actions;
     }
 
     /**

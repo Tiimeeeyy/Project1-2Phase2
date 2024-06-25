@@ -46,6 +46,9 @@ public class ReplayBuffer implements Serializable {
         }
         experiences.add(experience);
     }
+    public static List<Experience> getAllExperiences() {
+        return new ArrayList<>(experiences);
+    }
 
     // Nested static class to make sure the objects are immutable.
     public static class Experience implements Serializable {

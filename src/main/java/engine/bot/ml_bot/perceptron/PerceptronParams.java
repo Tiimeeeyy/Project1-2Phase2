@@ -28,7 +28,7 @@ public class PerceptronParams implements Serializable {
         this.weights = new double[size];
         this.bias = 0.0;
         RandomGenerator rnd = new JDKRandomGenerator();
-        double stdDev = Math.sqrt(2.0 / size);
+        double stdDev = Math.sqrt(1.0 / size);
         for (int i = 0; i < weights.length; i++) {
             weights[i] = rnd.nextGaussian() * stdDev;
         }
