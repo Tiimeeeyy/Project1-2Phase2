@@ -373,7 +373,13 @@ public class ThirdScreenController implements ScreenInterface {
         }
 
     }
-
+    
+    /**
+     * Executes the ball hit action with given power and direction.
+     *
+     * @param power          the power of the hit
+     * @param directionVector the direction vector of the hit
+     */
     private void ballHit(double power, double[] directionVector) {
         if (!REACHED_THE_HOLE) {
             // Clear the trajectory before each new hit
@@ -430,6 +436,11 @@ public class ThirdScreenController implements ScreenInterface {
         }
     }
 
+    /**
+     * Executes the ball hit action with multiple steps.
+     *
+     * @param step the current step of the hit
+     */
     private void ballHitMultiple(int step) {
         if (!REACHED_THE_HOLE) {
             double[] currentShot=shots.get(step).clone();
@@ -797,6 +808,9 @@ public class ThirdScreenController implements ScreenInterface {
     
     /**
      * Rule-based bot method to animate the shoot.
+     *
+     * @param plays the list of plays
+     * @param index the current index in the list of plays
      */
     private void playBotShot(ArrayList<double[]> plays, int index) {
         if (index < plays.size()) {
@@ -860,6 +874,9 @@ public class ThirdScreenController implements ScreenInterface {
     //     // ballHit(0);
     // }
 
+    /**
+     * GA bot method to play the game.
+     */
     @FXML
     private void gaBotFunc() {
         playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
@@ -961,80 +978,86 @@ public class ThirdScreenController implements ScreenInterface {
         }
     }
 
-    // @FXML
-    // private void hcBotPlay() {
-    //     playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
-    //     logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-
-    //         Task<ArrayList<double[]>> task = new Task<>() {
-    //             @Override
-    //             protected ArrayList<double[]> call() {
-    //                 HillClimbingBotNEW chBot = new HillClimbingBotNEW(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-    //                 return chBot.hillClimbingAlgorithm();
-    //             }
-    
-    //             @Override
-    //             protected void succeeded() {
-    //                 stopMusic();
-    //                 ArrayList<double[]> velocities = getValue();
-    //                 shots = velocities;
-    //                 ballHitMultiple(0);
-    //             }
-    
-    //             @Override
-    //             protected void failed() {
-    //                 stopMusic();
-    //                 Throwable exception = getException();
-    //                 exception.printStackTrace();
-    //             }
-    //         };
-    
-    //         new Thread(task).start();
-
-    // }
-
-
-
+    /**
+     * HC bot method to play the game.
+     */
     @FXML
     private void hcBotPlay() {
-        // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+        playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
         logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
-        initPosit = BallPosition.clone();
-        int i = 0;
-        int currentShots = 0;
-        int totalShots = 0;
-        double currentDuration = 0;
-        double totalDuration = 0;
-        int succes = 0;
-        while(i<10){
-            System.out.println(initPosit[0]+" "+initPosit[1]);
-            System.out.println("Iteration: "+i);
-            HillClimbingBot chBot = new HillClimbingBot(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
-            ArrayList<double[]> velocities =chBot.hillClimbingAlgorithm(); 
-            currentDuration = chBot.getDuration();
-            
-            // shots = velocities;
-            currentShots = velocities.size();
-            // ballHitMultiple(0);
-            totalShots += currentShots;
-            totalDuration += currentDuration;
-            if (chBot.isGoal()) {
-                succes++;
-            }
 
-            i++;
-        }
-        double averageShots = (double) totalShots / 10;
-        double averageDuration = (double) totalDuration / 10;
-        double successRate = (double) succes / 10 *100;
-        System.out.println("-------------------------------");
-        System.out.println("\nTotal shots: " + totalShots);
-        System.out.println("Average shots per game: " + averageShots);
-        System.out.println("Total duration: " + totalDuration+" seconds");
-        System.out.println("Average duration per game: " + averageDuration+" seconds");
-        System.out.println("Success rate: " + successRate+"%");
+            Task<ArrayList<double[]>> task = new Task<>() {
+                @Override
+                protected ArrayList<double[]> call() {
+                    HillClimbingBot chBot = new HillClimbingBot(golfGame, BallPosition, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+                    return chBot.hillClimbingAlgorithm();
+                }
+    
+                @Override
+                protected void succeeded() {
+                    stopMusic();
+                    ArrayList<double[]> velocities = getValue();
+                    shots = velocities;
+                    ballHitMultiple(0);
+                }
+    
+                @Override
+                protected void failed() {
+                    stopMusic();
+                    Throwable exception = getException();
+                    exception.printStackTrace();
+                }
+            };
+    
+            new Thread(task).start();
+
     }
 
+
+
+    // @FXML
+    // private void hcBotPlay() {
+    //     // playMusic("/music/elevator-music-vanoss-gaming-background-music.mp3");
+    //     logEvent("!!--HC bot entered the party (it is slow, be patient)--!!");
+    //     initPosit = BallPosition.clone();
+    //     int i = 0;
+    //     int currentShots = 0;
+    //     int totalShots = 0;
+    //     double currentDuration = 0;
+    //     double totalDuration = 0;
+    //     int succes = 0;
+    //     while(i<10){
+    //         System.out.println(initPosit[0]+" "+initPosit[1]);
+    //         System.out.println("Iteration: "+i);
+    //         HillClimbingBot chBot = new HillClimbingBot(golfGame, initPosit, HolePostion, "src/main/resources/userInputMap.png", radiusHole);
+    //         ArrayList<double[]> velocities =chBot.hillClimbingAlgorithm(); 
+    //         currentDuration = chBot.getDuration();
+            
+    //         // shots = velocities;
+    //         currentShots = velocities.size();
+    //         // ballHitMultiple(0);
+    //         totalShots += currentShots;
+    //         totalDuration += currentDuration;
+    //         if (chBot.isGoal()) {
+    //             succes++;
+    //         }
+
+    //         i++;
+    //     }
+    //     double averageShots = (double) totalShots / 10;
+    //     double averageDuration = (double) totalDuration / 10;
+    //     double successRate = (double) succes / 10 *100;
+    //     System.out.println("-------------------------------");
+    //     System.out.println("\nTotal shots: " + totalShots);
+    //     System.out.println("Average shots per game: " + averageShots);
+    //     System.out.println("Total duration: " + totalDuration+" seconds");
+    //     System.out.println("Average duration per game: " + averageDuration+" seconds");
+    //     System.out.println("Success rate: " + successRate+"%");
+    // }
+
+    /**
+     * Replays the shots.
+     */
     @FXML
     private void replay(){
         // shots = replayShots;
@@ -1047,6 +1070,9 @@ public class ThirdScreenController implements ScreenInterface {
         ballHitMultiple(0);
     }
 
+    /**
+     * ML bot method to play the game.
+     */
     @FXML
     private void mlBotPlay(){
         this.shots = new ArrayList<>();
@@ -1061,6 +1087,11 @@ public class ThirdScreenController implements ScreenInterface {
         ballHitMultiple(0);
     }
 
+    /**
+     * Plays the background music.
+     *
+     * @param path the path to the music file
+     */
     private void playMusic(String path) {
     // try {
         // String musicFile = "/music/elevator-music-vanoss-gaming-background-music.mp3";
@@ -1076,6 +1107,9 @@ public class ThirdScreenController implements ScreenInterface {
     // }
     }
 
+    /**
+     * Stops the background music.
+     */
     private void stopMusic() {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
